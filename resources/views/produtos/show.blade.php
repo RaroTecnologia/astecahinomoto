@@ -65,10 +65,10 @@
                 <div class="mt-6">
                     <button class="accordion-toggle font-semibold text-lg flex justify-between items-center w-full">
                         Informação Nutricional
-                        <i class="fas fa-chevron-down transition-transform duration-200"></i>
+                        <i class="fas fa-chevron-down transition-transform duration-300"></i>
                     </button>
-                    <div class="accordion-content overflow-hidden transition-[height] duration-300 ease-in-out hidden" style="height: 0;">
-                        <div class="tabela-nutricional">
+                    <div class="accordion-content overflow-hidden transition-all duration-300 ease-in-out" style="height: 0;">
+                        <div class="tabela-nutricional py-4">
                             <table class="w-full table-fixed border border-black mt-4">
                                 <thead>
                                     <tr>
@@ -239,6 +239,33 @@
                     toggleViewButton.textContent = 'Ver todos';
                 }
                 isExpanded = !isExpanded;
+            });
+        }
+
+        // Lógica do accordion melhorada
+        const accordionToggle = document.querySelector('.accordion-toggle');
+        const accordionContent = document.querySelector('.accordion-content');
+        let isOpen = false;
+
+        if (accordionToggle && accordionContent) {
+            accordionToggle.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                const content = accordionContent;
+
+                if (!isOpen) {
+                    // Expandir
+                    content.style.height = content.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                } else {
+                    // Recolher
+                    content.style.height = content.scrollHeight + 'px';
+                    // Força um reflow
+                    content.offsetHeight;
+                    content.style.height = '0';
+                    icon.style.transform = 'rotate(0)';
+                }
+
+                isOpen = !isOpen;
             });
         }
     });
