@@ -1,7 +1,7 @@
 <!-- Header Mobile -->
 <header class="block lg:hidden">
     <div class="bg-black h-2"></div>
-    <div class="bg-vermelho-asteca py-4 relative shadow-lg z-[9999]">
+    <div class="bg-vermelho-asteca py-4 fixed left-0 w-full shadow-lg z-[9999]">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <!-- Logo -->
             <a href="/">

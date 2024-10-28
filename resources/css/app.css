@@ -79,7 +79,7 @@
     transition: opacity 0.3s ease-in-out;
 }
 
-.hidden {
+.invisible {
     opacity: 0;
 }
 
