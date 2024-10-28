@@ -19,6 +19,8 @@ class Sku extends Model
         'produto_id',
         'quantidade',
         'unidade',
+        'ean',
+        'dun',
         'descricao',  // Adicione este campo se ele existir na tabela 'skus'
         // Outros campos específicos do SKU
     ];

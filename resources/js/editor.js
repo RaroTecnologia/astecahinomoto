@@ -24,45 +24,39 @@ function initializeQuill(selector) {
     // Definir altura do editor após a inicialização
     const editor = document.querySelector(`${selector} .ql-editor`);
     if (editor) {
-        editor.style.height = '200px';
+        editor.style.height = '300px';
     } else {
         console.error(`Editor não encontrado dentro de ${selector}`);
     }
 
-    console.log(`Quill initialized for ${selector}`);
     return quill;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('DOMContentLoaded event triggered.');
+    const quillConteudo = initializeQuill('#editor-conteudo');
 
-    // Inicializar os editores Quill
-    const quillIngredientes = initializeQuill('#editor-ingredientes');
-    const quillModoPreparo = initializeQuill('#editor-modo-preparo');
-
-    // Capturar o conteúdo ao submeter o formulário
     const form = document.querySelector('form');
     if (form) {
         form.onsubmit = function () {
-            console.log('Formulário sendo submetido.');
-            if (quillIngredientes && quillModoPreparo) {
-                const ingredientesInput = document.querySelector('input[name=ingredientes]');
-                const modoPreparoInput = document.querySelector('input[name=modo_preparo]');
-
-                if (ingredientesInput && modoPreparoInput) {
-                    ingredientesInput.value = JSON.stringify(quillIngredientes.getContents());
-                    modoPreparoInput.value = JSON.stringify(quillModoPreparo.getContents());
-                    console.log('Conteúdo capturado e pronto para submissão.');
-                } else {
-                    console.error("Campos de input para 'ingredientes' ou 'modo_preparo' não encontrados.");
-                    notyf.error("Erro ao preparar o conteúdo para submissão. Campos de entrada ausentes.");
+            if (quillConteudo) {
+                const conteudoInput = document.querySelector('input[name=conteudo]');
+                if (conteudoInput) {
+                    conteudoInput.value = quillConteudo.root.innerHTML; // Armazena o HTML diretamente
                 }
-            } else {
-                console.error("Quill não foi inicializado corretamente.");
-                notyf.error("Erro ao preparar o conteúdo para submissão.");
             }
+            console.log('Conteúdo HTML:', quillConteudo.root.innerHTML);
+
         };
-    } else {
-        console.error("Formulário não encontrado.");
+    }
+
+    const tituloInput = document.getElementById('titulo');
+    const slugInput = document.getElementById('slug');
+    if (tituloInput && slugInput) {
+        tituloInput.addEventListener('input', function () {
+            slugInput.value = generateSlug(tituloInput.value);
+        });
     }
 });
+
+
+

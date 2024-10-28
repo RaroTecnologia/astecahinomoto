@@ -26,6 +26,18 @@
             <input type="text" name="unidade" id="unidade_{{ $sku->id ?? 'new' }}" value="{{ $sku->unidade ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
         </div>
 
+        <!-- Código EAN do SKU -->
+        <div class="mb-4">
+            <label for="ean_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Código EAN</label>
+            <input type="text" name="ean" id="ean_{{ $sku->id ?? 'new' }}" value="{{ $sku->ean ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
+        </div>
+
+        <!-- Código DUN do SKU -->
+        <div class="mb-4">
+            <label for="dun_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Código DUN</label>
+            <input type="text" name="dun" id="dun_{{ $sku->id ?? 'new' }}" value="{{ $sku->dun ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
+        </div>
+
         <!-- Imagem do SKU -->
         <div class="mb-4">
             <label for="imagem_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Imagem do SKU</label>

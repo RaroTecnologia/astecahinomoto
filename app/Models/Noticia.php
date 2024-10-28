@@ -10,7 +10,7 @@ class Noticia extends Model
     use HasFactory;
 
     // Defina os campos que podem ser preenchidos em massa (mass assignment)
-    protected $fillable = ['titulo', 'slug', 'conteudo', 'imagem', 'categoria_id', 'publicado_em'];
+    protected $fillable = ['titulo', 'slug', 'conteudo', 'imagem', 'status', 'categoria_id', 'publicado_em'];
 
     // Relacionamento com a categoria
     public function categoria()
