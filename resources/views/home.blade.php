@@ -124,13 +124,7 @@
 
                 <div class="p-4">
                     <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $receita->nome }}</h3>
-                    <p class="text-gray-600">
-                        @if($receita->conteudo)
-                        {{ Str::limit($receita->chamada, 100) }}
-                        @else
-                        {{ dd($receita->toArray()) }}
-                        @endif
-                    </p>
+                    <p class="text-gray-600">{{ Str::limit($receita->chamada, 100) }}</p>
                 </div>
             </div>
             @endforeach

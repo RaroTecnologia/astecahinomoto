@@ -16,6 +16,8 @@ class Receita extends Model
         'ingredientes',
         'modo_preparo',
         'categoria_id',
+        'imagem',
+        'chamada',
         'compartilhamentos', // Novo campo
         'curtidas',          // Novo campo
         'dificuldade',       // Novo campo
