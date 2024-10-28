@@ -67,7 +67,7 @@
     <div class="mb-8">
         <h2 class="text-2xl font-bold mb-4">{{ $marcaNome }}</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($skus as $sku)
             <div class="border p-4 rounded-lg text-center">
                 <img src="{{ asset('storage/thumbnails/' . $sku->imagem) }}" alt="{{ $sku->produto->nome }}" class="w-full h-48 object-contain mb-4 rounded">
