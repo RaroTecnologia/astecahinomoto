@@ -1,7 +1,7 @@
 <!-- Header Mobile -->
-<header class="block lg:hidden">
+<header class="block lg:hidden fixed left-0 w-full shadow-lg z-[9999]">
     <div class="bg-black h-2"></div>
-    <div class="bg-vermelho-asteca py-4 fixed left-0 w-full shadow-lg z-[9999]">
+    <div class="bg-vermelho-asteca py-4">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <!-- Logo -->
             <a href="/">
@@ -16,14 +16,34 @@
     </div>
 
     <!-- Menu Mobile (inicialmente oculto) -->
-    <div id="mobile-menu" class="hidden fixed top-[4.5rem] left-0 w-full bg-vermelho-asteca z-[9998]">
+    <div id="mobile-menu" class="hidden fixed top-[4.5rem] left-0 w-full bg-vermelho-asteca z-[9998] h-screen overflow-y-auto">
         <nav class="container mx-auto px-4 py-4">
             <a href="{{ route('sobre') }}" class="block py-3 text-white text-lg {{ Request::is('sobre') ? 'font-semibold' : '' }}">
                 Sobre a Asteca
             </a>
-            <a href="{{ route('marcas') }}" class="block py-3 text-white text-lg {{ Request::is('nossas-marcas') ? 'font-semibold' : '' }}">
-                Produtos
-            </a>
+
+            <!-- Novo botão dropdown para Produtos -->
+            <div class="relative">
+                <button class="w-full flex justify-between items-center py-3 text-white text-lg" id="mobile-produtos-btn">
+                    Produtos
+                    <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <div id="mobile-produtos-dropdown" class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-red-800 rounded-md">
+                    <div class="px-2">
+                        @foreach($tiposHeader as $tipo)
+                        <a href="{{ route('marcas.tipo', $tipo->slug) }}" class="flex items-center space-x-3 px-4 py-3 text-white hover:bg-red-900">
+                            <img src="{{ asset('images/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-6 h-6">
+                            <span>{{ $tipo->nome }}</span>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resto do menu continua igual -->
             <a href="{{ route('noticias.index') }}" class="block py-3 text-white text-lg {{ Request::is('noticias.index') ? 'font-semibold' : '' }}">
                 Notícias
             </a>
@@ -186,6 +206,21 @@
             mobileMenu.classList.add('hidden');
             menuIcon.classList.remove('fa-times');
             menuIcon.classList.add('fa-bars');
+        }
+    });
+
+    // Script atualizado para o dropdown de produtos com animação
+    document.getElementById('mobile-produtos-btn').addEventListener('click', function() {
+        const dropdown = document.getElementById('mobile-produtos-dropdown');
+        const arrow = this.querySelector('svg');
+        const dropdownContent = dropdown.querySelector('div');
+
+        if (dropdown.style.maxHeight) {
+            dropdown.style.maxHeight = null;
+            arrow.style.transform = '';
+        } else {
+            dropdown.style.maxHeight = dropdownContent.scrollHeight + "px";
+            arrow.style.transform = 'rotate(180deg)';
         }
     });
 </script>

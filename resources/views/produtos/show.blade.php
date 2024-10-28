@@ -33,10 +33,10 @@
                 <!-- Disponível em -->
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">Disponível em:</h3>
-                    <div class="flex space-x-2" id="sku-options">
+                    <div class="flex flex-wrap gap-2" id="sku-options">
                         @foreach($skus as $sku)
                         <button
-                            class="sku-option px-3 py-1 border text-gray-700 rounded-full hover:bg-red-600 hover:text-white transition"
+                            class="sku-option px-3 py-1 border text-gray-700 rounded-full hover:bg-red-600 hover:text-white transition min-w-[80px] text-center text-sm md:text-base"
                             data-sku-name="{{ $sku->nome }}"
                             data-sku-slug="{{ $sku->slug }}"
                             data-image-url="{{ asset('storage/skus/' . $sku->imagem) }}">
