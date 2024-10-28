@@ -8,7 +8,7 @@ export default defineConfig({
                 'resources/css/app.css',
                  'resources/js/app.js', 
                  'resources/js/slider.js',
-                 'resources/js/produto.js',
+                 'resources/js/produtos.js',
                  'resources/js/copiaUrl.js',
                  'resources/js/editor.js',
                  'resources/js/submenu.js',
