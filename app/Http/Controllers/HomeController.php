@@ -17,8 +17,11 @@ class HomeController extends Controller
         // Buscar as 4 notícias mais recentes
         $noticias = Noticia::latest()->take(4)->get();
 
-        // Buscar as 4 receitas mais recentes
-        $receitas = Receita::latest()->take(4)->get();
+        // Buscar as 4 receitas mais recentes com todos os campos necessários
+        $receitas = Receita::select('id', 'nome', 'chamada', 'imagem')
+            ->latest()
+            ->take(4)
+            ->get();
 
         // Buscar as categorias de nível "marca"
         $marcas = Categoria::where('nivel', 'marca')->get();

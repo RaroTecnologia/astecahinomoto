@@ -79,14 +79,19 @@
             <h2 class="text-center text-gray-700 text-3xl font-semibold mb-8">O que falam sobre a <span class="text-black font-bold">Asteca</span> na imprensa?</h2>
 
             <!-- Grid de Notícias -->
-            @foreach($noticias as $noticia)
-            <div>
-                <img src="{{ $noticia->imagem_url }}" alt="{{ $noticia->titulo }}" class="rounded-lg mb-4 w-full">
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $noticia->titulo }}</h3>
-                <p class="text-gray-600 mb-4">{{ Str::limit($noticia->conteudo, 100) }}</p>
-                <a href="{{ route('noticias.show', ['categoria' => $noticia->categoria->slug, 'slug' => $noticia->slug]) }}" class="text-blue-500 font-semibold">Veja mais</a>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($noticias as $noticia)
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <img src="{{ $noticia->imagem_url ?? asset('assets/sem_imagem.png') }}"
+                        alt="{{ $noticia->titulo }}"
+                        class="rounded-lg mb-4 w-full h-48 object-cover">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $noticia->titulo }}</h3>
+                    <p class="text-gray-600 mb-4">{{ Str::limit($noticia->conteudo, 100) }}</p>
+                    <a href="{{ route('noticias.show', ['categoria' => $noticia->categoria->slug, 'slug' => $noticia->slug]) }}"
+                        class="text-blue-500 font-semibold">Veja mais</a>
+                </div>
+                @endforeach
             </div>
-            @endforeach
 
         </div>
 
@@ -113,11 +118,19 @@
             <div class="relative bg-white rounded-lg shadow-lg overflow-hidden">
                 <div class="absolute top-4 left-4 bg-yellow-500 text-white text-xs font-semibold py-1 px-3 rounded-full">Receitas</div>
 
-                <img src="{{ $receita->imagem_url }}" alt="{{ $receita->titulo }}" class="w-full h-48 object-cover">
+                <img src="{{ $receita->imagem_url ?? asset('assets/sem_imagem.png') }}"
+                    alt="{{ $receita->titulo }}"
+                    class="w-full h-48 object-cover">
 
                 <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $receita->titulo }}</h3>
-                    <p class="text-gray-600">{{ Str::limit($receita->conteudo, 100) }}</p>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ $receita->nome }}</h3>
+                    <p class="text-gray-600">
+                        @if($receita->conteudo)
+                        {{ Str::limit($receita->chamada, 100) }}
+                        @else
+                        {{ dd($receita->toArray()) }}
+                        @endif
+                    </p>
                 </div>
             </div>
             @endforeach

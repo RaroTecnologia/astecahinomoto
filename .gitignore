@@ -4,6 +4,8 @@
 /public/hot
 /storage/*.key
 /storage/pail
+/app/Providers/*.php
+/vite.config.js
 /vendor
 .env
 .env.backup
