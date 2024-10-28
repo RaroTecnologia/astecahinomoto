@@ -23,8 +23,8 @@ class SkuController extends Controller
             'nome' => 'required|string|max:255',
             'quantidade' => 'required|string|max:255',
             'unidade' => 'required|string|max:255',
-            'ean' => 'nullable|string|max:13',
-            'dun' => 'nullable|string|max:14',
+            'ean' => 'nullable|string|max:17',
+            'dun' => 'nullable|string|max:18',
             'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
@@ -60,8 +60,8 @@ class SkuController extends Controller
                 'nome' => 'required|string|max:255',
                 'quantidade' => 'required|string|max:255',
                 'unidade' => 'required|string|max:255',
-                'ean' => 'nullable|string|max:13',
-                'dun' => 'nullable|string|max:14',
+                'ean' => 'nullable|string|max:17',
+                'dun' => 'nullable|string|max:18',
                 'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
 
