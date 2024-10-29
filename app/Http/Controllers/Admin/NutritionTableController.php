@@ -27,14 +27,18 @@ class NutritionTableController extends Controller
 
     public function store(Request $request)
     {
-        // Validação do nome da tabela nutricional
+        // Validação dos campos
         $request->validate([
             'nome' => 'required|string|max:255',
+            'porcao_caseira' => 'nullable|string|max:255',
+            'segundo_valor' => 'nullable|string|max:20',
         ]);
 
         // Criação da tabela nutricional
         $tabelaNutricional = TabelaNutricional::create([
             'nome' => $request->input('nome'),
+            'porcao_caseira' => $request->input('porcao_caseira'),
+            'segundo_valor' => $request->input('segundo_valor'),
         ]);
 
         // Verifica se o redirecionamento para edição foi solicitado
@@ -57,7 +61,11 @@ class NutritionTableController extends Controller
     public function update(Request $request, $id)
     {
         $tabelaNutricional = TabelaNutricional::findOrFail($id);
-        $tabelaNutricional->update(['nome' => $request->input('nome')]);
+        $tabelaNutricional->update([
+            'nome' => $request->input('nome'),
+            'porcao_caseira' => $request->input('porcao_caseira'),
+            'segundo_valor' => $request->input('segundo_valor'),
+        ]);
 
         // Limpar nutrientes existentes antes de adicionar os novos
         $tabelaNutricional->nutrientes()->detach();

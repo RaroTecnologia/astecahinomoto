@@ -35,6 +35,18 @@
                     <input type="text" name="nome" id="nome" value="{{ $tabelaNutricional->nome }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
 
+                <!-- Porção Caseira -->
+                <div class="mb-4">
+                    <label for="porcao_caseira" class="block text-gray-700 font-bold mb-2">Porção Caseira:</label>
+                    <input type="text" name="porcao_caseira" id="porcao_caseira" value="{{ $tabelaNutricional->porcao_caseira }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+
+                <!-- Porção Caseira -->
+                <div class="mb-4">
+                    <label for="segundo_valor" class="block text-gray-700 font-bold mb-2">Porção Fracionada:</label>
+                    <input type="text" name="segundo_valor" id="segundo_valor" value="{{ $tabelaNutricional->segundo_valor }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+
                 <!-- Nutrientes Dinâmicos -->
                 <h3 class="text-xl font-semibold mb-4">Nutrientes Selecionados</h3>
                 <div id="nutrientes-container">

@@ -20,10 +20,16 @@
             <input type="text" name="quantidade" id="quantidade_{{ $sku->id ?? 'new' }}" value="{{ $sku->quantidade ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
         </div>
 
-        <!-- Unidade do SKU -->
+        <!-- Porção por embalagem (tabela nutricional) -->
         <div class="mb-4">
-            <label for="unidade_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Unidade</label>
-            <input type="text" name="unidade" id="unidade_{{ $sku->id ?? 'new' }}" value="{{ $sku->unidade ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
+            <label for="quantidade_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Porção por embalagem (tabela nutricional)</label>
+            <input type="text" name="quantidade_embalagem" id="quantidade_embalagem_{{ $sku->id ?? 'new' }}" value="{{ $sku->quantidade_embalagem ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
+        </div>
+
+        <!-- Quantidade inner -->
+        <div class="mb-4">
+            <label for="unidade_inner_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Quantidade inner</label>
+            <input type="text" name="unidade_inner" id="unidade_inner_{{ $sku->id ?? 'new' }}" value="{{ $sku->unidade_inner ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
         </div>
 
         <!-- Código EAN do SKU -->

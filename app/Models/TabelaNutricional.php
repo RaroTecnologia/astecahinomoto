@@ -9,10 +9,13 @@ class TabelaNutricional extends Model
 {
     use HasFactory;
 
-    protected $table = 'tabelas_nutricionais'; // Nome correto da tabela
+    protected $table = 'tabelas_nutricionais';
 
-    // Defina os relacionamentos e fillables
-    protected $fillable = ['nome'];
+    protected $fillable = [
+        'nome',
+        'porcao_caseira',
+        'segundo_valor'
+    ];
 
     public function nutrientes()
     {
