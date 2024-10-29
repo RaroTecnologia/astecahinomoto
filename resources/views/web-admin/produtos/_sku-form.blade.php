@@ -31,11 +31,12 @@
                     <input type="text" name="porcao_tabela" id="porcao_tabela_{{ $sku->id ?? 'new' }}" value="{{ $sku->porcao_tabela ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
                 </div>
 
-                <!-- Código EAN do SKU -->
+                <!-- Código SKU -->
                 <div class="mb-4">
-                    <label for="ean_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Código EAN</label>
-                    <input type="text" name="ean" id="ean_{{ $sku->id ?? 'new' }}" value="{{ $sku->ean ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
+                    <label for="codigo_sku_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Código SKU</label>
+                    <input type="text" name="codigo_sku" id="codigo_sku_{{ $sku->id ?? 'new' }}" value="{{ $sku->codigo_sku ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
                 </div>
+
             </div>
 
             <!-- Coluna Direita -->
@@ -52,7 +53,15 @@
                     <input type="text" name="dun" id="dun_{{ $sku->id ?? 'new' }}" value="{{ $sku->dun ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
                 </div>
 
-                <!-- Imagem do SKU -->
+                <!-- Código EAN do SKU -->
+                <div class="mb-4">
+                    <label for="ean_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Código EAN</label>
+                    <input type="text" name="ean" id="ean_{{ $sku->id ?? 'new' }}" value="{{ $sku->ean ?? '' }}" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+            </div>
+
+            <!-- Imagem do SKU (ocupando duas colunas) -->
+            <div class="col-span-2">
                 <div class="mb-4">
                     <label for="imagem_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Imagem do SKU</label>
                     <input type="file" name="imagem" id="imagem_{{ $sku->id ?? 'new' }}" class="w-full px-4 py-2 border rounded-lg">

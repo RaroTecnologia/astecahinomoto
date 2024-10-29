@@ -25,11 +25,14 @@ class SkuController extends Controller
             'unidade' => 'nullable|string|max:255',
             'ean' => 'nullable|string|max:17',
             'dun' => 'nullable|string|max:18',
+            'porcao_tabela' => 'nullable|string|max:60',
+            'quantidade_inner' => 'nullable|string|max:60',
+            'codigo_sku' => 'nullable|string|max:60',
             'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $slug = Str::slug($request->nome);
-        $skuData = $request->only(['produto_id', 'nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun']);
+        $skuData = $request->only(['produto_id', 'nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun', 'codigo_sku']);
         $skuData['slug'] = $slug;
 
         if ($request->hasFile('imagem')) {
@@ -62,10 +65,13 @@ class SkuController extends Controller
                 'unidade' => 'nullable|string|max:255',
                 'ean' => 'nullable|string|max:17',
                 'dun' => 'nullable|string|max:18',
+                'porcao_tabela' => 'nullable|string|max:60',
+                'quantidade_inner' => 'nullable|string|max:60',
+                'codigo_sku' => 'nullable|string|max:60',
                 'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
 
-            $skuData = $request->only(['nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun']);
+            $skuData = $request->only(['nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun', 'codigo_sku']);
 
             if ($request->hasFile('imagem')) {
                 $this->deleteImage($sku);
