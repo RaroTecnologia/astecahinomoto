@@ -21,15 +21,15 @@ class SkuController extends Controller
         $request->validate([
             'produto_id' => 'required|exists:produtos,id',
             'nome' => 'required|string|max:255',
-            'quantidade' => 'required|string|max:255',
-            'unidade' => 'required|string|max:255',
+            'quantidade' => 'nullable|string|max:255',
+            'unidade' => 'nullable|string|max:255',
             'ean' => 'nullable|string|max:17',
             'dun' => 'nullable|string|max:18',
             'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $slug = Str::slug($request->nome);
-        $skuData = $request->only(['produto_id', 'nome', 'quantidade', 'unidade']);
+        $skuData = $request->only(['produto_id', 'nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun']);
         $skuData['slug'] = $slug;
 
         if ($request->hasFile('imagem')) {
@@ -58,14 +58,14 @@ class SkuController extends Controller
 
             $request->validate([
                 'nome' => 'required|string|max:255',
-                'quantidade' => 'required|string|max:255',
-                'unidade' => 'required|string|max:255',
+                'quantidade' => 'nullable|string|max:255',
+                'unidade' => 'nullable|string|max:255',
                 'ean' => 'nullable|string|max:17',
                 'dun' => 'nullable|string|max:18',
                 'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
 
-            $skuData = $request->only(['nome', 'quantidade', 'unidade']);
+            $skuData = $request->only(['nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun']);
 
             if ($request->hasFile('imagem')) {
                 $this->deleteImage($sku);
@@ -152,5 +152,16 @@ class SkuController extends Controller
         if ($sku->thumbnail && Storage::exists('public/thumbnails/' . $sku->thumbnail)) {
             Storage::delete('public/thumbnails/' . $sku->thumbnail);
         }
+    }
+
+    protected function validationRules()
+    {
+        return [
+            // ... regras existentes ...
+            'ean' => 'nullable|string|max:255',
+            'dun' => 'nullable|string|max:255',
+            'porcao_tabela' => 'nullable|string|max:60',
+            'quantidade_inner' => 'nullable|string|max:60',
+        ];
     }
 }

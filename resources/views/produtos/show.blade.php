@@ -56,7 +56,7 @@
                 @if($produto->ingredientes)
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-700">Ingredientes:</h3>
-                    <p class="text-gray-600">{{ $produto->ingredientes }}</p>
+                    <p class="text-gray-600 text-justify whitespace-pre-line">{{ $produto->ingredientes }}</p>
                 </div>
                 @endif
 
@@ -72,18 +72,18 @@
                             <table class="w-full table-fixed border border-black mt-4">
                                 <thead>
                                     <tr>
-                                        <td colspan="4" class="text-center font-bold text-lg py-2">INFORMAÇÃO NUTRICIONAL</td>
+                                        <td colspan="4" class="text-center font-bold text-2xl py-2">INFORMAÇÃO NUTRICIONAL</td>
                                     </tr>
                                     <tr class="tabela-linha1">
                                         <td colspan="4" class="border-b border-black py-2 text-sm">
-                                            Porções por embalagem: {{ $produto->tabelaNutricional->porcoes_por_embalagem ?? '' }}<br>
-                                            Porção: {{ $produto->tabelaNutricional->porcao ?? '' }}
+                                            Porções por embalagem: {{ $produto->tabelaNutricional->porcao_tabela ?? '' }}<br>
+                                            Porção: {{ $produto->tabelaNutricional->porcao_caseira ?? '' }}
                                         </td>
                                     </tr>
                                     <tr class="border-t-4 border-black">
                                         <td class="text-left py-2"></td>
                                         <td class="text-center py-2 font-bold">100g</td>
-                                        <td class="text-center py-2 font-bold">{{ $produto->tabelaNutricional->porcao_g ?? '' }}g</td>
+                                        <td class="text-center py-2 font-bold">{{ $produto->tabelaNutricional->segundo_valor ?? '' }}</td>
                                         <td class="text-center py-2 font-bold">%VD*</td>
                                     </tr>
                                 </thead>

@@ -22,6 +22,8 @@ class Sku extends Model
         'ean',
         'dun',
         'descricao',  // Adicione este campo se ele existir na tabela 'skus'
+        'porcao_tabela',
+        'quantidade_inner',
         // Outros campos específicos do SKU
     ];
 
