@@ -16,38 +16,21 @@ class SkuController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('Recebendo dados para o SKU:', $request->all());
+        try {
+            $sku = Sku::create($request->all());
 
-        $request->validate([
-            'produto_id' => 'required|exists:produtos,id',
-            'nome' => 'required|string|max:255',
-            'quantidade' => 'nullable|string|max:255',
-            'unidade' => 'nullable|string|max:255',
-            'ean' => 'nullable|string|max:17',
-            'dun' => 'nullable|string|max:18',
-            'porcao_tabela' => 'nullable|string|max:60',
-            'quantidade_inner' => 'nullable|string|max:60',
-            'codigo_sku' => 'nullable|string|max:60',
-            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $slug = Str::slug($request->nome);
-        $skuData = $request->only(['produto_id', 'nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun', 'codigo_sku']);
-        $skuData['slug'] = $slug;
-
-        if ($request->hasFile('imagem')) {
-            $imagePath = $request->file('imagem')->store('skus', 'public');
-            $imageName = basename($imagePath);
-            $skuData['imagem'] = $imageName;
-
-            $thumbnailPath = storage_path('app/public/thumbnails/' . $imageName);
-            $this->resizeImage($request->file('imagem')->getRealPath(), $thumbnailPath, 300, 300);
+            return response()->json([
+                'success' => true,
+                'message' => 'SKU criado com sucesso',
+                'sku' => $sku
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erro ao criar SKU: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar SKU'
+            ], 500);
         }
-
-        Log::info('Dados do SKU antes de salvar:', $skuData);
-        Sku::create($skuData);
-
-        return response()->json(['success' => true, 'message' => 'SKU criado com sucesso.']);
     }
 
     /**
@@ -104,21 +87,39 @@ class SkuController extends Controller
     public function destroy($id)
     {
         try {
+            Log::info('Iniciando exclusão do SKU:', ['id' => $id]);
+
             $sku = Sku::findOrFail($id);
 
-            $this->deleteImage($sku);
+            // Primeiro apaga as imagens físicas
+            if (method_exists($this, 'deleteImage')) {
+                $this->deleteImage($sku);
+            }
 
-            $sku->delete();
+            // Apaga o registro do banco
+            $deleted = $sku->delete();
 
-            Log::info('SKU excluído com sucesso:', ['id' => $id]);
+            Log::info('Resultado da exclusão:', ['success' => $deleted]);
 
-            return response()->json(['success' => true, 'message' => 'SKU excluído com sucesso.']);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('SKU não encontrado: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'SKU não encontrado.'], 404);
+            if ($deleted) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'SKU excluído com sucesso.'
+                ]);
+            } else {
+                throw new \Exception('Falha ao excluir o SKU');
+            }
         } catch (\Exception $e) {
-            Log::error('Erro ao excluir SKU: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Erro ao excluir SKU: ' . $e->getMessage()], 500);
+            Log::error('Erro ao excluir SKU:', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao excluir SKU: ' . $e->getMessage()
+            ], 500);
         }
     }
 

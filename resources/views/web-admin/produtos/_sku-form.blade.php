@@ -86,13 +86,9 @@
 
             <!-- Botão Excluir SKU (exibido apenas se o SKU existir) -->
             @if(isset($sku->id))
-            <form action="{{ route('skus.destroy', $sku->id) }}" method="POST" class="delete-sku-form">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg">
-                    <i class="fas fa-trash-alt"></i> Excluir
-                </button>
-            </form>
+            <button type="button" class="bg-red-500 text-white px-4 py-2 rounded-lg delete-sku" data-id="{{ $sku->id }}">
+                <i class="fas fa-trash-alt"></i> Excluir
+            </button>
             @endif
         </div>
     </form>
