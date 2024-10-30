@@ -19,6 +19,7 @@
                 <nav class="space-x-4">
                     <a href="{{ route('web-admin.index') }}" class="hover:text-gray-300">Dashboard</a>
                     <a href="{{ route('web-admin.usuarios.index') }}" class="hover:text-gray-300">Usuários</a>
+                    <a href="{{ route('web-admin.home.index') }}" class="hover:text-gray-300">Conteúdos Home</a>
                     <a href="{{ route('web-admin.categorias.index') }}" class="hover:text-gray-300">Categorias</a>
                     <a href="{{ route('web-admin.nutrientes.index') }}" class="hover:text-gray-300">Nutrientes</a>
                     <a href="{{ route('web-admin.tabelas-nutricionais.index') }}" class="hover:text-gray-300">Tabelas Nutricionais</a>

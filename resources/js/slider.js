@@ -2,17 +2,21 @@ import Swiper from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 document.addEventListener('DOMContentLoaded', function () {
     const bannerSwiperEl = document.querySelector('.banner-swiper');
     const bannerSlides = bannerSwiperEl.querySelectorAll('.swiper-slide').length;
 
     const bannerSwiper = new Swiper('.banner-swiper', {
-        modules: [Navigation, Pagination],
-        loop: bannerSlides > 1, // Habilita o loop apenas se houver mais de 1 slide
-        slidesPerView: 1, // Garante que apenas um slide seja exibido por vez
+        modules: [Navigation, Pagination, Autoplay],
+        loop: bannerSlides > 1,
+        slidesPerView: 1,
         spaceBetween: 0,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
         navigation: {
             nextEl: '.banner-swiper .swiper-button-next',
             prevEl: '.banner-swiper .swiper-button-prev',
@@ -27,10 +31,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const brandSlides = brandSwiperEl.querySelectorAll('.swiper-slide').length;
 
     const brandSwiper = new Swiper('.brands-swiper', {
-        modules: [Navigation, Pagination],
-        loop: brandSlides > 4, // Habilita o loop apenas se houver mais de 4 slides
-        slidesPerView: 4, // Exibindo 4 marcas ao mesmo tempo
+        modules: [Navigation, Pagination, Autoplay],
+        loop: brandSlides > 4,
+        slidesPerView: 4,
         spaceBetween: 30,
+        centeredSlides: true,
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
         navigation: {
             nextEl: '.brands-swiper .swiper-button-next',
             prevEl: '.brands-swiper .swiper-button-prev',
@@ -40,6 +49,10 @@ document.addEventListener('DOMContentLoaded', function () {
             clickable: true,
         },
         breakpoints: {
+            320: {
+                slidesPerView: 1,
+                spaceBetween: 10,
+            },
             640: {
                 slidesPerView: 2,
                 spaceBetween: 20,
@@ -50,7 +63,8 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             1024: {
                 slidesPerView: 4,
-                spaceBetween: 40,
+                spaceBetween: 30,
+                centeredSlides: false,
             },
         },
     });

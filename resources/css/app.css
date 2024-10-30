@@ -86,3 +86,40 @@
 .visible {
     opacity: 1;
 }
+
+/* Estilo para as setas de navegação */
+.banner-swiper .swiper-button-next,
+.banner-swiper .swiper-button-prev {
+    color: #ffffff; /* Cor branca */
+    /* Opcional: adicionar sombra para melhor visibilidade */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilo comum para paginação de todos os sliders */
+.swiper-pagination-bullet {
+    width: 12px !important;
+    height: 12px !important;
+    background: #ffffff !important;
+    opacity: 0.7 !important;
+    margin: 0 8px !important;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1 !important;
+    width: 16px !important;
+    height: 16px !important;
+}
+
+/* Posicionamento específico para o slider de marcas */
+.brands-swiper .swiper-pagination {
+    position: absolute;
+    bottom: 10px !important;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
+/* Estilo específico para o slider de marcas */
+.brands-swiper .swiper-pagination-bullet {
+    background: #000000 !important;
+}

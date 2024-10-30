@@ -4,18 +4,33 @@
 
 @section('content')
 <div>
-    <div class="w-full max-w-full overflow-hidden h-[70vh]">
+    <div class="w-full max-w-full overflow-hidden">
         <!-- Swiper para Banners Principais -->
-        <div class="swiper-container banner-swiper w-full h-full">
+        <div class="swiper-container banner-swiper w-full h-[70vh] relative">
             <div class="swiper-wrapper">
-                <div class="swiper-slide w-full h-[60vh] bg-cover bg-center" style="background-image: url('https://via.placeholder.com/1920x1080?text=Desktop+Slide+1');"></div>
-                <div class="swiper-slide w-full h-[60vh] bg-cover bg-center" style="background-image: url('https://via.placeholder.com/1920x1080?text=Desktop+Slide+2');"></div>
-                <div class="swiper-slide w-full h-[60vh] bg-cover bg-center" style="background-image: url('https://via.placeholder.com/1920x1080?text=Desktop+Slide+3');"></div>
-                <div class="swiper-slide w-full h-[60vh] bg-cover bg-center" style="background-image: url('https://via.placeholder.com/1920x1080?text=Desktop+Slide+4');"></div>
+                @foreach($banners as $banner)
+                <div class="swiper-slide relative w-full h-full">
+                    @if($banner->link)
+                    <a href="{{ $banner->link }}" class="block w-full h-full">
+                        @endif
+                        <picture>
+                            <source media="(min-width: 768px)"
+                                srcset="{{ asset('storage/banners/' . $banner->imagem_desktop) }}">
+                            <source media="(max-width: 767px)"
+                                srcset="{{ asset('storage/banners/' . $banner->imagem_mobile) }}">
+                            <img src="{{ asset('storage/banners/' . $banner->imagem_desktop) }}"
+                                alt="Banner"
+                                class="w-full h-full object-cover">
+                        </picture>
+                        @if($banner->link)
+                    </a>
+                    @endif
+                </div>
+                @endforeach
             </div>
 
-            <!-- Paginação -->
-            <div class="swiper-pagination"></div>
+            <!-- Paginação específica para banner-swiper -->
+            <div class="swiper-pagination banner-swiper-pagination absolute bottom-4"></div>
 
             <!-- Botões de navegação -->
             <div class="swiper-button-next"></div>
@@ -23,24 +38,24 @@
         </div>
     </div>
 
-    <div class="relative w-full max-w-full overflow-hidden h-52 py-7 bg-vermelho-asteca">
-        <!-- Swiper para Marcas -->
-        <div class="swiper-container brands-swiper w-full h-full">
-            <div class="swiper-wrapper">
-                @foreach ($marcas as $marca)
-                <div class="swiper-slide flex justify-center items-center">
-                    <!-- Ajuste para exibir a imagem e o nome da marca dinamicamente -->
-                    <img src="{{ asset('path/to/marca-images/' . $marca->slug . '.png') }}" alt="{{ $marca->nome }}" class="rounded-full w-32 h-32">
+    <div class="relative w-full max-w-full overflow-hidden h-80 py-7 bg-vermelho-asteca">
+        <!-- Container centralizado -->
+        <div class="container mx-auto px-4">
+            <!-- Swiper para Marcas -->
+            <div class="swiper-container brands-swiper h-full max-w-5xl mx-auto">
+                <div class="swiper-wrapper">
+                    @foreach ($marcas as $marca)
+                    <div class="swiper-slide flex justify-center items-center">
+                        <img src="{{ asset('assets/marcas/' . $marca->slug . '.png') }}"
+                            alt="{{ $marca->nome }}"
+                            class="rounded-full w-52 h-52">
+                    </div>
+                    @endforeach
                 </div>
-                @endforeach
+
+                <!-- Paginação -->
+                <div class="swiper-pagination"></div>
             </div>
-
-            <!-- Paginação -->
-            <div class="swiper-pagination"></div>
-
-            <!-- Botões de navegação -->
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
         </div>
     </div>
 
@@ -76,7 +91,7 @@
     <!-- Notícias em Destaque -->
     <div class="bg-gradient-to-r from-red-50 to-white py-12">
         <div class="container mx-auto">
-            <h2 class="text-center text-gray-700 text-3xl font-semibold mb-8">O que falam sobre a <span class="text-black font-bold">Asteca</span> na imprensa?</h2>
+            <h2 class="text-center text-gray-700 text-3xl font-semibold mb-8">Fique por dentro das nossas notícias</h2>
 
             <!-- Grid de Notícias -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

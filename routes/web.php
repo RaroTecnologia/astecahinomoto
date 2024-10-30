@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\NutrientController as AdminNutrientController;
 use App\Http\Controllers\Admin\NutritionTableController as AdminNutritionTableController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SkuController as AdminSkuController;
+use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 
 // Rotas Públicas
 Route::controller(PaginaController::class)->group(function () {
@@ -49,6 +50,7 @@ Route::middleware('auth')->group(function () {
 
         // Rotas de Admin usando Resource com alias
         Route::resources([
+            'home' => AdminHomeController::class,
             'noticias' => AdminNewsController::class,
             'receitas' => AdminRecipeController::class,
             'categorias' => AdminCategoryController::class,
