@@ -54,7 +54,7 @@
                 Fale com a Asteca
             </a>
             <a href="#" class="block py-3 text-white text-lg">
-                <i class="fas fa-shopping-cart mr-2"></i>
+                <i class="fas fa-phone mr-4"></i>
                 Contato para Pedido
             </a>
         </nav>
@@ -157,7 +157,7 @@
             <!-- Botões e Ícones -->
             <div class="flex items-center space-x-4">
                 <a href="#" class="bg-black hover:bg-red-900 text-white font-semibold px-6 py-3 flex items-center">
-                    <i class="fas fa-shopping-cart mr-2"></i>
+                    <i class="fas fa-phone mr-4"></i>
                     Contato para Pedido
                 </a>
                 <button class="text-black">

@@ -109,7 +109,7 @@
 
         <!-- Botão Ver Tudo -->
         <div class="mt-8 text-center">
-            <a href="{{ route('noticias.index') }}" class="inline-block px-8 py-4 bg-white border border-gray-300 text-gray-700 font-semibold rounded-full shadow-sm hover:bg-gray-50">Ver tudo</a>
+            <a href="{{ route('noticias.index') }}" class="inline-block px-8 py-4 bg-white border border-gray-300 text-gray-700 font-semibold rounded-full shadow-sm hover:bg-gray-50">Ver mais</a>
         </div>
     </div>
 </div>
