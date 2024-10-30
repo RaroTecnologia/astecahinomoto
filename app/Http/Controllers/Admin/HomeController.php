@@ -232,13 +232,33 @@ class HomeController extends Controller
      */
     private function storeDestaque(Request $request)
     {
-        $request->validate([
-            'produto_id' => 'required|exists:produtos,id',
-            'ordem' => 'required|integer|min:0'
-        ]);
+        try {
+            $request->validate([
+                'produto_id' => 'required|exists:produtos,id',
+                'ordem' => 'required|integer|min:0',
+                'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            ]);
 
-        HomeDestaque::create($request->all());
-        return redirect()->back()->with('success', 'Produto em destaque adicionado com sucesso!');
+            $data = $request->only(['produto_id', 'ordem']);
+
+            if ($request->hasFile('imagem')) {
+                $imagePath = $request->file('imagem')->store('destaques', 'public');
+                $data['imagem'] = basename($imagePath);
+            }
+
+            HomeDestaque::create($data);
+            return redirect()->back()->with('success', 'Produto em destaque adicionado com sucesso!');
+        } catch (\Exception $e) {
+            Log::error('Erro ao criar destaque:', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Erro ao criar destaque: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**

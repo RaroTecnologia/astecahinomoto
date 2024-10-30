@@ -62,31 +62,22 @@
     <!-- Produtos em Destaque -->
     <div class="py-12">
         <div class="container mx-auto">
-            <h2 class="text-center text-vermelho-asteca text-4xl font-bold mb-8">Nossos <span class="font-extrabold">Produtos em Destaque</span></h2>
+            <h2 class="text-center md:text-left text-vermelho-asteca text-3xl mb-8">Nossos <span class="font-extrabold">Produtos em Destaque</span></h2>
 
             <!-- Bloco de Produtos -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 @foreach($destaques as $destaque)
-                <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <div>
                     @if($destaque->produto)
-                    <a href="{{ route('produtos.show', ['slugMarca' => $destaque->produto->categoria->slug, 'slugProduto' => $destaque->produto->slug]) }}" class="block">
+                    <a href="{{ route('produtos.show', [
+                        'slugMarca' => $destaque->produto->marca->slug ?? 'marca-nao-encontrada',
+                        'slugProduto' => $destaque->produto->slug
+                    ]) }}" class="block">
                         <img
-                            src="{{ asset('storage/produtos/' . $destaque->produto->imagem) }}"
+                            src="{{ $destaque->imagem ? asset('storage/destaques/' . $destaque->imagem) : asset('storage/produtos/' . $destaque->produto->imagem) }}"
                             alt="{{ $destaque->produto->nome }}"
-                            class="rounded-lg w-full h-64 object-cover">
-                        <div class="mt-4">
-                            <h3 class="text-lg font-semibold text-gray-800">{{ $destaque->produto->nome }}</h3>
-                            @if($destaque->produto->descricao_curta)
-                            <p class="text-gray-600 mt-2 text-sm">
-                                {{ Str::limit($destaque->produto->descricao_curta, 100) }}
-                            </p>
-                            @endif
-                        </div>
+                            class="rounded-3xl w-full h-[450px] object-cover hover:scale-105 transition-all duration-300">
                     </a>
-                    @else
-                    <div class="bg-gray-100 rounded-lg p-4 text-center">
-                        <p class="text-gray-500">Produto não encontrado</p>
-                    </div>
                     @endif
                 </div>
                 @endforeach
@@ -97,7 +88,7 @@
     <!-- Notícias em Destaque -->
     <div class="py-12">
         <div class="container mx-auto">
-            <h2 class="text-center text-gray-700 text-3xl font-semibold mb-8">Fique por dentro das nossas notícias</h2>
+            <h2 class="text-center md:text-left text-gray-500 text-3xl mb-8">Fique por dentro das <span class="font-extrabold">nossas notícias</span></h2>
 
             <!-- Grid de Notícias -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -133,7 +124,7 @@
     <div class="container mx-auto relative z-10"> <!-- z-10 para ficar acima do overlay -->
         <!-- Título e botão -->
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-white">Receitas Asteca Hinomoto</h2>
+            <h2 class="text-3xl text-white">Receitas <span class="font-extrabold">Asteca Hinomoto</span></h2>
             <a href="{{ route('receitas.index') }}"
                 class="px-6 py-2 bg-yellow-500 text-white font-semibold rounded-full hover:bg-yellow-600 transition duration-300">
                 Ver tudo

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Kalnoy\Nestedset\NodeTrait;
 
 class Categoria extends Model
 {
-    use HasFactory;
+    use HasFactory, NodeTrait;
 
     protected $fillable = ['nome', 'slug', 'descricao', 'imagem', 'parent_id', 'tipo', 'nivel'];
 

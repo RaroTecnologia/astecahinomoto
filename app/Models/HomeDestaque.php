@@ -8,6 +8,7 @@ class HomeDestaque extends Model
 {
     protected $fillable = [
         'produto_id',
+        'imagem',
         'ordem',
         'ativo'
     ];

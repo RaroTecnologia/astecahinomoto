@@ -79,7 +79,7 @@
         <h2 class="text-xl font-semibold mb-4">Produtos em Destaque</h2>
 
         <!-- Formulário para adicionar destaque -->
-        <form action="{{ route('web-admin.home.store') }}" method="POST" class="mb-6 bg-white p-6 rounded-lg shadow">
+        <form action="{{ route('web-admin.home.store') }}" method="POST" enctype="multipart/form-data" class="mb-6 bg-white p-6 rounded-lg shadow">
             @csrf
             <input type="hidden" name="type" value="destaque">
             <div class="grid grid-cols-2 gap-4">
@@ -94,6 +94,11 @@
                 <div>
                     <label class="block mb-2">Ordem</label>
                     <input type="number" name="ordem" class="w-full px-3 py-2 border rounded" value="0">
+                </div>
+                <div class="col-span-2">
+                    <label class="block mb-2">Imagem Personalizada</label>
+                    <input type="file" name="imagem" class="w-full" accept="image/*">
+                    <p class="text-sm text-gray-500 mt-1">Opcional. Se não fornecida, será usada a imagem do produto.</p>
                 </div>
             </div>
             <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Adicionar Destaque</button>

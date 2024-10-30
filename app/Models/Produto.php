@@ -32,4 +32,17 @@ class Produto extends Model
     {
         return $this->hasMany(Sku::class, 'produto_id');
     }
+
+    public function getMarcaAttribute()
+    {
+        // Busca a categoria pai (que pode ser linha ou produto)
+        $categoria = $this->categoria;
+
+        // Sobe na hierarquia até encontrar a marca (nivel = 'marca')
+        while ($categoria && $categoria->nivel !== 'marca') {
+            $categoria = $categoria->parent;
+        }
+
+        return $categoria;
+    }
 }
