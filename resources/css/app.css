@@ -113,7 +113,7 @@
 /* Posicionamento específico para o slider de marcas */
 .brands-swiper .swiper-pagination {
     position: absolute;
-    bottom: 10px !important;
+    bottom: 15px !important;
     left: 0;
     right: 0;
     z-index: 10;
@@ -122,4 +122,5 @@
 /* Estilo específico para o slider de marcas */
 .brands-swiper .swiper-pagination-bullet {
     background: #000000 !important;
+    opacity: 0.2 !important;
 }

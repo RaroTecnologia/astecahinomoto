@@ -172,8 +172,8 @@
                 <!-- Coluna de Categorias -->
                 <div class="grid grid-cols-2 gap-8 w-2/3">
                     @foreach($tiposHeader as $tipo)
-                    <div class="flex items-center space-x-3" data-tipo-descricao="{{ $tipo->descricao }}" data-tipo-imagem="{{ asset('images/' . $tipo->slug . '_highlight.png') }}">
-                        <img src="{{ asset('images/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-10 h-10">
+                    <div class="flex items-center space-x-3" data-tipo-descricao="{{ $tipo->descricao }}" data-tipo-imagem="{{ asset('assets/' . $tipo->slug . '_icon.png') }}">
+                        <img src="{{ asset('assets/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-10 h-10">
                         <a href="{{ route('marcas.tipo', $tipo->slug) }}" class="text-black font-medium">{{ $tipo->nome }}</a>
                     </div>
                     @endforeach

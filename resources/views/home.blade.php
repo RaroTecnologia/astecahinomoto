@@ -66,24 +66,30 @@
 
             <!-- Bloco de Produtos -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Produto 1 -->
-                <div class="bg-blue-700 p-4 rounded-lg">
-                    <img src="https://via.placeholder.com/300x500?text=Produto+1" alt="Produto 1" class="rounded-lg w-full">
+                @foreach($destaques as $destaque)
+                <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    @if($destaque->produto)
+                    <a href="{{ route('produtos.show', ['slugMarca' => $destaque->produto->categoria->slug, 'slugProduto' => $destaque->produto->slug]) }}" class="block">
+                        <img
+                            src="{{ asset('storage/produtos/' . $destaque->produto->imagem) }}"
+                            alt="{{ $destaque->produto->nome }}"
+                            class="rounded-lg w-full h-64 object-cover">
+                        <div class="mt-4">
+                            <h3 class="text-lg font-semibold text-gray-800">{{ $destaque->produto->nome }}</h3>
+                            @if($destaque->produto->descricao_curta)
+                            <p class="text-gray-600 mt-2 text-sm">
+                                {{ Str::limit($destaque->produto->descricao_curta, 100) }}
+                            </p>
+                            @endif
+                        </div>
+                    </a>
+                    @else
+                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                        <p class="text-gray-500">Produto não encontrado</p>
+                    </div>
+                    @endif
                 </div>
-
-                <!-- Produto 2 -->
-                <div class="bg-red-700 p-4 rounded-lg">
-                    <img src="https://via.placeholder.com/300x500?text=Produto+2" alt="Produto 2" class="rounded-lg w-full">
-                </div>
-
-                <!-- Produto 3 -->
-                <div class="bg-gray-100 p-4 rounded-lg">
-                    <img src="https://via.placeholder.com/300x500?text=Produto+3" alt="Produto 3" class="rounded-lg w-full">
-                </div>
-
-                <div class="bg-gray-100 p-4 rounded-lg">
-                    <img src="https://via.placeholder.com/300x500?text=Produto+4" alt="Produto 4" class="rounded-lg w-full">
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
@@ -119,19 +125,28 @@
 
 
 <!-- BannerReceitas -->
-<div class="bg-yellow-100 mt-10 py-8 mx-12 rounded-3xl">
-    <div class="container mx-auto">
+<div class="mt-10 py-8 mx-12 rounded-3xl relative bg-cover bg-center bg-no-repeat"
+    style="background-image: url('{{ asset('assets/bg_receitas.jpg') }}')">
+    <!-- Overlay para garantir legibilidade do texto -->
+    <div class="absolute inset-0 bg-black bg-opacity-30 rounded-3xl"></div>
+
+    <div class="container mx-auto relative z-10"> <!-- z-10 para ficar acima do overlay -->
         <!-- Título e botão -->
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Receitas Asteca Hinomoto</h2>
-            <a href="{{ route('receitas.index') }}" class="px-6 py-2 bg-yellow-500 text-white font-semibold rounded-full hover:bg-yellow-600 transition duration-300">Ver tudo</a>
+            <h2 class="text-3xl font-bold text-white">Receitas Asteca Hinomoto</h2>
+            <a href="{{ route('receitas.index') }}"
+                class="px-6 py-2 bg-yellow-500 text-white font-semibold rounded-full hover:bg-yellow-600 transition duration-300">
+                Ver tudo
+            </a>
         </div>
 
         <!-- Grid de receitas -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             @foreach($receitas as $receita)
             <div class="relative bg-white rounded-lg shadow-lg overflow-hidden">
-                <div class="absolute top-4 left-4 bg-yellow-500 text-white text-xs font-semibold py-1 px-3 rounded-full">Receitas</div>
+                <div class="absolute top-4 left-4 bg-yellow-500 text-white text-xs font-semibold py-1 px-3 rounded-full">
+                    Receitas
+                </div>
 
                 <img src="{{ $receita->imagem_url ?? asset('assets/sem_imagem.png') }}"
                     alt="{{ $receita->titulo }}"

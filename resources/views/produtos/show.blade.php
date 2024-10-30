@@ -132,7 +132,7 @@
             <!-- Botão para Exibir Todos (apenas se houver mais de 5 produtos) -->
             @if($produtosRelacionados->count() > 5)
             <div class="text-center mt-8">
-                <button id="toggleViewButton" class="px-6 py-2 border border-gray-600 text-gray-600 font-semibold rounded-lg hover:text-gray-700 hover:bg-gray-50 transition duration-300">Ver todos</button>
+                <button id="toggleViewButton" class="px-6 py-2 border border-gray-600 text-gray-600 font-semibold rounded-lg hover:text-gray-700 hover:bg-gray-50 transition duration-300">Ver mais</button>
             </div>
             @endif
         </div>

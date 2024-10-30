@@ -7,6 +7,7 @@ use App\Models\Receita;
 use App\Models\Tipo;
 use App\Models\Categoria;
 use App\Models\HomeBanner;
+use App\Models\HomeDestaque;
 
 class HomeController extends Controller
 {
@@ -14,6 +15,11 @@ class HomeController extends Controller
     {
         // Buscar banners ordenados
         $banners = HomeBanner::orderBy('ordem')->get();
+
+        // Buscar produtos em destaque
+        $destaques = HomeDestaque::with('produto')
+            ->orderBy('ordem')
+            ->get();
 
         // Buscar os tipos de categorias principais para o sub menu
         $tiposHeader = Tipo::orderBy('ordem')->get();
@@ -31,6 +37,6 @@ class HomeController extends Controller
         $marcas = Categoria::where('nivel', 'marca')->get();
 
         // Passar os dados para a view
-        return view('home', compact('banners', 'tiposHeader', 'noticias', 'receitas', 'marcas'));
+        return view('home', compact('banners', 'tiposHeader', 'noticias', 'receitas', 'marcas', 'destaques'));
     }
 }
