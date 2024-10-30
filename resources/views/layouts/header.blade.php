@@ -167,7 +167,7 @@
         </div>
 
         <!-- Submenu Expansível de Produtos que ocupa 100% da largura -->
-        <div id="produtos-submenu" class="absolute left-0 w-screen bg-red-700 text-black py-6 hidden transition-all duration-300 ease-in-out top-full">
+        <div id="produtos-submenu" class="absolute left-0 w-screen bg-red-700 text-black py-6 hidden transition-all duration-300 ease-in-out top-full overflow-hidden">
             <div class="flex justify-between w-full max-w-screen-xl mx-auto px-10">
                 <!-- Coluna de Categorias -->
                 <div class="grid grid-cols-2 gap-8 w-2/3">
