@@ -72,7 +72,7 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|integer',
             'tipo' => 'required|string|max:255',
             'nivel' => 'nullable|string|in:marca,produto,linha',
-            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Valida a imagem
+            'imagem' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // Adicionado GIF
         ]);
 
         // Gerar o slug automaticamente
@@ -122,8 +122,10 @@ class CategoryController extends Controller
      */
     private function resizeImage($sourcePath, $destinationPath, $width, $height)
     {
-        list($originalWidth, $originalHeight) = getimagesize($sourcePath);
+        // Obtém informações da imagem
+        list($originalWidth, $originalHeight, $type) = getimagesize($sourcePath);
 
+        // Calcula o aspect ratio
         $aspectRatio = $originalWidth / $originalHeight;
         if ($width / $height > $aspectRatio) {
             $width = $height * $aspectRatio;
@@ -131,12 +133,33 @@ class CategoryController extends Controller
             $height = $width / $aspectRatio;
         }
 
+        // Cria nova imagem
         $newImage = imagecreatetruecolor($width, $height);
-        $sourceImage = imagecreatefromjpeg($sourcePath);
 
+        // Habilita transparência para PNG e GIF
+        imagealphablending($newImage, false);
+        imagesavealpha($newImage, true);
+
+        // Carrega a imagem baseado no tipo
+        $sourceImage = match ($type) {
+            IMAGETYPE_JPEG => imagecreatefromjpeg($sourcePath),
+            IMAGETYPE_PNG  => imagecreatefrompng($sourcePath),
+            IMAGETYPE_GIF  => imagecreatefromgif($sourcePath),
+            default        => throw new \Exception('Formato de imagem não suportado'),
+        };
+
+        // Copia e redimensiona
         imagecopyresampled($newImage, $sourceImage, 0, 0, 0, 0, $width, $height, $originalWidth, $originalHeight);
-        imagejpeg($newImage, $destinationPath, 90);
 
+        // Salva a imagem no formato correto
+        match ($type) {
+            IMAGETYPE_JPEG => imagejpeg($newImage, $destinationPath, 90),
+            IMAGETYPE_PNG  => imagepng($newImage, $destinationPath, 9),
+            IMAGETYPE_GIF  => imagegif($newImage, $destinationPath),
+            default        => throw new \Exception('Formato de imagem não suportado'),
+        };
+
+        // Libera memória
         imagedestroy($newImage);
         imagedestroy($sourceImage);
     }
