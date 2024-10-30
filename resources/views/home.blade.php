@@ -46,7 +46,7 @@
                 <div class="swiper-wrapper">
                     @foreach ($marcas as $marca)
                     <div class="swiper-slide flex justify-center items-center">
-                        <img src="{{ asset('assets/marcas/' . $marca->slug . '.png') }}"
+                        <img src="{{ asset('storage/categorias/' . $marca->imagem) }}"
                             alt="{{ $marca->nome }}"
                             class="rounded-full w-52 h-52">
                     </div>
@@ -60,7 +60,7 @@
     </div>
 
     <!-- Produtos em Destaque -->
-    <div class="bg-gradient-to-r from-red-50 to-white py-12">
+    <div class="py-12">
         <div class="container mx-auto">
             <h2 class="text-center text-vermelho-asteca text-4xl font-bold mb-8">Nossos <span class="font-extrabold">Produtos em Destaque</span></h2>
 
@@ -95,14 +95,14 @@
     </div>
 
     <!-- Notícias em Destaque -->
-    <div class="bg-gradient-to-r from-red-50 to-white py-12">
+    <div class="py-12">
         <div class="container mx-auto">
             <h2 class="text-center text-gray-700 text-3xl font-semibold mb-8">Fique por dentro das nossas notícias</h2>
 
             <!-- Grid de Notícias -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach($noticias as $noticia)
-                <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <img src="{{ $noticia->imagem_url ?? asset('assets/sem_imagem.png') }}"
                         alt="{{ $noticia->titulo }}"
                         class="rounded-lg mb-4 w-full h-48 object-cover">

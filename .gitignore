@@ -4,6 +4,7 @@
 /public/hot
 /storage/*.key
 /storage/pail
+/storage/*
 /app/Providers/*.php
 /vite.config.js
 /vendor
