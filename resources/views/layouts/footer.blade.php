@@ -40,7 +40,7 @@
         <div class="w-full md:w-1/4 flex flex-col justify-center items-center md:items-end">
             <p class="mb-4">Siga-nos:</p>
             <div class="flex space-x-4">
-                <a href="#" class="text-white hover:text-red-800">
+                <a href="https://www.tiktok.com/@askov_oficial" target="_blank" class="text-white hover:text-red-800">
                     <i class="fab fa-tiktok fa-lg"></i>
                 </a>
                 <a href="#" class="text-white hover:text-red-800">
