@@ -114,7 +114,7 @@ class CategoryController extends Controller
             );
 
             // Atualiza o caminho da imagem no banco
-            $categoria->imagem = 'categorias/' . $fileName;
+            $categoria->imagem = $fileName;
         }
 
         // Salvando manualmente
