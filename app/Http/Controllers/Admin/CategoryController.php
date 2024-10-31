@@ -97,18 +97,24 @@ class CategoryController extends Controller
 
         // Tratamento da imagem
         if ($request->hasFile('imagem')) {
-            // Exclui a imagem anterior, se houver
-            if ($categoria->imagem) {
-                Storage::delete('public/categorias/' . $categoria->imagem);
-            }
+            $image = $request->file('imagem');
 
-            // Faz o upload da nova imagem
-            $imagePath = $request->file('imagem')->store('categorias', 'public');
-            $categoria->imagem = basename($imagePath);
+            // Gera um nome único para o arquivo
+            $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
-            // Redimensiona a imagem (opcional)
-            $thumbnailPath = storage_path('app/public/categorias/' . $categoria->imagem);
-            $this->resizeImage($request->file('imagem')->getRealPath(), $thumbnailPath, 300, 300);
+            // Define o caminho completo incluindo o nome do arquivo
+            $destinationPath = storage_path('app/public/categorias/' . $fileName);
+
+            // Redimensiona e salva a imagem
+            $this->resizeImage(
+                $image->getRealPath(),
+                $destinationPath,
+                800, // width
+                600  // height
+            );
+
+            // Atualiza o caminho da imagem no banco
+            $categoria->imagem = 'categorias/' . $fileName;
         }
 
         // Salvando manualmente
@@ -122,6 +128,14 @@ class CategoryController extends Controller
      */
     private function resizeImage($sourcePath, $destinationPath, $width, $height)
     {
+        // Certifique-se que o destinationPath inclui o nome do arquivo
+        $directory = dirname($destinationPath);
+
+        // Cria o diretório se não existir
+        if (!file_exists($directory)) {
+            mkdir($directory, 0775, true);
+        }
+
         // Obtém informações da imagem
         list($originalWidth, $originalHeight, $type) = getimagesize($sourcePath);
 
