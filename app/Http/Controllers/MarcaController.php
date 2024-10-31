@@ -42,23 +42,28 @@ class MarcaController extends Controller
 
     public function listarProdutosOuLinhasDaMarca($tipoSlug, $slugMarca)
     {
-        // Carregar todos os tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
         $tipo = Tipo::where('slug', $tipoSlug)->firstOrFail();
-        $marca = Categoria::where('slug', $slugMarca)->where('nivel', 'marca')->firstOrFail();
+        $marca = Categoria::where('slug', $slugMarca)
+            ->where('nivel', 'marca')
+            ->firstOrFail();
 
-        // Verificar se a marca possui produtos diretos ou linhas
-        $produtos = Categoria::where('parent_id', $marca->id)->where('nivel', 'produto')->get();
-        $linhas = Categoria::where('parent_id', $marca->id)->where('nivel', 'linha')->get();
+        // Verifica se a marca tem subcategorias (produtos ou linhas)
+        $temSubcategorias = $marca->children()->exists();
 
-        if ($produtos->isNotEmpty()) {
-            return view('marcas.produtos-marca', compact('tipo', 'marca', 'produtos', 'tiposHeader'));
-        } elseif ($linhas->isNotEmpty()) {
-            return view('marcas.linhas-marca', compact('tipo', 'marca', 'linhas', 'tiposHeader'));
+        // Se não tem subcategorias, busca produtos diretos
+        if (!$temSubcategorias) {
+            $produtos = $marca->produtos()->get();
+            return view('marcas.produtos-marca', compact('marca', 'tipo', 'produtos', 'tiposHeader'));
         }
 
-        abort(404, "Nenhum produto ou linha encontrado para esta marca.");
+        // Se tem subcategorias, busca as categorias filhas
+        $categorias = $marca->children()
+            ->where('tipo', 'produto')
+            ->get();
+
+        return view('marcas.produtos-marca', compact('marca', 'tipo', 'categorias', 'tiposHeader'));
     }
 
     public function listarLinhasOuProdutos($tipoSlug, $slugMarca, $slugProduto, $slugLinha = null)
