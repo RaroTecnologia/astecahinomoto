@@ -17,14 +17,30 @@
     <div class="space-y-8">
         <div class="flex flex-wrap justify-center gap-8">
             @foreach($marcas as $marca)
-            <a href="{{ route('marcas.produtos', [$tipo->slug, $marca->slug]) }}" class="block border p-6 rounded-lg shadow-lg hover:bg-gray-50 transition duration-200 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] max-w-sm">
+            <a href="{{ route('marcas.produtos', [$tipo->slug, $marca->slug]) }}"
+                class="block border p-6 rounded-lg shadow-lg hover:bg-gray-50 transition duration-200 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] max-w-sm">
                 <div class="flex flex-col h-full">
                     <div class="mb-4 flex justify-center">
-                        <img src="{{ $marca->imagem ? asset('storage/categorias/' . $marca->imagem) : asset('assets/sem_imagem.png') }}" alt="{{ $marca->nome }}" class="w-32 h-32 object-contain">
+                        <img src="{{ $marca->imagem ? asset('storage/categorias/' . $marca->imagem) : asset('assets/sem_imagem.png') }}"
+                            alt="{{ $marca->nome }}"
+                            class="w-32 h-32 object-contain">
                     </div>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2 text-center">{{ $marca->nome }}</h2>
-                    <p class="text-gray-600 flex-grow text-center">{{ $marca->descricao ?? 'Descrição indisponível' }}</p>
-                    <span class="text-red-600 font-semibold hover:underline mt-4 text-center">Ver mais detalhes</span>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2 text-center">
+                        {{ $marca->nome }}
+                    </h2>
+                    <p class="text-gray-600 flex-grow text-center">
+                        {{ $marca->descricao ?? 'Descrição indisponível' }}
+                    </p>
+
+                    <!-- Tipos Relacionados -->
+                    <div class="mt-4 flex flex-wrap gap-2 justify-center">
+                        @foreach($marca->tipos as $tipoRelacionado)
+                        <span class="px-2 py-1 text-sm rounded-full text-{{ $tipoRelacionado->cor_texto }}"
+                            style="background-color: #{{ $tipoRelacionado->cor_bg }};">
+                            {{ $tipoRelacionado->nome }}
+                        </span>
+                        @endforeach
+                    </div>
                 </div>
             </a>
             @endforeach

@@ -42,4 +42,17 @@ class Categoria extends Model
         }
         return $categoria; // Retorna a categoria de nível "marca", ou null se não encontrar
     }
+
+    public function tipos()
+    {
+        return $this->belongsToMany(Tipo::class, 'categoria_tipo')
+            ->withPivot('is_principal');
+    }
+
+    public function tipoPrincipal()
+    {
+        return $this->belongsToMany(Tipo::class, 'categoria_tipo')
+            ->wherePivot('is_principal', true)
+            ->first();
+    }
 }

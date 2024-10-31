@@ -38,11 +38,11 @@
         </div>
     </div>
 
-    <div class="relative w-full max-w-full overflow-hidden h-80 py-7 bg-vermelho-asteca">
+    <div class="relative overflow-hidden h-80 py-7 bg-vermelho-asteca">
         <!-- Container centralizado -->
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto">
             <!-- Swiper para Marcas -->
-            <div class="swiper-container brands-swiper h-full max-w-5xl mx-auto">
+            <div class="swiper-container brands-swiper h-full">
                 <div class="swiper-wrapper">
                     @foreach ($marcas as $marca)
                     <div class="swiper-slide flex justify-center items-center">

@@ -12,16 +12,30 @@ class MarcaController extends Controller
     public function listarTipos()
     {
         $tiposHeader = Tipo::orderBy('ordem')->get();
-        $tipos = Tipo::all();
-        return view('marcas.tipos', compact('tipos', 'tiposHeader'));
+
+        $tipos = Tipo::orderBy('ordem')
+            ->withCount(['categorias' => function ($query) {
+                $query->where('nivel', 'marca');
+            }])
+            ->get();
+
+        return view('marcas.nossas-marcas', compact('tipos', 'tiposHeader'));
     }
 
     // 2. Listar todas as marcas para um tipo específico
     public function listarMarcasPorTipo($tipoSlug)
     {
+
+        // Carregar todos os tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
+
         $tipo = Tipo::where('slug', $tipoSlug)->firstOrFail();
-        $marcas = Categoria::where('tipo_id', $tipo->id)->where('nivel', 'marca')->get();
+
+        $marcas = Categoria::whereHas('tipos', function ($query) use ($tipo) {
+            $query->where('tipos.id', $tipo->id);
+        })
+            ->where('nivel', 'marca')
+            ->get();
 
         return view('marcas.marcas-por-tipo', compact('tipo', 'marcas', 'tiposHeader'));
     }
