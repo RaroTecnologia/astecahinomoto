@@ -22,12 +22,12 @@
             $skuImagem = $produtoFinal->skus->first()->imagem ?? null;
             @endphp
             <a href="{{ route('produtos.show', ['slugMarca' => $marca->slug, 'slugProduto' => $produtoFinal->slug]) }}"
-                class="block border p-6 rounded-lg shadow-lg hover:bg-gray-50 transition duration-200 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] max-w-sm">
+                class="block border p-6 rounded-lg shadow-lg hover:shadow-xl bg-white transition duration-200 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] max-w-sm">
                 <div class="flex flex-col h-full">
                     <!-- Se o SKU tiver imagem, usa ela; caso contrário, usa a imagem do produto ou uma padrão -->
                     <img src="{{ $skuImagem ? asset('storage/skus/' . $skuImagem) : ($produtoFinal->imagem ? asset('storage/produtos/' . $produtoFinal->imagem) : asset('assets/sem_imagem.png')) }}"
                         alt="{{ $produtoFinal->nome }}"
-                        class="w-full h-48 object-cover mb-4 rounded">
+                        class="w-full h-56 object-contain mb-4 rounded">
 
                     <h2 class="text-xl font-semibold text-gray-800 mb-2 text-center">{{ $produtoFinal->nome }}</h2>
                     <p class="text-gray-600 flex-grow text-center">{{ $produtoFinal->descricao ?? 'Descrição indisponível' }}</p>
