@@ -16,10 +16,19 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
             <!-- Coluna da Imagem do Produto -->
             <div class="flex justify-center">
-                <img id="product-image"
-                    src="{{ $skus->first()->imagem ? asset('storage/skus/' . $skus->first()->imagem) : asset('assets/sem_imagem.png') }}"
-                    alt="{{ $produto->nome }}"
-                    class="w-[450px] h-[450px] object-contain rounded transition-opacity duration-200 opacity-100">
+                <!-- Container principal da imagem com altura fixa -->
+                <div class="relative w-[450px] h-[450px]">
+                    <!-- Imagem atual -->
+                    <img id="product-image"
+                        src="{{ $skus->first()->imagem ? asset('storage/skus/' . $skus->first()->imagem) : asset('assets/sem_imagem.png') }}"
+                        alt="{{ $produto->nome }}"
+                        class="absolute inset-0 w-full h-full object-contain rounded opacity-0 transition-opacity duration-200">
+
+                    <!-- Div de loading -->
+                    <div id="image-loading" class="absolute inset-0 flex items-center justify-center bg-gray-50">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Coluna das Informações do Produto -->
@@ -143,10 +152,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Função para atualizar o título e a imagem do produto ao clicar no SKU
+        const productImage = document.getElementById('product-image');
+        const loadingElement = document.getElementById('image-loading');
+        const preloadImages = document.querySelectorAll('.preload-image');
+        const imageCache = new Map();
+
+        // Pré-carrega todas as imagens
+        preloadImages.forEach(img => {
+            const src = img.src;
+            const image = new Image();
+            image.src = src;
+            image.onload = () => {
+                imageCache.set(src, true);
+            };
+        });
+
+        // Função para atualizar o título e a imagem do produto
         function updateProductTitle(skuName, skuSlug) {
             const skuTitleElement = document.getElementById('sku-title');
-            const productImage = document.getElementById('product-image');
             fadeOutElement(skuTitleElement, function() {
                 skuTitleElement.textContent = skuName;
                 fadeInElement(skuTitleElement);
@@ -154,31 +177,55 @@
             window.location.hash = skuSlug;
         }
 
-        // Funções de fade in e fade out
-        function fadeInElement(element) {
-            element.classList.remove('opacity-0');
-            element.classList.add('opacity-100');
-        }
-
+        // Funções de fade
         function fadeOutElement(element, callback) {
             element.classList.remove('opacity-100');
             element.classList.add('opacity-0');
             setTimeout(callback, 200);
         }
 
+        function fadeInElement(element) {
+            element.classList.remove('opacity-0');
+            element.classList.add('opacity-100');
+        }
+
+        // Função para trocar a imagem com loading
+        function changeImage(imageUrl) {
+            // Mostra loading
+            loadingElement.classList.remove('hidden');
+            productImage.classList.add('opacity-0');
+
+            // Se a imagem já está em cache, troca imediatamente
+            if (imageCache.has(imageUrl)) {
+                productImage.src = imageUrl;
+                setTimeout(() => {
+                    loadingElement.classList.add('hidden');
+                    productImage.classList.remove('opacity-0');
+                }, 50);
+                return;
+            }
+
+            // Se não está em cache, carrega primeiro
+            const tempImage = new Image();
+            tempImage.onload = function() {
+                imageCache.set(imageUrl, true);
+                productImage.src = imageUrl;
+                setTimeout(() => {
+                    loadingElement.classList.add('hidden');
+                    productImage.classList.remove('opacity-0');
+                }, 50);
+            };
+            tempImage.src = imageUrl;
+        }
+
         // Lógica para alterar o SKU e a imagem
         const skuOptions = document.querySelectorAll('.sku-option');
-        const productImage = document.getElementById('product-image');
-
         skuOptions.forEach(option => {
             option.addEventListener('click', function() {
                 const skuName = this.getAttribute('data-sku-name');
                 const imageUrl = this.getAttribute('data-image-url');
                 updateProductTitle(skuName, this.getAttribute('data-sku-slug'));
-                fadeOutElement(productImage, function() {
-                    productImage.src = imageUrl;
-                    fadeInElement(productImage);
-                });
+                changeImage(imageUrl);
             });
         });
 
@@ -191,21 +238,20 @@
                     const skuName = skuButton.getAttribute('data-sku-name');
                     const imageUrl = skuButton.getAttribute('data-image-url');
                     updateProductTitle(skuName, hash);
-                    productImage.src = imageUrl;
+                    changeImage(imageUrl);
                 }
             }
         }
 
+        // Inicialização
         loadSkuFromHash();
-
-        // Caso não tenha hash, carrega o primeiro SKU
         if (!window.location.hash) {
             const firstSkuButton = document.querySelector('.sku-option');
             if (firstSkuButton) {
                 const skuName = firstSkuButton.getAttribute('data-sku-name');
                 const imageUrl = firstSkuButton.getAttribute('data-image-url');
                 updateProductTitle(skuName, firstSkuButton.getAttribute('data-sku-slug'));
-                productImage.src = imageUrl;
+                changeImage(imageUrl);
             }
         }
 
