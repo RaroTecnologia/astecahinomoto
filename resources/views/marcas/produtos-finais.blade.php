@@ -47,7 +47,7 @@
                     </div>
                     @endif
 
-                    <span class="text-red-600 font-semibold hover:text-white hover:bg-red-600 transition-colors duration-200 mt-4 block text-center">Ver mais detalhes</span>
+                    <span class="text-vermelho-asteca font-semibold rounded-full px-4 py-2 border border-vermelho-asteca hover:text-white hover:bg-vermelho-asteca transition-colors duration-200 mt-4 block text-center">Ver mais detalhes</span>
                 </div>
             </a>
             @endforeach
