@@ -47,7 +47,7 @@
                     </div>
                     @endif
 
-                    <span class="text-red-600 font-semibold hover:underline mt-4 block text-center">Ver mais detalhes</span>
+                    <span class="text-red-600 font-semibold hover:text-white hover:bg-red-600 transition-colors duration-200 mt-4 block text-center">Ver mais detalhes</span>
                 </div>
             </a>
             @endforeach
