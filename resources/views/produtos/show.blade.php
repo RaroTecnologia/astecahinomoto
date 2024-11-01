@@ -126,13 +126,32 @@
             <!-- Grid de Produtos Relacionados -->
             <div id="relatedProductsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 @foreach($produtosRelacionados->take(12) as $index => $relacionado)
+                @php
+                // Define a imagem principal: primeiro produto, depois SKU
+                $imagemPrincipal = $relacionado->imagem
+                ? asset('storage/produtos/' . $relacionado->imagem)
+                : ($relacionado->skus->first()->imagem
+                ? asset('storage/skus/' . $relacionado->skus->first()->imagem)
+                : asset('assets/sem_imagem.png'));
+                @endphp
                 <div class="border p-4 rounded-lg @if($index >= 4) hidden @endif related-product">
                     <a href="{{ url('/produto/' . $categoriaMarca->slug . '/' . $relacionado->slug) }}">
-                        <img src="{{ $relacionado->skus->first()->imagem ? asset('storage/skus/' . $relacionado->skus->first()->imagem) : asset('assets/sem_imagem.png') }}"
+                        <img src="{{ $imagemPrincipal }}"
                             alt="{{ $relacionado->nome }}"
                             class="w-full h-48 object-contain mb-4">
                         <h4 class="text-xl font-semibold text-gray-800">{{ $relacionado->nome }}</h4>
                         <p class="text-gray-600">{{ $relacionado->descricao ?? 'Descrição indisponível' }}</p>
+
+                        <!-- Badges de SKUs -->
+                        @if($relacionado->skus->isNotEmpty())
+                        <div class="flex flex-wrap gap-2 justify-start mt-3">
+                            @foreach($relacionado->skus as $sku)
+                            <span class="px-2 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
+                                {{ $sku->quantidade }}
+                            </span>
+                            @endforeach
+                        </div>
+                        @endif
                     </a>
                 </div>
                 @endforeach
