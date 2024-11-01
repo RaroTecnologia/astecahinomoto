@@ -17,15 +17,15 @@
             <!-- Coluna da Imagem do Produto -->
             <div class="flex justify-center">
                 <!-- Container principal da imagem com altura fixa -->
-                <div class="relative w-[450px] h-[450px]">
+                <div class="relative w-[450px] h-[450px] bg-white">
                     <!-- Imagem atual -->
                     <img id="product-image"
                         src="{{ $skus->first()->imagem ? asset('storage/skus/' . $skus->first()->imagem) : asset('assets/sem_imagem.png') }}"
                         alt="{{ $produto->nome }}"
-                        class="absolute inset-0 w-full h-full object-contain rounded opacity-0 transition-opacity duration-200">
+                        class="absolute inset-0 w-full h-full object-contain rounded transition-opacity duration-200 ease-in-out">
 
                     <!-- Div de loading -->
-                    <div id="image-loading" class="absolute inset-0 flex items-center justify-center bg-gray-50">
+                    <div id="image-loading" class="absolute inset-0 flex items-center justify-center bg-white">
                         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
                     </div>
                 </div>
@@ -191,17 +191,17 @@
 
         // Função para trocar a imagem com loading
         function changeImage(imageUrl) {
-            // Mostra loading
+            // Mostra loading e esconde imagem atual
             loadingElement.classList.remove('hidden');
-            productImage.classList.add('opacity-0');
+            productImage.style.opacity = '0';
 
             // Se a imagem já está em cache, troca imediatamente
             if (imageCache.has(imageUrl)) {
                 productImage.src = imageUrl;
                 setTimeout(() => {
                     loadingElement.classList.add('hidden');
-                    productImage.classList.remove('opacity-0');
-                }, 50);
+                    productImage.style.opacity = '1';
+                }, 200); // Ajustado para 200ms
                 return;
             }
 
@@ -212,8 +212,8 @@
                 productImage.src = imageUrl;
                 setTimeout(() => {
                     loadingElement.classList.add('hidden');
-                    productImage.classList.remove('opacity-0');
-                }, 50);
+                    productImage.style.opacity = '1';
+                }, 200); // Ajustado para 200ms
             };
             tempImage.src = imageUrl;
         }
