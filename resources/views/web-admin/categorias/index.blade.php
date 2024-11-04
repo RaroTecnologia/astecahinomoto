@@ -64,12 +64,39 @@ renderCategoriaOptions($categoria->subcategorias, $level + 1, $selectedParentId)
                 <!-- Nível da Categoria -->
                 <div class="mb-4">
                     <label for="nivel" class="block text-gray-700 font-bold mb-2">Nível:</label>
-                    <select name="nivel" id="nivel" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="nivel" id="nivel" class="w-full px-4 py-2 border rounded-lg">
                         <option value="">Selecione</option>
                         <option value="marca">Marca</option>
                         <option value="produto">Produto</option>
                         <option value="linha">Linha</option>
                     </select>
+                </div>
+
+                <!-- Tipo ID (Relacionamento) -->
+                <div class="mb-4" id="tipo_id_container">
+                    <label for="tipo_id" class="block text-gray-700 font-bold mb-2">Tipo Relacionado:</label>
+                    <select name="tipo_id" id="tipo_id" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="">Selecione o tipo</option>
+                        @if(isset($tipos) && $tipos->count() > 0)
+                        @foreach($tipos as $tipo)
+                        <option value="{{ $tipo->id }}">{{ $tipo->nome }}</option>
+                        @endforeach
+                        @endif
+                    </select>
+                    <small class="text-gray-500">Selecione o tipo principal da marca</small>
+                </div>
+
+                <!-- Is Principal -->
+                <div class="mb-4" id="is_principal_container">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox"
+                            name="is_principal"
+                            class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-500 focus:ring-green-500"
+                            value="1"
+                            checked>
+                        <span class="ml-2 text-sm text-gray-600">É tipo principal?</span>
+                    </label>
+                    <small class="block text-gray-500">Marque se este é o tipo principal da marca</small>
                 </div>
 
                 <!-- Botão de Submissão -->
@@ -109,3 +136,26 @@ renderCategoriaOptions($categoria->subcategorias, $level + 1, $selectedParentId)
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nivelSelect = document.getElementById('nivel');
+        const tipoIdContainer = document.getElementById('tipo_id_container');
+        const isPrincipalContainer = document.getElementById('is_principal_container');
+
+        if (nivelSelect && tipoIdContainer && isPrincipalContainer) {
+            function toggleTipoFields() {
+                const isMarca = nivelSelect.value === 'marca';
+                tipoIdContainer.style.display = isMarca ? 'block' : 'none';
+                isPrincipalContainer.style.display = isMarca ? 'block' : 'none';
+            }
+
+            nivelSelect.addEventListener('change', toggleTipoFields);
+            toggleTipoFields(); // Execute on page load
+        } else {
+            console.error('Um ou mais elementos não foram encontrados');
+        }
+    });
+</script>
+@endpush

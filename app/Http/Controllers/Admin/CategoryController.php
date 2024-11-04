@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
+use App\Models\Tipo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
@@ -13,41 +14,89 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        // Carrega apenas categorias principais (sem parent_id)
-        $categorias = Categoria::with('subcategorias')->whereNull('parent_id')->get();
+        try {
+            $categorias = Categoria::whereNull('parent_id')
+                ->with('subcategorias')
+                ->get();
 
-        return view('web-admin.categorias.index', compact('categorias'));
+            // Carregar e verificar os tipos
+            $tipos = Tipo::orderBy('nome')->get();
+
+            if ($tipos->isEmpty()) {
+                Log::warning('Nenhum tipo encontrado na tabela tipos');
+            }
+
+            return view('web-admin.categorias.index', compact('categorias', 'tipos'));
+        } catch (\Exception $e) {
+            Log::error('Erro ao carregar categorias: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Erro ao carregar categorias']);
+        }
     }
 
     public function create()
     {
-        // Carrega todas as categorias principais (que não possuem parent_id)
-        $categorias = Categoria::whereNull('parent_id')->get();
-
-        return view('web-admin.categorias.create', compact('categorias'));
+        $tipos = Tipo::all();
+        $categorias = Categoria::all(); // para o parent_id
+        return view('web-admin.categorias.create', compact('tipos', 'categorias'));
     }
 
     public function store(Request $request)
     {
+        try {
+            $validated = $request->validate([
+                'nome' => 'required|string|max:255',
+                'descricao' => 'nullable|string',
+                'tipo' => 'required|string|in:noticia,receita,produto',
+                'nivel' => 'required|string|in:marca,produto,linha',
+                'parent_id' => 'nullable|exists:categorias,id',
+                'tipo_id' => $request->nivel === 'marca' ? 'required|exists:tipos,id' : 'nullable',
+                'is_principal' => 'boolean',
+                'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
 
-        //dd($request->all());
+            // Processar imagem se foi enviada
+            $imagemPath = '';  // Valor padrão vazio
+            if ($request->hasFile('imagem')) {
+                $image = $request->file('imagem');
+                $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $imagemPath = $fileName;
 
-        // Gerar o slug automaticamente
-        $slug = Str::slug($request->input('nome'));
+                // Salvar imagem usando seu método existente
+                $this->resizeImage(
+                    $image->getRealPath(),
+                    storage_path('app/public/categorias/' . $fileName),
+                    800,
+                    600
+                );
+            }
 
-        // Criar a categoria com o tipo, slug e nível gerados
-        Categoria::create([
-            'nome' => $request->input('nome'),
-            'slug' => $slug,
-            'descricao' => $request->input('descricao'),
-            'parent_id' => $request->input('parent_id'),
-            'tipo' => $request->input('tipo'),
-            'nivel' => $request->input('nivel'),
-        ]);
+            // Criar a categoria
+            $categoria = Categoria::create([
+                'nome' => $validated['nome'],
+                'descricao' => $validated['descricao'],
+                'slug' => Str::slug($validated['nome']),
+                'tipo' => $validated['tipo'],
+                'nivel' => $validated['nivel'],
+                'parent_id' => $validated['parent_id'],
+                'imagem' => $imagemPath  // Adiciona o campo imagem
+            ]);
 
-        return redirect()->route('web-admin.categorias.index')->with('success', 'Categoria criada com sucesso');
+            // Se for uma marca e tiver tipo_id, vincular
+            if ($validated['nivel'] === 'marca' && isset($validated['tipo_id'])) {
+                $categoria->tipos()->attach($validated['tipo_id'], [
+                    'is_principal' => $request->boolean('is_principal', true)
+                ]);
+            }
+
+            return redirect()->route('web-admin.categorias.index')
+                ->with('success', 'Categoria criada com sucesso.');
+        } catch (\Exception $e) {
+            Log::error('Erro ao criar categoria: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Erro ao criar categoria. Por favor, verifique os dados e tente novamente.']);
+        }
     }
-
 
     public function edit($id)
     {
@@ -59,7 +108,6 @@ class CategoryController extends Controller
 
         return view('web-admin.categorias.edit', compact('categoria', 'categorias'));
     }
-
 
     public function update(Request $request, Categoria $categoria)
     {
@@ -177,7 +225,6 @@ class CategoryController extends Controller
         imagedestroy($newImage);
         imagedestroy($sourceImage);
     }
-
 
     public function destroy(Categoria $categoria)
     {

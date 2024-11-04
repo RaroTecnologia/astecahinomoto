@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Kalnoy\Nestedset\NodeTrait;
 
 class Categoria extends Model
 {
-    use HasFactory, NodeTrait;
+    use HasFactory;
 
-    protected $fillable = ['nome', 'slug', 'descricao', 'imagem', 'parent_id', 'tipo', 'nivel'];
+    protected $fillable = ['nome', 'slug', 'descricao', 'imagem', 'parent_id', 'tipo', 'nivel', 'tipo_id'];
 
-    // Relacionamentos já existentes
+    // Seus relacionamentos atuais são suficientes
     public function produtos()
     {
         return $this->hasMany(Produto::class, 'categoria_id');
@@ -33,14 +32,13 @@ class Categoria extends Model
         return $this->hasMany(Categoria::class, 'parent_id');
     }
 
-    // Método para percorrer recursivamente as categorias até encontrar a marca
     public function getMarca()
     {
         $categoria = $this;
         while ($categoria && $categoria->nivel !== 'marca') {
             $categoria = $categoria->parent;
         }
-        return $categoria; // Retorna a categoria de nível "marca", ou null se não encontrar
+        return $categoria;
     }
 
     public function tipos()
