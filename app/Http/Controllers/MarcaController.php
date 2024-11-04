@@ -75,15 +75,25 @@ class MarcaController extends Controller
 
         if ($slugLinha) {
             $linha = Categoria::where('slug', $slugLinha)->where('parent_id', $produtoOuLinha->id)->firstOrFail();
-            $produtosFinais = Produto::where('categoria_id', $linha->id)->get();
+            $produtosFinais = Produto::where('categoria_id', $linha->id)
+                ->where('is_active', 1)
+                ->get();
         } else {
-            $subLinhas = Categoria::where('parent_id', $produtoOuLinha->id)->where('nivel', 'linha')->get();
-            $produtosFinais = Produto::where('categoria_id', $produtoOuLinha->id)->get();
+            // Busca apenas sublinhas que tenham produtos ativos
+            $subLinhas = Categoria::where('parent_id', $produtoOuLinha->id)
+                ->where('nivel', 'linha')
+                ->whereHas('produtos', function ($query) {
+                    $query->where('is_active', 1);
+                })
+                ->get();
+
+            $produtosFinais = Produto::where('categoria_id', $produtoOuLinha->id)
+                ->where('is_active', 1)
+                ->get();
         }
 
-        // Verificar se há apenas um produto final
+        // Verificar se há apenas um produto final ativo
         if ($produtosFinais->count() === 1) {
-            // Redirecionar diretamente para o único produto final encontrado
             $produtoUnico = $produtosFinais->first();
             return redirect()->route('produtos.show', ['slugMarca' => $marca->slug, 'slugProduto' => $produtoUnico->slug]);
         }

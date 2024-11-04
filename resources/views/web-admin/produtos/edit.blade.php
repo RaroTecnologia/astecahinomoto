@@ -16,7 +16,7 @@
             <h3 class="text-lg font-bold mb-6">Variações de SKU</h3>
 
             <div id="sku-list">
-                @foreach($produto->skus as $sku)
+                @foreach($produto->allSkus as $sku)
                 <div class="mb-4 border p-4 rounded-md sku-item" data-id="{{ $sku->id }}">
                     @component('web-admin.produtos._sku-form', ['sku' => $sku, 'produtoId' => $produto->id, 'method' => 'PUT'])
                     @endcomponent

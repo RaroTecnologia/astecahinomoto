@@ -13,6 +13,7 @@ class Sku extends Model
 
     protected $fillable = [
         'nome',
+        'is_active',
         'slug',
         'imagem',
         'thumbnail',

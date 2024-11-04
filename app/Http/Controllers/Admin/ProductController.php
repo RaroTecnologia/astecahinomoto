@@ -86,7 +86,8 @@ class ProductController extends Controller
     public function edit($id)
     {
         try {
-            $produto = Produto::findOrFail($id);
+            $produto = Produto::with('allSkus')
+                ->findOrFail($id);
             $tabelasNutricionais = TabelaNutricional::all();
             $categorias = Categoria::where('tipo', 'produto')->get();
             return view('web-admin.produtos.edit', compact('produto', 'tabelasNutricionais', 'categorias'));
@@ -105,39 +106,39 @@ class ProductController extends Controller
                 'ingredientes' => 'nullable|string',
                 'tabela_nutricional_id' => 'nullable|exists:tabelas_nutricionais,id',
                 'categoria_id' => 'nullable|exists:categorias,id',
-                'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Valida o upload de imagem
-                'is_active' => 'boolean',
+                'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'is_active' => 'nullable',
             ]);
 
             $produto = Produto::findOrFail($id);
 
-            $slug = $produto->nome !== $request->input('nome') ? Str::slug($request->input('nome')) : $produto->slug;
-
+            // Processa a imagem se houver upload
             if ($request->hasFile('imagem')) {
                 if ($produto->imagem && Storage::exists('public/produtos/' . $produto->imagem)) {
                     Storage::delete('public/produtos/' . $produto->imagem);
                 }
-
                 $imagePath = $request->file('imagem')->store('produtos', 'public');
                 $produto->imagem = basename($imagePath);
             }
 
+            // Converte o status para 0 ou 1
+            $isActive = $request->has('is_active') ? 1 : 0;
+
+            // Atualiza os dados do produto
             $produto->update([
                 'nome' => $request->input('nome'),
-                'slug' => $slug,
-                'categoria_id' => $request->input('categoria_id'),
+                'slug' => $produto->nome !== $request->input('nome') ? Str::slug($request->input('nome')) : $produto->slug,
                 'descricao' => $request->input('descricao'),
                 'ingredientes' => $request->input('ingredientes'),
+                'categoria_id' => $request->input('categoria_id'),
                 'tabela_nutricional_id' => $request->input('tabela_nutricional_id'),
-                'imagem' => $produto->imagem ?? $produto->imagem,
-                'is_active' => $request->boolean('is_active'),
+                'is_active' => $isActive, // Valor 0 ou 1
             ]);
 
-            return redirect()->route('web-admin.produtos.edit', $produto->id)
-                ->with('success', 'Produto atualizado com sucesso.');
+            return response()->json(['success' => true, 'message' => 'Produto atualizado com sucesso.']);
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar produto: ' . $e->getMessage());
-            return redirect()->back()->withErrors('Ocorreu um erro ao atualizar o produto.');
+            return response()->json(['success' => false, 'message' => 'Erro ao atualizar produto.'], 500);
         }
     }
 

@@ -39,45 +39,47 @@ class SkuController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $sku = Sku::findOrFail($id);
-            Log::info('Request completo:', $request->all());
-
             $request->validate([
                 'nome' => 'required|string|max:255',
-                'quantidade' => 'nullable|string|max:255',
-                'unidade' => 'nullable|string|max:255',
-                'ean' => 'nullable|string|max:17',
-                'dun' => 'nullable|string|max:18',
-                'porcao_tabela' => 'nullable|string|max:60',
-                'quantidade_inner' => 'nullable|string|max:60',
-                'codigo_sku' => 'nullable|string|max:60',
-                'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                'quantidade' => 'nullable|string',
+                'unidade' => 'nullable|string',
+                'ean' => 'nullable|string',
+                'dun' => 'nullable|string',
+                'porcao_tabela' => 'nullable|string',
+                'quantidade_inner' => 'nullable|string',
+                'codigo_sku' => 'nullable|string',
+                'is_active' => 'nullable|boolean', // Validação do status
             ]);
 
-            $skuData = $request->only(['nome', 'quantidade', 'unidade', 'porcao_tabela', 'quantidade_inner', 'ean', 'dun', 'codigo_sku']);
+            $sku = Sku::findOrFail($id);
 
+            // Processa a imagem se houver upload
             if ($request->hasFile('imagem')) {
-                $this->deleteImage($sku);
-
+                if ($sku->imagem && Storage::exists('public/skus/' . $sku->imagem)) {
+                    Storage::delete('public/skus/' . $sku->imagem);
+                }
                 $imagePath = $request->file('imagem')->store('skus', 'public');
-                $imageName = basename($imagePath);
-                $skuData['imagem'] = $imageName;
-
-                $thumbnailPath = storage_path('app/public/thumbnails/' . $imageName);
-                $this->resizeImage($request->file('imagem')->getRealPath(), $thumbnailPath, 300, 300);
+                $sku->imagem = basename($imagePath);
             }
 
-            $sku->update($skuData);
-
-            Log::info('SKU atualizado com sucesso:', ['id' => $sku->id, 'dados' => $skuData]);
+            // Atualiza os dados do SKU
+            $sku->update([
+                'nome' => $request->input('nome'),
+                'slug' => Str::slug($request->input('nome')),
+                'quantidade' => $request->input('quantidade'),
+                'unidade' => $request->input('unidade'),
+                'ean' => $request->input('ean'),
+                'dun' => $request->input('dun'),
+                'porcao_tabela' => $request->input('porcao_tabela'),
+                'quantidade_inner' => $request->input('quantidade_inner'),
+                'codigo_sku' => $request->input('codigo_sku'),
+                'is_active' => $request->boolean('is_active'), // Usa o helper boolean()
+            ]);
 
             return response()->json(['success' => true, 'message' => 'SKU atualizado com sucesso.']);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::error('SKU não encontrado: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'SKU não encontrado.'], 404);
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar SKU: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Erro ao atualizar SKU: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Erro ao atualizar SKU.'], 500);
         }
     }
 

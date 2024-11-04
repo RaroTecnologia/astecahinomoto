@@ -74,62 +74,41 @@
     <!-- Botões de Salvar e Cancelar -->
     <div class="flex justify-end mt-6">
         <a href="{{ route('web-admin.produtos.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-700 mr-2">Cancelar</a>
-        <button type="submit" id="submitBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+        <button type="button" id="submitBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
             Salvar Produto
         </button>
     </div>
 </form>
 
 <script>
-    document.getElementById('submitBtn').addEventListener('click', function() {
-        const form = document.getElementById('productForm');
-        const formData = new FormData(form);
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('submitBtn').addEventListener('click', function(e) {
+            e.preventDefault(); // Previne qualquer comportamento padrão
 
-        fetch(form.action, {
-                method: 'POST', // Mesmo sendo PUT, Laravel usa POST com _method PUT
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                }
-            })
-            .then(response => {
-                console.log('Status de resposta:', response.status);
+            const form = document.getElementById('productForm');
+            const formData = new FormData(form);
 
-                // Se a resposta for 204 (No Content), consideramos sucesso sem conteúdo
-                if (response.status === 204) {
-                    return null; // Nada a processar
-                }
-
-                // Se a resposta for 200 (OK), verificamos se há conteúdo
-                if (response.status === 200) {
-                    return response.text().then(text => {
-                        // Se houver texto, tentamos processar como JSON
-                        return text ? JSON.parse(text) : {}; // Verifica se o texto é vazio
-                    });
-                }
-
-                // Se houver erro de validação (422), processamos os erros
-                if (response.status === 422) {
-                    return response.json().then(errors => {
-                        notyf.error('Erro de validação');
-                        console.log(errors);
-                    });
-                }
-
-                // Se não for nenhuma das condições acima, lançamos um erro
-                throw new Error('Erro inesperado');
-            })
-            .then(data => {
-                // Tratamos o caso onde recebemos JSON
-                if (data && data.success) {
-                    notyf.success('Produto atualizado com sucesso!');
-                }
-            })
-            .catch(error => {
-                // Tratamos todos os erros de comunicação
-                notyf.error('Erro de comunicação com o servidor.');
-                console.error(error);
-            });
+            fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json', // Garante que esperamos JSON como resposta
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        notyf.success(data.message);
+                    } else {
+                        notyf.error(data.message || 'Erro ao atualizar produto');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    notyf.error('Erro ao atualizar produto');
+                });
+        });
     });
 </script>
