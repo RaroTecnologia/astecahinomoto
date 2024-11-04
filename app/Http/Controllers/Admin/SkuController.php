@@ -48,7 +48,7 @@ class SkuController extends Controller
                 'porcao_tabela' => 'nullable|string',
                 'quantidade_inner' => 'nullable|string',
                 'codigo_sku' => 'nullable|string',
-                'is_active' => 'nullable|boolean', // Validação do status
+                'is_active' => 'nullable|in:0,1,true,false,on,off', // Aceita vários formatos
             ]);
 
             $sku = Sku::findOrFail($id);
@@ -62,6 +62,9 @@ class SkuController extends Controller
                 $sku->imagem = basename($imagePath);
             }
 
+            // Converte explicitamente o is_active para 0 ou 1
+            $isActive = in_array($request->input('is_active'), [1, '1', true, 'true', 'on']) ? 1 : 0;
+
             // Atualiza os dados do SKU
             $sku->update([
                 'nome' => $request->input('nome'),
@@ -73,7 +76,7 @@ class SkuController extends Controller
                 'porcao_tabela' => $request->input('porcao_tabela'),
                 'quantidade_inner' => $request->input('quantidade_inner'),
                 'codigo_sku' => $request->input('codigo_sku'),
-                'is_active' => $request->boolean('is_active'), // Usa o helper boolean()
+                'is_active' => $isActive, // Usa o valor convertido
             ]);
 
             return response()->json(['success' => true, 'message' => 'SKU atualizado com sucesso.']);
