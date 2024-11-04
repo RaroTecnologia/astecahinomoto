@@ -25,6 +25,11 @@ class Sku extends Model
         'porcao_tabela',
         'quantidade_inner',
         'codigo_sku',
+        'is_active'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     // Relacionamento com o produto
@@ -37,5 +42,10 @@ class Sku extends Model
     public function valoresNutricionais()
     {
         return $this->hasMany(ValorNutricional::class, 'sku_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

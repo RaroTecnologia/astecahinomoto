@@ -24,6 +24,7 @@ class ProdutoController extends Controller
         // Tenta encontrar o produto com base no slug e na lista de IDs de categorias
         $produto = Produto::where('slug', $slugProduto)
             ->whereIn('categoria_id', $categoriaIds)
+            ->where('is_active', true)
             ->firstOrFail();
 
         // Carrega valores nutricionais se houver
@@ -33,11 +34,14 @@ class ProdutoController extends Controller
             ->get();
 
         // Carrega os SKUs do produto
-        $skus = Sku::where('produto_id', $produto->id)->get();
+        $skus = Sku::where('produto_id', $produto->id)
+            ->where('is_active', true)
+            ->get();
 
         // Busca produtos relacionados dentro da mesma categoria
         $produtosRelacionados = Produto::where('categoria_id', $produto->categoria_id)
             ->where('id', '!=', $produto->id)
+            ->where('is_active', true)
             ->get();
 
         // Carrega os tipos de header

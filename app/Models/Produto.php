@@ -30,7 +30,17 @@ class Produto extends Model
 
     public function skus()
     {
+        return $this->hasMany(Sku::class, 'produto_id')->where('is_active', true);
+    }
+
+    public function allSkus()
+    {
         return $this->hasMany(Sku::class, 'produto_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 
     public function getMarcaAttribute()

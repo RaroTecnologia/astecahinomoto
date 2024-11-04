@@ -99,7 +99,6 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            // Validações
             $request->validate([
                 'nome' => 'required|string|max:255',
                 'descricao' => 'nullable|string',
@@ -107,27 +106,22 @@ class ProductController extends Controller
                 'tabela_nutricional_id' => 'nullable|exists:tabelas_nutricionais,id',
                 'categoria_id' => 'nullable|exists:categorias,id',
                 'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Valida o upload de imagem
+                'is_active' => 'boolean',
             ]);
 
-            // Encontra o produto
             $produto = Produto::findOrFail($id);
 
-            // Verificar se o nome foi alterado para gerar o slug novamente
             $slug = $produto->nome !== $request->input('nome') ? Str::slug($request->input('nome')) : $produto->slug;
 
-            // Tratamento da imagem (caso uma nova imagem tenha sido enviada)
             if ($request->hasFile('imagem')) {
-                // Apagar imagem anterior, se existir
                 if ($produto->imagem && Storage::exists('public/produtos/' . $produto->imagem)) {
                     Storage::delete('public/produtos/' . $produto->imagem);
                 }
 
-                // Fazer o upload da nova imagem
                 $imagePath = $request->file('imagem')->store('produtos', 'public');
-                $produto->imagem = basename($imagePath); // Armazena apenas o nome do arquivo no banco de dados
+                $produto->imagem = basename($imagePath);
             }
 
-            // Atualizar os dados do produto
             $produto->update([
                 'nome' => $request->input('nome'),
                 'slug' => $slug,
@@ -135,17 +129,17 @@ class ProductController extends Controller
                 'descricao' => $request->input('descricao'),
                 'ingredientes' => $request->input('ingredientes'),
                 'tabela_nutricional_id' => $request->input('tabela_nutricional_id'),
-                'imagem' => $produto->imagem ?? $produto->imagem, // Mantém a imagem se não for enviada uma nova
+                'imagem' => $produto->imagem ?? $produto->imagem,
+                'is_active' => $request->boolean('is_active'),
             ]);
 
-            // Redirecionar para a página de edição do produto com uma mensagem de sucesso
-            return redirect()->route('web-admin.produtos.edit', $produto->id)->with('success', 'Produto atualizado com sucesso.');
+            return redirect()->route('web-admin.produtos.edit', $produto->id)
+                ->with('success', 'Produto atualizado com sucesso.');
         } catch (\Exception $e) {
             Log::error('Erro ao atualizar produto: ' . $e->getMessage());
             return redirect()->back()->withErrors('Ocorreu um erro ao atualizar o produto.');
         }
     }
-
 
     public function destroy($id)
     {
