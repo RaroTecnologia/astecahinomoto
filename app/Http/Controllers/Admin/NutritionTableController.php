@@ -33,6 +33,7 @@ class NutritionTableController extends Controller
             'porcao_caseira' => 'nullable|string|max:255',
             'primeiro_valor' => 'nullable|string|max:10',
             'segundo_valor' => 'nullable|string|max:10',
+            'rodape' => 'nullable|string|max:255',
         ]);
 
         // Criação da tabela nutricional
@@ -41,6 +42,7 @@ class NutritionTableController extends Controller
             'porcao_caseira' => $request->input('porcao_caseira'),
             'primeiro_valor' => $request->input('primeiro_valor'),
             'segundo_valor' => $request->input('segundo_valor'),
+            'rodape' => $request->input('rodape'),
         ]);
 
         // Verifica se o redirecionamento para edição foi solicitado
@@ -68,6 +70,7 @@ class NutritionTableController extends Controller
             'porcao_caseira' => $request->input('porcao_caseira'),
             'primeiro_valor' => $request->input('primeiro_valor'),
             'segundo_valor' => $request->input('segundo_valor'),
+            'rodape' => $request->input('rodape'),
         ]);
 
         // Limpar nutrientes existentes antes de adicionar os novos

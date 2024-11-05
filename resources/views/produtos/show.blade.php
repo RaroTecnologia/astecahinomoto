@@ -121,7 +121,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr class="border-t-4 border-black">
-                                        <td colspan="4" class="py-2 text-sm">*Percentual de valores diários fornecidos pela porção.</td>
+                                        <td colspan="4" class="py-2 text-sm">{{ $produto->tabelaNutricional->rodape ?? '*Percentual de valores diários fornecidos pela porção.' }}</td>
                                     </tr>
                                 </tfoot>
                             </table>

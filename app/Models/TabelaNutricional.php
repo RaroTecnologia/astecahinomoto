@@ -15,7 +15,8 @@ class TabelaNutricional extends Model
         'nome',
         'porcao_caseira',
         'primeiro_valor',
-        'segundo_valor'
+        'segundo_valor',
+        'rodape'
     ];
 
     public function nutrientes()

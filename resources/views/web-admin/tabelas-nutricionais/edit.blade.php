@@ -53,34 +53,42 @@
                     <input type="text" name="segundo_valor" id="segundo_valor" value="{{ $tabelaNutricional->segundo_valor }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
 
+                <!-- Rodapé -->
+                <div class="mb-4">
+                    <label for="rodape" class="block text-gray-700 font-bold mb-2">Rodapé da Tabela:</label>
+                    <textarea name="rodape" id="rodape" rows="3" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ $tabelaNutricional->rodape ?? '*Percentual de valores diários fornecidos pela porção.' }}</textarea>
+                </div>
+
                 <!-- Nutrientes Dinâmicos -->
                 <h3 class="text-xl font-semibold mb-4">Nutrientes Selecionados</h3>
                 <div id="nutrientes-container">
                     @foreach($tabelaNutricional->nutrientes as $nutriente)
-                    <div class="flex items-center mb-4 nutrient-row" data-id="{{ $nutriente->id }}">
+                    <div class="flex items-center space-x-4 mb-4 nutrient-row" data-id="{{ $nutriente->id }}">
                         <input type="hidden" name="nutrientes[{{ $nutriente->id }}][id]" value="{{ $nutriente->id }}">
-                        <div class="w-1/4">
+                        <div class="w-1/3">
                             <label class="block text-gray-700 font-bold">{{ $nutriente->nome }} ({{ $nutriente->unidade_medida }})</label>
                         </div>
-                        <div class="w-1/4">
+                        <div class="w-[15%]">
                             <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_por_100g]"
                                 value="{{ $nutriente->pivot->valor_por_100g }}"
-                                placeholder="Valor por 100g"
-                                class="w-full px-4 py-2 border rounded-lg">
+                                placeholder="100g"
+                                class="w-full px-2 py-1 border rounded-lg text-sm">
                         </div>
-                        <div class="w-1/4">
+                        <div class="w-[15%]">
                             <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_por_porção]"
                                 value="{{ $nutriente->pivot->valor_por_porção }}"
-                                placeholder="Valor por Porção"
-                                class="w-full px-4 py-2 border rounded-lg">
+                                placeholder="Porção"
+                                class="w-full px-2 py-1 border rounded-lg text-sm">
                         </div>
-                        <div class="w-1/4">
+                        <div class="w-[15%]">
                             <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_diario]"
                                 value="{{ $nutriente->pivot->valor_diario }}"
                                 placeholder="%VD"
-                                class="w-full px-4 py-2 border rounded-lg">
+                                class="w-full px-2 py-1 border rounded-lg text-sm">
                         </div>
-                        <button type="button" class="text-red-500 ml-4 remove-nutrient">Excluir</button>
+                        <button type="button" class="text-red-500 remove-nutrient">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                     @endforeach
                 </div>
@@ -112,21 +120,29 @@
 
             const container = document.querySelector('#nutrientes-container');
             const nutrientRow = `
-                <div class="flex items-center mb-4 nutrient-row" data-id="${id}">
+                <div class="flex items-center space-x-4 mb-4 nutrient-row" data-id="${id}">
                     <input type="hidden" name="nutrientes[${id}][id]" value="${id}">
-                    <div class="w-1/4">
+                    <div class="w-1/3">
                         <label class="block text-gray-700 font-bold">${nome} (${unidade})</label>
                     </div>
-                    <div class="w-1/4">
-                        <input type="text" name="nutrientes[${id}][valor_por_100g]" placeholder="Valor por 100g" class="w-full px-4 py-2 border rounded-lg">
+                    <div class="w-[15%]">
+                        <input type="text" name="nutrientes[${id}][valor_por_100g]" 
+                            placeholder="100g" 
+                            class="w-full px-2 py-1 border rounded-lg text-sm">
                     </div>
-                    <div class="w-1/4">
-                        <input type="text" name="nutrientes[${id}][valor_por_porção]" placeholder="Valor por Porção" class="w-full px-4 py-2 border rounded-lg">
+                    <div class="w-[15%]">
+                        <input type="text" name="nutrientes[${id}][valor_por_porção]" 
+                            placeholder="Porção" 
+                            class="w-full px-2 py-1 border rounded-lg text-sm">
                     </div>
-                    <div class="w-1/4">
-                        <input type="text" name="nutrientes[${id}][valor_diario]" placeholder="%VD" class="w-full px-4 py-2 border rounded-lg">
+                    <div class="w-[15%]">
+                        <input type="text" name="nutrientes[${id}][valor_diario]" 
+                            placeholder="%VD" 
+                            class="w-full px-2 py-1 border rounded-lg text-sm">
                     </div>
-                    <button type="button" class="text-red-500 ml-4 remove-nutrient">Excluir</button>
+                    <button type="button" class="text-red-500 remove-nutrient">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>`;
             container.insertAdjacentHTML('beforeend', nutrientRow);
         });
