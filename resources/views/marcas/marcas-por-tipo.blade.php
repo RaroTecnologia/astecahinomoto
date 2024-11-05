@@ -7,7 +7,7 @@
     <!-- Breadcrumb -->
     <x-breadcrumb-share
         :tipo="$tipo"
-        currentPage="{{ $tipo->nome }}" />
+        currentPage="" />
 
     <!-- Título da Página -->
     <div class="text-center mb-16">
