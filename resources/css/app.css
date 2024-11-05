@@ -17,12 +17,12 @@
 .tabela-nutricional {
     border: 2px solid #000;
     padding: 10px;
-    display: inline-block;
 }
 
 .tabela-nutricional table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .tabela-nutricional td {
@@ -31,20 +31,17 @@
     font-family: Arial, sans-serif;
 }
 
-.tabela-linha1, .border-t-4 {
-    border-top: 5px solid #000;
+/* Estilo específico para o título principal */
+.tabela-nutricional thead tr:first-child td {
+    font-size: 24px;
 }
 
-.border-b {
-    border-bottom: 1px solid #000;
+.coluna-nutriente {
+    text-align: left;
 }
 
-.border-black {
-    border-color: #000;
-}
-
-.pl-4 {
-    padding-left: 16px;
+.coluna-valor {
+    text-align: center;
 }
 
 /* Estilos do Swiper */
@@ -124,3 +121,4 @@
     background: #000000 !important;
     opacity: 0.2 !important;
 }
+

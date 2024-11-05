@@ -7,6 +7,7 @@ use App\Models\Sku;
 use App\Models\Tipo;
 use App\Models\Categoria;
 use App\Models\ValorNutricional;
+use App\Models\TabelaNutricional;
 
 class ProdutoController extends Controller
 {
@@ -36,10 +37,19 @@ class ProdutoController extends Controller
         $categoriaProduto = $categoriaLinha ? Categoria::find($categoriaLinha->parent_id) : null;
 
         // Carrega valores nutricionais se houver
-        $valoresNutricionais = ValorNutricional::where('tabela_nutricional_id', $produto->tabela_nutricional_id)
-            ->join('nutrientes', 'valores_nutricionais.nutriente_id', '=', 'nutrientes.id')
-            ->select('nutrientes.nome', 'valores_nutricionais.valor_por_100g', 'valores_nutricionais.valor_por_porção', 'valores_nutricionais.valor_diario')
-            ->get();
+        $valoresNutricionais = null;
+        if ($produto->tabela_nutricional_id) {
+            $tabelaNutricional = TabelaNutricional::with(['nutrientes' => function ($query) {
+                $query->select(
+                    'nutrientes.*',
+                    'valores_nutricionais.valor_por_100g',
+                    'valores_nutricionais.valor_por_porção',
+                    'valores_nutricionais.valor_diario'
+                );
+            }])->find($produto->tabela_nutricional_id);
+
+            $valoresNutricionais = $tabelaNutricional ? $tabelaNutricional->nutrientes : collect();
+        }
 
         // Carrega os SKUs do produto
         $skus = Sku::where('produto_id', $produto->id)

@@ -9,7 +9,7 @@ class Nutriente extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nome', 'unidade_medida', 'tipo_nutriente'];
+    protected $fillable = ['nome', 'unidade_medida', 'tipo_nutriente', 'nivel'];
 
     // Relação muitos-para-muitos com Tabelas Nutricionais
     public function tabelasNutricionais()

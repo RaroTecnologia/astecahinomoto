@@ -49,7 +49,8 @@
                             class="sku-option px-3 py-1 border text-gray-700 rounded-full hover:bg-red-600 hover:text-white transition min-w-[80px] text-center text-sm md:text-base"
                             data-sku-name="{{ $sku->nome }}"
                             data-sku-slug="{{ $sku->slug }}"
-                            data-image-url="{{ asset('storage/skus/' . $sku->imagem) }}">
+                            data-image-url="{{ asset('storage/skus/' . $sku->imagem) }}"
+                            data-porcao-tabela="{{ $sku->porcao_tabela }}">
                             {{ $sku->quantidade }}
                         </button>
                         @endforeach
@@ -79,31 +80,42 @@
                     </button>
                     <div class="accordion-content overflow-hidden transition-all duration-300 ease-in-out" style="height: 0;">
                         <div class="tabela-nutricional py-4">
-                            <table class="w-full table-fixed border border-black mt-4">
+                            <table class="w-full table-fixed">
+                                <colgroup>
+                                    <col width="40%">
+                                    <col width="20%">
+                                    <col width="20%">
+                                    <col width="20%">
+                                </colgroup>
                                 <thead>
                                     <tr>
                                         <td colspan="4" class="text-center font-bold text-2xl py-2">INFORMAÇÃO NUTRICIONAL</td>
                                     </tr>
-                                    <tr class="tabela-linha1">
-                                        <td colspan="4" class="border-b border-black py-2 text-sm">
-                                            Porções por embalagem: {{ $produto->tabelaNutricional->porcao_tabela ?? '' }}<br>
+                                    <tr class="tabela-linha1 border-t border-b-[5px] border-black">
+                                        <td colspan="4" class="py-2 text-sm">
+                                            Porções por embalagem: {{ $skus->first()->porcao_tabela ?? '' }}<br>
                                             Porção: {{ $produto->tabelaNutricional->porcao_caseira ?? '' }}
                                         </td>
                                     </tr>
-                                    <tr class="border-t-4 border-black">
-                                        <td class="text-left py-2"></td>
-                                        <td class="text-center py-2 font-bold">100g</td>
-                                        <td class="text-center py-2 font-bold">{{ $produto->tabelaNutricional->segundo_valor ?? '' }}</td>
-                                        <td class="text-center py-2 font-bold">%VD*</td>
+                                    <tr>
+                                        <td colspan="4" style="height: 8px; padding: 0;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left"></td>
+                                        <td class="text-center font-bold border-l border-black">{{ $produto->tabelaNutricional->primeiro_valor ?? '100 g' }}</td>
+                                        <td class="text-center font-bold border-l border-r border-black">{{ $produto->tabelaNutricional->segundo_valor ?? '' }}</td>
+                                        <td class="text-center font-bold">%VD*</td>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($produto->tabelaNutricional->nutrientes ?? [] as $nutriente)
                                     <tr>
-                                        <td class="border-t border-b border-black py-2">{{ $nutriente->nome ?? '' }}</td>
-                                        <td class="border-t border-b border-black text-center">{{ $nutriente->valor_100g ?? '' }}</td>
-                                        <td class="border-t border-b border-black text-center">{{ $nutriente->valor_porcao ?? '' }}</td>
-                                        <td class="border-t border-b border-black text-center">{{ $nutriente->vd ?? '' }}</td>
+                                        <td class="text-left border-t border-b border-black py-2">
+                                            {!! $nutriente->nivel == 2 ? '&nbsp;' : ($nutriente->nivel == 3 ? '&nbsp;&nbsp;' : '') !!}{{ $nutriente->nome }}
+                                        </td>
+                                        <td class="text-center border-t border-b border-l border-black">{{ $nutriente->pivot->valor_por_100g }}</td>
+                                        <td class="text-center border-t border-b border-l border-r border-black">{{ $nutriente->pivot->valor_por_porção }}</td>
+                                        <td class="text-center border-t border-b border-black">{{ $nutriente->pivot->valor_diario }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -192,10 +204,16 @@
         });
 
         // Função para atualizar o título e a imagem do produto
-        function updateProductTitle(skuName, skuSlug) {
+        function updateProductTitle(skuName, skuSlug, skuPorcaoTabela) {
             const skuTitleElement = document.getElementById('sku-title');
+            const porcaoTabelaElement = document.querySelector('.tabela-linha1 td');
+
             fadeOutElement(skuTitleElement, function() {
                 skuTitleElement.textContent = skuName;
+                if (porcaoTabelaElement) {
+                    const porcaoCaseira = porcaoTabelaElement.innerHTML.split('<br>')[1] || '';
+                    porcaoTabelaElement.innerHTML = `Porções por embalagem: ${skuPorcaoTabela}<br>${porcaoCaseira}`;
+                }
                 fadeInElement(skuTitleElement);
             });
             window.location.hash = skuSlug;
@@ -248,33 +266,41 @@
             option.addEventListener('click', function() {
                 const skuName = this.getAttribute('data-sku-name');
                 const imageUrl = this.getAttribute('data-image-url');
-                updateProductTitle(skuName, this.getAttribute('data-sku-slug'));
+                const skuPorcaoTabela = this.getAttribute('data-porcao-tabela');
+                updateProductTitle(skuName, this.getAttribute('data-sku-slug'), skuPorcaoTabela);
                 changeImage(imageUrl);
             });
         });
 
-        // Carrega o SKU baseado no hash da URL
+        // Carrega o SKU baseado no hash da URL ou o primeiro SKU
         function loadSkuFromHash() {
             const hash = window.location.hash.substring(1);
-            if (hash) {
-                const skuButton = document.querySelector(`button[data-sku-slug="${hash}"]`);
-                if (skuButton) {
-                    const skuName = skuButton.getAttribute('data-sku-name');
-                    const imageUrl = skuButton.getAttribute('data-image-url');
-                    updateProductTitle(skuName, hash);
-                    changeImage(imageUrl);
-                }
+            const skuButton = hash ?
+                document.querySelector(`button[data-sku-slug="${hash}"]`) :
+                document.querySelector('.sku-option');
+
+            if (skuButton) {
+                const skuName = skuButton.getAttribute('data-sku-name');
+                const imageUrl = skuButton.getAttribute('data-image-url');
+                const skuPorcaoTabela = skuButton.getAttribute('data-porcao-tabela');
+
+                updateProductTitle(skuName, skuButton.getAttribute('data-sku-slug'), skuPorcaoTabela);
+                changeImage(imageUrl);
             }
         }
 
         // Inicialização
         loadSkuFromHash();
+
+        // Se não houver hash na URL, carrega o primeiro SKU
         if (!window.location.hash) {
             const firstSkuButton = document.querySelector('.sku-option');
             if (firstSkuButton) {
                 const skuName = firstSkuButton.getAttribute('data-sku-name');
                 const imageUrl = firstSkuButton.getAttribute('data-image-url');
-                updateProductTitle(skuName, firstSkuButton.getAttribute('data-sku-slug'));
+                const skuPorcaoTabela = firstSkuButton.getAttribute('data-porcao-tabela');
+
+                updateProductTitle(skuName, firstSkuButton.getAttribute('data-sku-slug'), skuPorcaoTabela);
                 changeImage(imageUrl);
             }
         }

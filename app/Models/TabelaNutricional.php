@@ -14,6 +14,7 @@ class TabelaNutricional extends Model
     protected $fillable = [
         'nome',
         'porcao_caseira',
+        'primeiro_valor',
         'segundo_valor'
     ];
 

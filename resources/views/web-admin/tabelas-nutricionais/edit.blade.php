@@ -41,7 +41,13 @@
                     <input type="text" name="porcao_caseira" id="porcao_caseira" value="{{ $tabelaNutricional->porcao_caseira }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
 
-                <!-- Porção Caseira -->
+                <!-- Porção Padrão -->
+                <div class="mb-4">
+                    <label for="primeiro_valor" class="block text-gray-700 font-bold mb-2">Porção Padrão:</label>
+                    <input type="text" name="primeiro_valor" id="primeiro_valor" value="{{ $tabelaNutricional->primeiro_valor }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+
+                <!-- Porção Fracionada -->
                 <div class="mb-4">
                     <label for="segundo_valor" class="block text-gray-700 font-bold mb-2">Porção Fracionada:</label>
                     <input type="text" name="segundo_valor" id="segundo_valor" value="{{ $tabelaNutricional->segundo_valor }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
@@ -57,13 +63,22 @@
                             <label class="block text-gray-700 font-bold">{{ $nutriente->nome }} ({{ $nutriente->unidade_medida }})</label>
                         </div>
                         <div class="w-1/4">
-                            <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_por_100g]" value="{{ number_format($nutriente->pivot->valor_por_100g, 2, ',', '.') }}" placeholder="Valor por 100g" class="w-full px-4 py-2 border rounded-lg">
+                            <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_por_100g]"
+                                value="{{ $nutriente->pivot->valor_por_100g }}"
+                                placeholder="Valor por 100g"
+                                class="w-full px-4 py-2 border rounded-lg">
                         </div>
                         <div class="w-1/4">
-                            <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_por_porção]" value="{{ number_format($nutriente->pivot->valor_por_porção, 2, ',', '.') }}" placeholder="Valor por Porção" class="w-full px-4 py-2 border rounded-lg">
+                            <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_por_porção]"
+                                value="{{ $nutriente->pivot->valor_por_porção }}"
+                                placeholder="Valor por Porção"
+                                class="w-full px-4 py-2 border rounded-lg">
                         </div>
                         <div class="w-1/4">
-                            <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_diario]" value="{{ number_format($nutriente->pivot->valor_diario, 2, ',', '.') }}" placeholder="%VD" class="w-full px-4 py-2 border rounded-lg">
+                            <input type="text" name="nutrientes[{{ $nutriente->id }}][valor_diario]"
+                                value="{{ $nutriente->pivot->valor_diario }}"
+                                placeholder="%VD"
+                                class="w-full px-4 py-2 border rounded-lg">
                         </div>
                         <button type="button" class="text-red-500 ml-4 remove-nutrient">Excluir</button>
                     </div>
@@ -121,14 +136,6 @@
         if (e.target && e.target.classList.contains('remove-nutrient')) {
             e.target.closest('.nutrient-row').remove();
         }
-    });
-
-    // Função para substituir vírgulas por pontos nos campos numéricos antes do envio do formulário
-    document.getElementById('nutrition-form').addEventListener('submit', function() {
-        const numericFields = document.querySelectorAll('input[type="text"]');
-        numericFields.forEach(function(input) {
-            input.value = input.value.replace(',', '.');
-        });
     });
 </script>
 @endsection

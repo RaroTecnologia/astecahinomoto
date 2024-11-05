@@ -31,13 +31,15 @@ class NutritionTableController extends Controller
         $request->validate([
             'nome' => 'required|string|max:255',
             'porcao_caseira' => 'nullable|string|max:255',
-            'segundo_valor' => 'nullable|string|max:20',
+            'primeiro_valor' => 'nullable|string|max:10',
+            'segundo_valor' => 'nullable|string|max:10',
         ]);
 
         // Criação da tabela nutricional
         $tabelaNutricional = TabelaNutricional::create([
             'nome' => $request->input('nome'),
             'porcao_caseira' => $request->input('porcao_caseira'),
+            'primeiro_valor' => $request->input('primeiro_valor'),
             'segundo_valor' => $request->input('segundo_valor'),
         ]);
 
@@ -64,6 +66,7 @@ class NutritionTableController extends Controller
         $tabelaNutricional->update([
             'nome' => $request->input('nome'),
             'porcao_caseira' => $request->input('porcao_caseira'),
+            'primeiro_valor' => $request->input('primeiro_valor'),
             'segundo_valor' => $request->input('segundo_valor'),
         ]);
 
