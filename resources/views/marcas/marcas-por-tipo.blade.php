@@ -5,7 +5,9 @@
 @section('content')
 <div class="container mx-auto py-16 px-4">
     <!-- Breadcrumb -->
-    <x-breadcrumb-share currentPage="{{ $tipo->nome }}" parentPage="Nossas Marcas" />
+    <x-breadcrumb-share
+        :tipo="$tipo"
+        currentPage="{{ $tipo->nome }}" />
 
     <!-- Título da Página -->
     <div class="text-center mb-16">

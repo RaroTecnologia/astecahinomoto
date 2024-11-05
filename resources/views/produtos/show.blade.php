@@ -7,10 +7,11 @@
     <div class="container mx-auto py-16 px-4">
         <!-- Breadcrumb -->
         <x-breadcrumb-share
-            currentPage="{{ $produto->nome }}"
+            :tipo="$tipo"
             :marca="$categoriaMarca"
-            :produto="$categoriaProduto"
-            :linha="$categoriaLinha ?? null" />
+            :linha="$categoriaProduto"
+            :produto="$categoriaLinha"
+            currentPage="" />
 
         <!-- Conteúdo da página: imagem à esquerda, informações à direita -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">

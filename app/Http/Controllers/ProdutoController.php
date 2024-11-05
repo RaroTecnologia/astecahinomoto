@@ -17,15 +17,23 @@ class ProdutoController extends Controller
             ->where('nivel', 'marca')
             ->firstOrFail();
 
+        // Carrega o tipo da marca
+        $tipo = $categoriaMarca->tipos->first();
+
         // Busca todos os IDs de subcategorias recursivamente
         $categoriaIds = $this->getAllSubcategoryIds($categoriaMarca->id);
-        $categoriaIds[] = $categoriaMarca->id; // Inclui o ID da marca principal
+        $categoriaIds[] = $categoriaMarca->id;
 
-        // Tenta encontrar o produto com base no slug e na lista de IDs de categorias
         $produto = Produto::where('slug', $slugProduto)
             ->whereIn('categoria_id', $categoriaIds)
             ->where('is_active', true)
             ->firstOrFail();
+
+        // Carrega a categoria do produto (subcategoria/linha - Remix)
+        $categoriaLinha = Categoria::find($produto->categoria_id);
+
+        // Carrega a categoria pai (Vodka)
+        $categoriaProduto = $categoriaLinha ? Categoria::find($categoriaLinha->parent_id) : null;
 
         // Carrega valores nutricionais se houver
         $valoresNutricionais = ValorNutricional::where('tabela_nutricional_id', $produto->tabela_nutricional_id)
@@ -47,17 +55,17 @@ class ProdutoController extends Controller
         // Carrega os tipos de header
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
-        $categoriaProduto = $produto;
-
         // Retorna a view com as variáveis necessárias
         return view('produtos.show', compact(
             'produto',
             'categoriaMarca',
+            'categoriaLinha',    // Subcategoria (Remix)
+            'categoriaProduto',  // Categoria principal (Vodka)
+            'tipo',
             'tiposHeader',
             'valoresNutricionais',
             'produtosRelacionados',
-            'categoriaProduto',
-            'skus' // Adiciona a variável de SKUs à view
+            'skus'
         ));
     }
 

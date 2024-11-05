@@ -1,75 +1,96 @@
-@props(['currentPage', 'parentPage' => null, 'tipo' => null, 'marca' => null, 'produto' => null, 'linha' => null, 'sku' => null, 'textColor' => 'text-gray-700'])
+@props(['currentPage', 'parentPage' => null, 'tipo' => null, 'marca' => null, 'linha' => null, 'produto' => null, 'sku' => null, 'textColor' => 'text-gray-700'])
 
 <div class="flex justify-between items-center mb-8">
-    <div class="flex items-center space-x-2 overflow-x-auto">
-        <!-- Versão Mobile -->
-        <div class="lg:hidden flex items-center space-x-2">
-            <a href="javascript:history.back()" class="{{ $textColor }} text-sm font-semibold">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-            <span class="{{ $textColor }}">/</span>
+    <div class="flex items-center space-x-4">
+        <!-- Botão Voltar -->
+        <a href="javascript:history.back()"
+            class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors duration-200 {{ $textColor }}">
+            <i class="fas fa-arrow-left text-lg"></i>
+        </a>
 
-            @if($sku)
-            <span class="{{ $textColor }} text-sm font-semibold">{{ $sku->nome }}</span>
-            @elseif($produto)
-            <span class="{{ $textColor }} text-sm font-semibold">{{ $produto->nome }}</span>
-            @elseif($linha)
-            <span class="{{ $textColor }} text-sm font-semibold">{{ $linha->nome }}</span>
-            @elseif($marca)
-            <span class="{{ $textColor }} text-sm font-semibold">{{ $marca->nome }}</span>
-            @endif
-        </div>
+        <!-- Breadcrumb -->
+        <div class="flex items-center space-x-2 overflow-x-auto">
+            <!-- Versão Mobile -->
+            <div class="lg:hidden flex items-center space-x-2">
+                @if($marca)
+                <span class="{{ $textColor }} text-sm">{{ $marca->nome }}</span>
+                @if($linha)
+                <span class="{{ $textColor }}">/</span>
+                <span class="{{ $textColor }} text-sm">{{ $linha->nome }}</span>
+                @endif
+                @if($produto)
+                <span class="{{ $textColor }}">/</span>
+                <span class="{{ $textColor }} text-sm">{{ $produto->nome }}</span>
+                @endif
+                @endif
+            </div>
 
-        <!-- Versão Desktop -->
-        <div class="hidden lg:flex items-center space-x-2">
-            <a href="/" class="{{ $textColor }} text-sm font-semibold flex items-center">
-                <i class="fas fa-home mr-2"></i>
-                Home
-            </a>
-            <span class="{{ $textColor }}">/</span>
+            <!-- Versão Desktop -->
+            <div class="hidden lg:flex items-center space-x-2">
+                <a href="/" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    <i class="fas fa-home"></i>
+                </a>
 
-            @if ($parentPage)
-            <a href="{{ url('/nossas-marcas') }}" class="{{ $textColor }} text-sm font-semibold">
-                {{ $parentPage }}
-            </a>
-            <span class="{{ $textColor }}">/</span>
-            @endif
+                <span class="{{ $textColor }}">/</span>
 
-            @if ($marca)
-            <a href="{{ url('/marcas/' . $marca->tipo . '/' . $marca->slug) }}" class="{{ $textColor }} text-sm font-semibold">
-                {{ $marca->nome }}
-            </a>
-            <span class="{{ $textColor }}">/</span>
-            @endif
+                <a href="{{ route('marcas') }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    Nossas Marcas
+                </a>
 
-            @if ($linha)
-            <a href="{{ url('/marcas/' . $marca->slug . '/linhas/' . $linha->slug . '/produtos') }}" class="{{ $textColor }} text-sm font-semibold">
-                {{ $linha->nome }}
-            </a>
-            <span class="{{ $textColor }}">/</span>
-            @endif
+                @if($tipo)
+                <span class="{{ $textColor }}">/</span>
+                <a href="{{ route('marcas.tipo', $tipo->slug) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    {{ $tipo->nome }}
+                </a>
+                @endif
 
-            @if ($produto)
-            <a href="{{ url('/marcas/' . $marca->slug . ($linha ? '/linhas/' . $linha->slug . '/produtos/' : '/produtos/') . $produto->slug) }}" class="{{ $textColor }} text-sm font-semibold">
-                {{ $produto->nome }}
-            </a>
-            <span class="{{ $textColor }}">/</span>
-            @endif
+                @if($marca)
+                <span class="{{ $textColor }}">/</span>
+                <a href="{{ route('marcas.produtos', ['tipoSlug' => $tipo->slug, 'slugMarca' => $marca->slug]) }}"
+                    class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    {{ $marca->nome }}
+                </a>
+                @endif
 
-            @if ($sku)
-            <span class="{{ $textColor }} text-sm font-semibold">{{ $sku->nome }}</span>
-            <span class="{{ $textColor }}">/</span>
-            @endif
+                @if($linha && (!$marca || $linha->nome !== $marca->nome))
+                <span class="{{ $textColor }}">/</span>
+                <a href="{{ route('marcas.produtos.linhas', [
+                    'tipoSlug' => $tipo->slug,
+                    'slugMarca' => $marca->slug,
+                    'slugProduto' => $linha->slug
+                ]) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    {{ $linha->nome }}
+                </a>
+                @endif
 
-            <span class="{{ $textColor }} font-bold">{{ $currentPage }}</span>
+                @if($produto && (!$linha || $produto->nome !== $linha->nome))
+                <span class="{{ $textColor }}">/</span>
+                @if($produto->slug)
+                <a href="{{ route('marcas.produtos.linhas', [
+                        'tipoSlug' => $tipo->slug,
+                        'slugMarca' => $marca->slug,
+                        'slugProduto' => $produto->slug
+                    ]) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    {{ $produto->nome }}
+                </a>
+                @else
+                <span class="{{ $textColor }} text-sm">{{ $produto->nome }}</span>
+                @endif
+                @endif
+
+                @if($currentPage && $currentPage !== '')
+                <span class="{{ $textColor }}">/</span>
+                <span class="{{ $textColor }} text-sm font-semibold">{{ $currentPage }}</span>
+                @endif
+            </div>
         </div>
     </div>
 
     <!-- Botão Compartilhar -->
     <div class="relative">
-        <a href="#" id="shareButton" class="{{ $textColor }} text-sm font-semibold flex items-center cursor-pointer">
-            <span id="shareText" class="hidden lg:inline">Compartilhar</span>
-            <i id="shareIcon" class="fas fa-share-alt ml-2"></i>
-        </a>
+        <button id="shareButton" class="{{ $textColor }} text-sm font-semibold flex items-center cursor-pointer hover:text-red-600 transition-colors duration-200">
+            <span class="hidden lg:inline mr-2">Compartilhar</span>
+            <i class="fas fa-share-alt"></i>
+        </button>
     </div>
 </div>
