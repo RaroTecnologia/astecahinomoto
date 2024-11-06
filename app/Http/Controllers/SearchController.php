@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Receita;
+use App\Models\Noticia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
@@ -16,6 +16,22 @@ class SearchController extends Controller
 
             if (empty($query) || strlen($query) < 2) {
                 return response()->json([]);
+            }
+
+            if ($type === 'noticias') {
+                $results = Noticia::query()
+                    ->where(function ($q) use ($query) {
+                        $q->where('titulo', 'LIKE', '%' . $query . '%')
+                            ->orWhere('conteudo', 'LIKE', '%' . $query . '%');
+                    })
+                    ->with(['categoria' => function ($q) {
+                        $q->select('id', 'nome', 'slug');
+                    }])
+                    ->select('id', 'titulo', 'slug', 'categoria_id')
+                    ->take(5)
+                    ->get();
+
+                return response()->json($results);
             }
 
             if ($type === 'receitas') {
@@ -30,7 +46,6 @@ class SearchController extends Controller
 
             return response()->json([]);
         } catch (\Exception $e) {
-            Log::error('Erro na busca: ' . $e->getMessage());
             return response()->json([], 500);
         }
     }

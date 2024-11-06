@@ -35,7 +35,16 @@
     <!-- Notícias Relacionadas -->
     <div class="mt-12">
         <h2 class="text-2xl font-bold mb-6">Leia Também</h2>
-        <x-news-list :noticias="$relacionadas" />
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            @foreach($relacionadas as $noticia)
+            <x-card-item
+                title="{{ $noticia->titulo }}"
+                description="{{ Str::limit($noticia->resumo, 100) }}"
+                image="{{ $noticia->imagem_url }}"
+                link="{{ route('noticias.show', ['categoria' => $noticia->categoria->slug, 'slug' => $noticia->slug]) }}"
+                linkText="Ler Mais" />
+            @endforeach
+        </div>
     </div>
 </div>
 @endsection

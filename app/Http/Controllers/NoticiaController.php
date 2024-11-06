@@ -74,7 +74,7 @@ class NoticiaController extends Controller
             ->firstOrFail();
 
         // Incrementa visualizações
-        $noticia->increment('visualizacoes');
+        $noticia->increment('views');
 
         // Notícias relacionadas (mesma categoria, excluindo atual)
         $relacionadas = Noticia::where('categoria_id', $categoria->id)

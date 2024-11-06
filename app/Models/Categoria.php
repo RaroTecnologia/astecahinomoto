@@ -59,4 +59,10 @@ class Categoria extends Model
     {
         return $this->hasMany(Receita::class, 'categoria_id');
     }
+
+    // Adicionar o relacionamento com notícias
+    public function noticias()
+    {
+        return $this->hasMany(Noticia::class, 'categoria_id');
+    }
 }

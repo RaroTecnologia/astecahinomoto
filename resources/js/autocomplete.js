@@ -53,10 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .then(response => {
+                    console.log('Response:', response);
                     if (!response.ok) throw new Error('Erro na resposta');
                     return response.json();
                 })
                 .then(data => {
+                    console.log('Data received:', data);
                     if (loadingElement) {
                         loadingElement.classList.add('hidden');
                     }
@@ -72,10 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             const resultDiv = document.createElement('div');
                             resultDiv.className = 'p-2 hover:bg-gray-100 cursor-pointer';
                             resultDiv.innerHTML = `
-                                <a href="/receitas/${item.categoria?.slug || 'sem-categoria'}/${item.slug}" 
+                                <a href="/${context}/${item.categoria?.slug || 'sem-categoria'}/${item.slug}" 
                                    class="flex items-center">
                                     <div class="flex-1">
-                                        <div class="font-medium">${item.nome}</div>
+                                        <div class="font-medium">${context === 'noticias' ? item.titulo : item.nome}</div>
                                         <div class="text-sm text-gray-500">
                                             ${item.categoria ? item.categoria.nome : ''}
                                         </div>
