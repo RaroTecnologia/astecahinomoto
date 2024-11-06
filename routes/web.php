@@ -12,6 +12,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\WebAdminController;
+use App\Http\Controllers\SearchController;
 
 // Controladores de Admin
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -104,6 +105,7 @@ Route::controller(ReceitaController::class)->group(function () {
 // API Routes
 Route::get('/api/produtos/filtrar/{categoria}/{subcategoria?}', [ProdutoController::class, 'filtrarCategoria'])->name('produtos.filtrar.ajax');
 Route::get('/api/subcategorias/{slug}', [CategoriaController::class, 'getSubcategorias']);
+Route::get('/api/search', [SearchController::class, 'search'])->name('api.search');
 
 // Rotas de autenticação
 require __DIR__ . '/auth.php';

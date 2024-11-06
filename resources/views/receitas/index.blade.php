@@ -3,135 +3,228 @@
 @section('title', 'Receitas')
 
 @section('content')
-<div class="relative bg-white pb-24">
-    <div class="container mx-auto py-16 px-4">
-        <!-- Breadcrumb e Opção de Compartilhar -->
-        <x-breadcrumb-share currentPage="Receitas" />
+<div class="container mx-auto py-16 px-4">
+    <!-- Breadcrumb e Compartilhar -->
+    <x-breadcrumb-share
+        currentPage="Receitas"
+        parentText="Home"
+        parentRoute="home" />
 
-        <!-- Título da Página -->
-        <div class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-gray-900">Receitas</h1>
-        </div>
+    <!-- Título Centralizado -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900">Receitas</h1>
+        <p class="mt-4 text-gray-600">Descubra nossas deliciosas receitas</p>
+    </div>
 
-        <!-- Filtros e Ordenação -->
-        <div class="flex justify-between items-center mb-6">
-            <div class="flex items-center">
-                <span class="text-gray-600 text-sm"><span id="count">{{ $receitas->total() }}</span> Artigos Encontrados</span>
-                <span class="mx-2 text-gray-400">|</span>
-                <a href="#" id="clear-filters" class="text-red-600 font-semibold text-sm">Limpar Filtros X</a>
-            </div>
-            <div class="flex items-center">
-                <button class="flex items-center text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 6h18M3 12h18m-7 6h7"></path>
-                    </svg>
-                    Ordenar
-                </button>
-            </div>
-        </div>
+    <!-- Autocomplete Search -->
+    <x-autocomplete context="receitas" placeholder="receitas" />
 
-        <!-- Filtros -->
-        <div class="mb-8">
-            <h3 class="text-sm font-semibold text-gray-700 mb-2">Filtrar por:</h3>
-            <div class="flex space-x-2" id="categories">
-                @foreach($categorias as $categoria)
-                <a href="javascript:void(0);" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm hover:bg-red-600 hover:text-white transition" data-slug="{{ $categoria->slug }}">
-                    {{ $categoria->nome }}
-                </a>
-                @endforeach
-            </div>
-        </div>
-
-        <!-- Campo de busca com autocomplete -->
-        <x-autocomplete context="receitas" placeholder="Receitas" />
-
-        <!-- Listagem de Receitas -->
-        <div id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            @foreach($receitas as $receita)
-            <x-card-item
-                title="{{ $receita->nome }}"
-                description="{{ Str::limit($receita->chamada, 100) }}"
-                image="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}"
-                link="{{ route('receitas.show', ['categoria' => $receita->categoria->slug, 'slug' => $receita->slug]) }}"
-                linkText="Ler Mais" />
+    <!-- Filtros e Ordenação -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <!-- Tags de Categorias -->
+        <div class="flex flex-wrap gap-2 flex-grow">
+            <a href="#"
+                data-category=""
+                class="category-link px-4 py-2 rounded-full text-sm {{ request()->get('categoria') === null ? 'bg-vermelho-asteca text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                Todas
+            </a>
+            @foreach($categorias as $categoria)
+            <a href="#"
+                data-category="{{ $categoria->slug }}"
+                class="category-link px-4 py-2 rounded-full text-sm {{ request()->get('categoria') === $categoria->slug ? 'bg-vermelho-asteca text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                {{ $categoria->nome }}
+            </a>
             @endforeach
         </div>
 
-        <!-- Paginação -->
-        <div id="pagination" class="mt-8">
-            {{ $receitas->links() }}
+        <!-- Ordenação -->
+        <div class="relative mt-4 md:mt-0">
+            <button id="orderFilter" class="flex items-center justify-between w-48 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                <span id="selectedOrder">
+                    @if(request()->get('order') == 'recent')
+                    Mais Recentes
+                    @elseif(request()->get('order') == 'likes')
+                    Mais Curtidas
+                    @else
+                    Ordenar por
+                    @endif
+                </span>
+                <i class="fas fa-chevron-down ml-2"></i>
+            </button>
+            <div id="orderDropdown" class="hidden absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+                <a href="#" data-order="recent" class="block px-4 py-2 hover:bg-gray-100 text-gray-700 {{ request()->get('order') == 'recent' ? 'bg-gray-100' : '' }}">
+                    Mais Recentes
+                </a>
+                <a href="#" data-order="likes" class="block px-4 py-2 hover:bg-gray-100 text-gray-700 {{ request()->get('order') == 'likes' ? 'bg-gray-100' : '' }}">
+                    Mais Curtidas
+                </a>
+            </div>
         </div>
+    </div>
 
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white p-5 rounded-lg flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-vermelho-asteca"></div>
+            <span class="text-gray-700 font-medium">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Lista de Receitas -->
+    <div id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        @foreach($receitas as $receita)
+        <x-card-item
+            title="{{ $receita->nome }}"
+            description="{{ Str::limit($receita->chamada, 100) }}"
+            image="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}"
+            link="{{ route('receitas.show', ['categoria' => $receita->categoria->slug, 'slug' => $receita->slug]) }}"
+            linkText="Ver Receita" />
+        @endforeach
+    </div>
+
+    <!-- Paginação -->
+    <div class="mt-8">
+        {{ $receitas->links() }}
     </div>
 </div>
 @endsection
-
+@vite('resources/js/autocomplete.js')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Script carregado e DOM pronto'); // Verifique se o script foi carregado
+        function showSkeletons() {
+            const recipesContainer = document.getElementById('recipes-list');
+            recipesContainer.style.opacity = '0';
+            recipesContainer.style.transition = 'opacity 0.3s ease';
 
-        // Capturar clique nas categorias
-        document.querySelectorAll('#categories a').forEach(function(categoryLink) {
-            categoryLink.addEventListener('click', function(e) {
-                e.preventDefault();
+            // Criar grid de skeletons
+            const skeletonsHTML = Array(8).fill().map(() => `
+                <x-recipe-skeleton />
+            `).join('');
 
-                let slug = this.getAttribute('data-slug');
-                console.log(`Categoria clicada: ${slug}`); // Verifique se o clique está sendo capturado
+            recipesContainer.innerHTML = skeletonsHTML;
+            recipesContainer.style.opacity = '1';
+        }
 
-                // Fazer a requisição AJAX para a filtragem
-                fetch(`/receitas/filtrar/${slug}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Dados recebidos da API:', data); // Verifique se os dados estão sendo recebidos corretamente
+        function renderResults(data) {
+            const recipesContainer = document.getElementById('recipes-list');
+            recipesContainer.style.opacity = '0';
 
-                        // Atualizar a contagem
-                        document.getElementById('count').innerText = data.count;
+            setTimeout(() => {
+                recipesContainer.innerHTML = data.list;
 
-                        // Atualizar a listagem de receitas
-                        document.getElementById('recipes-list').innerHTML = data.receitas;
+                // Adiciona fade-in para cada card
+                const cards = recipesContainer.querySelectorAll('.recipe-card');
+                cards.forEach((card, index) => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
 
-                        // Atualizar a paginação
-                        document.getElementById('pagination').innerHTML = data.pagination;
-                    })
-                    .catch(error => {
-                        console.error('Erro ao filtrar as receitas:', error);
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100); // Delay escalonado para cada card
+                });
+
+                recipesContainer.style.opacity = '1';
+            }, 300);
+        }
+
+        function updateRecipes(params = {}) {
+            const currentUrl = new URL(window.location.href);
+            const currentCategory = currentUrl.searchParams.get('categoria');
+
+            // Mantém a categoria atual se não estiver sendo alterada
+            if (!params.hasOwnProperty('categoria')) {
+                params.categoria = currentCategory;
+            }
+
+            // Atualiza os parâmetros da URL
+            Object.keys(params).forEach(key => {
+                if (params[key]) {
+                    currentUrl.searchParams.set(key, params[key]);
+                } else {
+                    currentUrl.searchParams.delete(key);
+                }
+            });
+
+            showSkeletons();
+
+            fetch(currentUrl.toString(), {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    renderResults(data);
+                    document.querySelector('.mt-8').innerHTML = data.pagination;
+                    window.history.pushState({}, '', currentUrl.toString());
+
+                    // Atualiza classes ativas das categorias
+                    document.querySelectorAll('.category-link').forEach(link => {
+                        const categorySlug = link.dataset.category;
+                        const isActive = categorySlug === (currentUrl.searchParams.get('categoria') || '');
+
+                        link.classList.toggle('bg-vermelho-asteca', isActive);
+                        link.classList.toggle('text-white', isActive);
+                        link.classList.toggle('bg-gray-100', !isActive);
+                        link.classList.toggle('text-gray-700', !isActive);
                     });
+                })
+                .catch(error => console.error('Erro:', error));
+        }
+
+        // Setup dos links de categoria
+        document.querySelectorAll('.category-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const category = this.dataset.category;
+                updateRecipes({
+                    categoria: category
+                });
             });
         });
 
-        // Limpar os filtros
-        document.getElementById('clear-filters').addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Recarregar a página para exibir todas as receitas
-            window.location.reload();
+        // Setup dos links de ordenação
+        document.querySelectorAll('#orderDropdown a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const order = this.dataset.order;
+                updateRecipes({
+                    order: order
+                }); // Não limpa a categoria
+                document.getElementById('orderDropdown').classList.add('hidden');
+            });
         });
 
-        // Paginação via AJAX
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('#pagination a')) {
-                e.preventDefault();
-                let url = e.target.getAttribute('href');
+        // Setup do dropdown
+        function setupDropdown(buttonId, dropdownId) {
+            const button = document.getElementById(buttonId);
+            const dropdown = document.getElementById(dropdownId);
 
-                // Fazer a requisição AJAX para a paginação
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Dados da paginação:', data); // Verifique se os dados da paginação estão corretos
-
-                        // Atualizar a contagem
-                        document.getElementById('count').innerText = data.count;
-
-                        // Atualizar a listagem de receitas
-                        document.getElementById('recipes-list').innerHTML = data.receitas;
-
-                        // Atualizar a paginação
-                        document.getElementById('pagination').innerHTML = data.pagination;
-                    })
-                    .catch(error => {
-                        console.error('Erro ao paginar:', error);
-                    });
+            if (button && dropdown) {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                });
             }
+        }
+
+        setupDropdown('orderFilter', 'orderDropdown');
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function() {
+            const dropdowns = document.querySelectorAll('#orderDropdown');
+            dropdowns.forEach(dropdown => dropdown.classList.add('hidden'));
+        });
+
+        // Prevenir fechamento ao clicar dentro do dropdown
+        const dropdowns = document.querySelectorAll('#orderDropdown');
+        dropdowns.forEach(dropdown => {
+            dropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         });
     });
 </script>

@@ -89,8 +89,8 @@
     <!-- Botão Compartilhar -->
     <div class="relative">
         <button id="shareButton" class="{{ $textColor }} text-sm font-semibold flex items-center cursor-pointer hover:text-red-600 transition-colors duration-200">
-            <span class="hidden lg:inline mr-2">Compartilhar</span>
-            <i class="fas fa-share-alt"></i>
+            <span id="shareText" class="hidden lg:inline mr-2">Compartilhar</span>
+            <i id="shareIcon" class="fas fa-share-alt"></i>
         </button>
     </div>
 </div>

@@ -2,31 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Receita;
 use Illuminate\Http\Request;
-use App\Models\Receita; // Supondo que você tenha modelos para cada tipo de conteúdo
-use App\Models\Noticia;
-use App\Models\Produto;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $query = $request->get('query');
-        $type = $request->get('type'); // O tipo de busca: receitas, noticias, produtos
+        try {
+            $query = $request->get('query');
+            $type = $request->get('type');
 
-        switch ($type) {
-            case 'receitas':
+            if (empty($query) || strlen($query) < 2) {
+                return response()->json([]);
+            }
+
+            if ($type === 'receitas') {
                 $results = Receita::where('nome', 'like', "%{$query}%")
-                    ->orWhere('ingredientes', 'like', "%{$query}%")
-                    ->with('categoria') // Certifique-se de que o relacionamento com categoria está sendo carregado
+                    ->orWhere('chamada', 'like', "%{$query}%")
+                    ->with('categoria')
                     ->take(5)
                     ->get();
-                break;
 
-            default:
-                $results = collect(); // Retornar coleção vazia se não encontrar o tipo
+                return response()->json($results);
+            }
+
+            return response()->json([]);
+        } catch (\Exception $e) {
+            Log::error('Erro na busca: ' . $e->getMessage());
+            return response()->json([], 500);
         }
-
-        return response()->json($results);
     }
 }

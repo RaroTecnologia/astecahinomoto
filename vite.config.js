@@ -14,6 +14,7 @@ export default defineConfig({
                 'resources/js/recipe-editor.js',
                 'resources/js/submenu.js',
                 'resources/js/toast.js',
+                'resources/js/autocomplete.js',
                 ],
             refresh: true,
         }),

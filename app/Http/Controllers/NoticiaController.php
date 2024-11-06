@@ -6,56 +6,84 @@ use App\Models\Noticia;
 use App\Models\Categoria;
 use App\Models\Tipo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class NoticiaController extends Controller
 {
-    // Listagem de notícias
-    public function index()
+    public function index(Request $request)
     {
-        // Pegar todas as categorias de notícias
-        $categorias = Categoria::where('tipo', 'noticias')->get();
+        // Pegar todas as categorias do tipo notícias
+        $categorias = Categoria::where('tipo', 'noticia')
+            ->orderBy('nome')
+            ->get();
 
-        // Pegar todas as notícias com paginação
-        $noticias = Noticia::paginate(8);
+        // Query base
+        $query = Noticia::with('categoria');
 
-        // Carregar todos os tipos para o submenu
+        // Filtrar por categoria se especificado
+        if ($request->has('categoria')) {
+            $categoria = Categoria::where('slug', $request->categoria)
+                ->where('tipo', 'noticia')
+                ->first();
+
+            if ($categoria) {
+                $query->where('categoria_id', $categoria->id);
+            }
+        }
+
+        // Ordenação
+        switch ($request->get('order')) {
+            case 'recent':
+                $query->latest();
+                break;
+            case 'views':
+                $query->orderBy('views', 'desc');
+                break;
+            default:
+                $query->latest(); // Ordenação padrão
+        }
+
+        // Executar a query com paginação
+        $noticias = $query->paginate(12);
+
+        // Carregar tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
+
+        // Se for uma requisição AJAX, retornar JSON
+        if ($request->ajax()) {
+            $view = View::make('noticias._lista', compact('noticias'))->render();
+            return response()->json([
+                'list' => $view,
+                'pagination' => $noticias->render()
+            ]);
+        }
 
         return view('noticias.index', compact('noticias', 'categorias', 'tiposHeader'));
     }
 
-    // Exibir notícias por categoria
-    public function categoriasNoticias($slug)
-    {
-        // Buscar a categoria
-        $categoria = Categoria::where('slug', $slug)->firstOrFail();
-
-        // Filtrar notícias pela categoria
-        $noticias = Noticia::where('categoria_id', $categoria->id)->paginate(8);
-
-        // Carregar todos os tipos para o submenu
-        $tiposHeader = Tipo::orderBy('ordem')->get();
-
-        return view('noticias.index', compact('noticias', 'categoria', 'tiposHeader'));
-    }
-
-    // Exibir notícia individual
     public function show($categoria, $slug)
     {
         // Buscar a categoria
-        $categoria = Categoria::where('slug', $categoria)->firstOrFail();
+        $categoria = Categoria::where('slug', $categoria)
+            ->where('tipo', 'noticia')
+            ->firstOrFail();
 
-        // Buscar a notícia pelo slug
-        $noticia = Noticia::where('slug', $slug)->where('categoria_id', $categoria->id)->firstOrFail();
+        // Buscar a notícia e incrementar visualizações
+        $noticia = Noticia::where('slug', $slug)
+            ->where('categoria_id', $categoria->id)
+            ->firstOrFail();
 
-        // Notícias relacionadas (baseado na mesma categoria)
+        // Incrementa visualizações
+        $noticia->increment('visualizacoes');
+
+        // Notícias relacionadas (mesma categoria, excluindo atual)
         $relacionadas = Noticia::where('categoria_id', $categoria->id)
-            ->where('id', '!=', $noticia->id) // Exclui a notícia atual
-            ->inRandomOrder()
+            ->where('id', '!=', $noticia->id)
+            ->latest()
             ->take(4)
             ->get();
 
-        // Carregar todos os tipos para o submenu
+        // Carregar tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
         return view('noticias.show', compact('noticia', 'categoria', 'relacionadas', 'tiposHeader'));

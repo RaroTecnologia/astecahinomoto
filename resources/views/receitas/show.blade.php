@@ -24,9 +24,12 @@
                     <i class="fa-regular fa-share-from-square mr-1"></i>
                     <span id="textoCompartilhar">Compartilhar esta receita</span>
                 </button>
-                <button onclick="curtirReceita({{ $receita->id }})" class="flex items-center text-gray-600 hover:text-red-600 transition">
-                    <i id="iconeCurtir" class="fa-regular fa-heart mr-1"></i>
-                    <span id="textoCurtir">Curtir</span>
+                <button
+                    id="botaoCurtir"
+                    class="flex items-center {{ Cookie::has('receita_curtida_' . $receita->id) ? 'text-red-600 pointer-events-none' : 'text-gray-600 hover:text-red-600' }} transition"
+                    data-receita-id="{{ $receita->id }}">
+                    <i id="iconeCurtir" class="fa-heart mr-1 {{ Cookie::has('receita_curtida_' . $receita->id) ? 'fa-solid' : 'fa-regular' }}"></i>
+                    <span id="textoCurtir">{{ Cookie::has('receita_curtida_' . $receita->id) ? 'Curtido' : 'Curtir' }}</span>
                     <span id="numeroCurtidas" class="ml-1">({{ $receita->curtidas }})</span>
                 </button>
             </div>
@@ -64,73 +67,86 @@
     <!-- Sugestões de Receitas -->
     <div class="mt-12">
         <h2 class="text-2xl font-bold mb-6">Experimente Também</h2>
-        <x-receitas-list :receitas="$sugestoes" />
+        <div id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            @foreach($sugestoes as $receita)
+            <x-card-item
+                title="{{ $receita->nome }}"
+                description="{{ Str::limit($receita->chamada, 100) }}"
+                image="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}"
+                link="{{ route('receitas.show', ['categoria' => $receita->categoria->slug, 'slug' => $receita->slug]) }}"
+                linkText="Ver Receita" />
+            @endforeach
+        </div>
     </div>
 </div>
 
 <script>
-    function compartilharReceita() {
-        // Pega a URL atual
-        const url = window.location.href;
-
-        // Copia para a área de transferência
-        navigator.clipboard.writeText(url).then(() => {
-            // Atualiza o texto do botão
-            const span = document.getElementById('textoCompartilhar');
-            span.textContent = 'Link copiado!';
-
-            // Volta ao texto original após 2 segundos
-            setTimeout(() => {
-                span.textContent = 'Compartilhar esta receita';
-            }, 2000);
-        });
-    }
-
-    function curtirReceita(receitaId) {
-        fetch(`/receitas/${receitaId}/curtir`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Atualiza o contador de curtidas
-                document.getElementById('numeroCurtidas').textContent = `(${data.curtidas})`;
-
-                if (data.error) {
-                    // Caso já tenha curtido
-                    document.getElementById('textoCurtir').textContent = 'Já curtido';
-                    document.getElementById('iconeCurtir').classList.remove('fa-regular');
-                    document.getElementById('iconeCurtir').classList.add('fa-solid');
-                } else {
-                    // Curtida com sucesso
-                    document.getElementById('textoCurtir').textContent = 'Curtido!';
-                    document.getElementById('iconeCurtir').classList.remove('fa-regular');
-                    document.getElementById('iconeCurtir').classList.add('fa-solid');
-                }
-
-                // Volta ao estado original após 2 segundos (mantendo o ícone preenchido)
-                setTimeout(() => {
-                    document.getElementById('textoCurtir').textContent = 'Curtir';
-                }, 2000);
-            })
-            .catch(error => {
-                console.error('Erro ao curtir:', error);
-            });
-    }
-
-    // Verifica se já curtiu ao carregar a página
     document.addEventListener('DOMContentLoaded', function() {
-        const receitaId = {
-            {
-                $receita - > id
+        // Função compartilhar
+        window.compartilharReceita = function() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                const span = document.getElementById('textoCompartilhar');
+                span.textContent = 'Link copiado!';
+                setTimeout(() => {
+                    span.textContent = 'Compartilhar esta receita';
+                }, 2000);
+            });
+        }
+
+        // Configuração do botão curtir
+        const botaoCurtir = document.getElementById('botaoCurtir');
+        if (botaoCurtir) {
+            const receitaId = "{{ $receita->id }}";
+            const iconeCurtir = document.getElementById('iconeCurtir');
+            const textoCurtir = document.getElementById('textoCurtir');
+
+            // Verifica se já curtiu ao carregar
+            if (document.cookie.includes('receita_curtida_' + receitaId)) {
+                setEstadoCurtido();
+                return; // Não adiciona o evento de clique se já estiver curtido
             }
-        };
-        if (document.cookie.includes(`receita_curtida_${receitaId}`)) {
-            document.getElementById('iconeCurtir').classList.remove('fa-regular');
-            document.getElementById('iconeCurtir').classList.add('fa-solid');
+
+            // Função para atualizar o estado visual
+            function setEstadoCurtido() {
+                iconeCurtir.classList.remove('fa-regular');
+                iconeCurtir.classList.add('fa-solid');
+                textoCurtir.textContent = 'Curtido';
+                botaoCurtir.classList.add('text-red-600', 'pointer-events-none');
+                botaoCurtir.classList.remove('hover:text-red-600');
+            }
+
+            // Adiciona evento de clique apenas se não estiver curtido
+            botaoCurtir.addEventListener('click', function() {
+                fetch('/receitas/' + receitaId + '/curtir', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const numeroCurtidas = document.getElementById('numeroCurtidas');
+
+                        if (numeroCurtidas) {
+                            numeroCurtidas.textContent = `(${data.curtidas})`;
+                        }
+
+                        // Animação de curtida bem-sucedida
+                        iconeCurtir.classList.remove('fa-regular');
+                        iconeCurtir.classList.add('fa-solid');
+                        textoCurtir.textContent = 'Curtido!';
+
+                        // Após um tempo, finaliza o estado
+                        setTimeout(() => {
+                            setEstadoCurtido();
+                        }, 2000);
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    });
+            });
         }
     });
 </script>

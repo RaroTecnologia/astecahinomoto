@@ -10,13 +10,43 @@ use Illuminate\Support\Facades\Cookie;
 
 class ReceitaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Carregar todos os tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
-        // Paginação com eager loading da categoria
-        $receitas = Receita::with('categoria')->paginate(12);
+        // Iniciar a query
+        $query = Receita::with('categoria');
+
+        // Filtrar por categoria se especificado
+        if ($request->has('categoria')) {
+            $categoria = Categoria::where('slug', $request->categoria)->first();
+            if ($categoria) {
+                $query->where('categoria_id', $categoria->id);
+            }
+        }
+
+        // Aplicar ordenação
+        switch ($request->get('order')) {
+            case 'recent':
+                $query->latest();
+                break;
+            case 'likes':
+                $query->orderBy('curtidas', 'desc');
+                break;
+            default:
+                $query->latest(); // ordenação padrão por data
+        }
+
+        // Executar a query com paginação
+        $receitas = $query->paginate(12)->appends(request()->query());
+
+        if ($request->ajax()) {
+            return response()->json([
+                'list' => view('receitas._list', compact('receitas'))->render(),
+                'pagination' => $receitas->links()->render()
+            ]);
+        }
 
         // Buscar apenas as categorias com tipo "receita"
         $categorias = Categoria::where('tipo', 'receita')->get();
