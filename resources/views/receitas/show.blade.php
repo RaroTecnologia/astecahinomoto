@@ -29,12 +29,6 @@
                     Curtir
                 </a>
             </div>
-
-            <!-- Tags -->
-            <div class="flex space-x-2 mt-4">
-                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm">{{ $categoria->nome }}</button>
-                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm">Oriental</button>
-            </div>
         </div>
 
         <!-- Conteúdo da Receita -->
