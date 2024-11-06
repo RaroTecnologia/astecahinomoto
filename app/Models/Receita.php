@@ -20,7 +20,8 @@ class Receita extends Model
         'tempo_preparo',
         'ingredientes',
         'modo_preparo',
-        'video_url'
+        'video_url',
+        'curtidas'
     ];
 
     // Relacionamento: Uma receita pertence a uma categoria

@@ -73,4 +73,14 @@ class ReceitaController extends Controller
             'count' => $receitas->total()
         ]);
     }
+
+    public function curtir($id)
+    {
+        $receita = Receita::findOrFail($id);
+        $receita->increment('curtidas');
+
+        return response()->json([
+            'curtidas' => $receita->curtidas
+        ]);
+    }
 }

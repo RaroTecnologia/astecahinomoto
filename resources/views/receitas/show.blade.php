@@ -20,14 +20,15 @@
 
             <!-- Botões de Compartilhar e Curtir -->
             <div class="flex space-x-4 mt-4">
-                <a href="#" class="flex items-center text-gray-600 hover:text-red-600 transition">
+                <button onclick="compartilharReceita()" class="flex items-center text-gray-600 hover:text-red-600 transition">
                     <i class="fa-regular fa-share-from-square mr-1"></i>
-                    Compartilhar esta receita
-                </a>
-                <a href="#" class="flex items-center text-gray-600 hover:text-red-600 transition">
-                    <i class="far fa-heart mr-1"></i>
-                    Curtir
-                </a>
+                    <span id="textoCompartilhar">Compartilhar esta receita</span>
+                </button>
+                <button onclick="curtirReceita({{ $receita->id }})" class="flex items-center text-gray-600 hover:text-red-600 transition">
+                    <i class="fa-regular fa-heart mr-1"></i>
+                    <span id="textoCurtir">Curtir</span>
+                    <span id="numeroCurtidas" class="ml-1">({{ $receita->curtidas }})</span>
+                </button>
             </div>
         </div>
 
@@ -66,4 +67,42 @@
         <x-receitas-list :receitas="$sugestoes" />
     </div>
 </div>
+
+<script>
+    function compartilharReceita() {
+        // Pega a URL atual
+        const url = window.location.href;
+
+        // Copia para a área de transferência
+        navigator.clipboard.writeText(url).then(() => {
+            // Atualiza o texto do botão
+            const span = document.getElementById('textoCompartilhar');
+            span.textContent = 'Link copiado!';
+
+            // Volta ao texto original após 2 segundos
+            setTimeout(() => {
+                span.textContent = 'Compartilhar esta receita';
+            }, 2000);
+        });
+    }
+
+    function curtirReceita(receitaId) {
+        fetch(`/receitas/${receitaId}/curtir`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('numeroCurtidas').textContent = `(${data.curtidas})`;
+                document.getElementById('textoCurtir').textContent = 'Curtido!';
+
+                setTimeout(() => {
+                    document.getElementById('textoCurtir').textContent = 'Curtir';
+                }, 2000);
+            });
+    }
+</script>
 @endsection

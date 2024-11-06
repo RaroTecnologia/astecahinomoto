@@ -98,6 +98,7 @@ Route::controller(ReceitaController::class)->group(function () {
     Route::get('/receitas', 'index')->name('receitas.index');
     Route::get('/receitas/categoria/{slug}', 'categoriasReceitas')->name('receitas.categoria');
     Route::get('/receitas/{categoria}/{slug}', 'show')->name('receitas.show');
+    Route::post('/receitas/{id}/curtir', [ReceitaController::class, 'curtir'])->name('receitas.curtir');
 });
 
 // API Routes
