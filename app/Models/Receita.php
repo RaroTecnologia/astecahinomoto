@@ -13,20 +13,19 @@ class Receita extends Model
     protected $fillable = [
         'nome',
         'slug',
+        'chamada',
+        'imagem',
+        'categoria_id',
+        'dificuldade',
+        'tempo_preparo',
         'ingredientes',
         'modo_preparo',
-        'categoria_id',
-        'imagem',
-        'chamada',
-        'compartilhamentos', // Novo campo
-        'curtidas',          // Novo campo
-        'dificuldade',       // Novo campo
-        'tempo_preparo',     // Novo campo
+        'video_url'
     ];
 
     // Relacionamento: Uma receita pertence a uma categoria
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 }

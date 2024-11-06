@@ -63,6 +63,17 @@
             </select>
         </div>
 
+        <!-- Campo de Data de Publicação -->
+        <div class="mb-4">
+            <label for="publicado_em" class="block text-gray-700 font-bold mb-2">Data de Publicação:</label>
+            <input
+                type="datetime-local"
+                name="publicado_em"
+                id="publicado_em"
+                value="{{ old('publicado_em', date('Y-m-d\TH:i')) }}"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
         <!-- Botões de Ação -->
         <div class="flex justify-end">
             <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-2">Salvar Notícia</button>

@@ -136,7 +136,11 @@
             @foreach($receitas as $receita)
             <div class="relative bg-white rounded-lg shadow-lg overflow-hidden">
                 <div class="absolute top-4 left-4 bg-yellow-500 text-white text-xs font-semibold py-1 px-3 rounded-full">
-                    Receitas
+                    @if($receita->categoria)
+                    {{ $receita->categoria->nome }}
+                    @else
+                    Sem categoria (ID: {{ $receita->categoria_id }})
+                    @endif
                 </div>
 
                 <img src="{{ $receita->imagem_url ?? asset('assets/sem_imagem.png') }}"

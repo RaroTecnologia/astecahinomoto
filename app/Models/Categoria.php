@@ -53,4 +53,10 @@ class Categoria extends Model
             ->wherePivot('is_principal', true)
             ->first();
     }
+
+    // Adicionar o relacionamento com receitas
+    public function receitas()
+    {
+        return $this->hasMany(Receita::class, 'categoria_id');
+    }
 }

@@ -14,8 +14,8 @@ class ReceitaController extends Controller
         // Carregar todos os tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
-        // Paginação para otimizar a listagem de receitas
-        $receitas = Receita::paginate(12);
+        // Paginação com eager loading da categoria
+        $receitas = Receita::with('categoria')->paginate(12);
 
         // Buscar apenas as categorias com tipo "receita"
         $categorias = Categoria::where('tipo', 'receita')->get();
@@ -63,7 +63,9 @@ class ReceitaController extends Controller
     public function filtrarPorCategoria($slug)
     {
         $categoria = Categoria::where('slug', $slug)->firstOrFail();
-        $receitas = Receita::where('categoria_id', $categoria->id)->paginate(8);
+        $receitas = Receita::with('categoria')
+            ->where('categoria_id', $categoria->id)
+            ->paginate(8);
 
         return response()->json([
             'receitas' => view('partials._receitas-list', compact('receitas'))->render(),

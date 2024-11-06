@@ -77,7 +77,8 @@ class NewsController extends Controller
 
     public function update(Request $request, Noticia $noticia)
     {
-        Log::info('Dados recebidos para atualização de notícia:', $request->all());
+        Log::info('Iniciando atualização da notícia');
+        Log::info('Todos os dados recebidos:', $request->all());
 
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -88,7 +89,7 @@ class NewsController extends Controller
             'publicado_em' => 'nullable|date',
         ]);
 
-        Log::info('Dados validados:', $data);
+        $data['slug'] = Str::slug($data['titulo']);
 
         if ($request->hasFile('imagem')) {
             $this->deleteImage($noticia);
@@ -103,7 +104,9 @@ class NewsController extends Controller
             $this->resizeImage($file->getPathname(), $thumbnailPath, 300, 300);
         }
 
+        Log::info('Atualizando notícia com os dados:', $data);
         $noticia->update($data);
+        Log::info('Notícia atualizada. Novo conteúdo:', ['conteudo' => $noticia->conteudo]);
 
         return redirect()->route('web-admin.noticias.index')->with('success', 'Notícia atualizada com sucesso!');
     }

@@ -4,15 +4,12 @@
 
 @section('content')
 <div class="container mx-auto py-16 px-4">
-    <!-- Voltar e Breadcrumb -->
-    <div class="flex justify-between items-center mb-6">
-        <a href="{{ route('noticias.index') }}" class="text-red-600 font-semibold flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 19l-7-7 7-7"></path>
-            </svg>
-            Voltar
-        </a>
-        <x-breadcrumb-share currentPage="{{ $noticia->titulo }}" />
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+        <x-breadcrumb-share
+            currentPage=""
+            parentRoute="noticias.index"
+            parentText="Notícias" />
     </div>
 
     <!-- Título da Notícia e Chamada -->

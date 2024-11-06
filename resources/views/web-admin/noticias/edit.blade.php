@@ -6,11 +6,9 @@
 <div class="container mx-auto py-8">
     <h1 class="text-2xl font-bold mb-6">{{ isset($noticia) ? 'Editar Notícia' : 'Criar Nova Notícia' }}</h1>
 
-    <form action="{{ isset($noticia) ? route('web-admin.noticias.update', $noticia->id) : route('web-admin.noticias.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('web-admin.noticias.update', $noticia->id) }}" method="POST" enctype="multipart/form-data" id="form-noticia">
         @csrf
-        @if(isset($noticia))
         @method('PUT')
-        @endif
 
         <!-- Campo de Título -->
         <div class="mb-4">
@@ -18,17 +16,11 @@
             <input type="text" name="titulo" id="titulo" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('titulo', $noticia->titulo ?? '') }}" required>
         </div>
 
-        <!-- Campo de Slug -->
+        <!-- Campo do Editor -->
         <div class="mb-4">
-            <label for="slug" class="block text-gray-700 font-bold mb-2">Slug:</label>
-            <input type="text" name="slug" id="slug" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ old('slug', $noticia->slug ?? '') }}" required readonly>
-        </div>
-
-        <!-- Campo de Conteúdo usando Quill -->
-        <div class="mb-4">
-            <label for="conteudo" class="block text-gray-700 font-bold mb-2">Conteúdo da Notícia:</label>
-            <div id="editor-conteudo" class="quill-editor"></div>
-            <input type="hidden" name="conteudo" id="conteudo" value="{{ old('conteudo', $noticia->conteudo ?? '') }}">
+            <label for="editor-conteudo" class="block text-gray-700 font-bold mb-2">Conteúdo:</label>
+            <div id="editor-conteudo" style="height: 300px;">{!! old('conteudo', $noticia->conteudo) !!}</div>
+            <input type="hidden" name="conteudo" id="input-conteudo">
         </div>
 
         <!-- Campo de Categoria -->
@@ -63,6 +55,17 @@
             </select>
         </div>
 
+        <!-- Campo de Data de Publicação -->
+        <div class="mb-4">
+            <label for="publicado_em" class="block text-gray-700 font-bold mb-2">Data de Publicação:</label>
+            <input
+                type="datetime-local"
+                name="publicado_em"
+                id="publicado_em"
+                value="{{ old('publicado_em', $noticia->publicado_em ? date('Y-m-d\TH:i', strtotime($noticia->publicado_em)) : '') }}"
+                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
         <!-- Botões de Ação -->
         <div class="flex justify-end">
             <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mr-2">Salvar Notícia</button>
@@ -75,5 +78,5 @@
 @endsection
 
 @section('scripts')
-@vite('resources/js/editor.js')
+@vite('resources/js/news-editor.js')
 @endsection

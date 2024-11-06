@@ -1,4 +1,15 @@
-@props(['currentPage', 'parentPage' => null, 'tipo' => null, 'marca' => null, 'linha' => null, 'produto' => null, 'sku' => null, 'textColor' => 'text-gray-700'])
+@props([
+'currentPage',
+'parentPage' => null,
+'parentRoute' => null,
+'parentText' => null,
+'tipo' => null,
+'marca' => null,
+'linha' => null,
+'produto' => null,
+'sku' => null,
+'textColor' => 'text-gray-700'
+])
 
 <div class="flex justify-between items-center mb-8">
     <div class="flex items-center space-x-4">
@@ -10,29 +21,14 @@
 
         <!-- Breadcrumb -->
         <div class="flex items-center space-x-2 overflow-x-auto">
-            <!-- Versão Mobile -->
-            <div class="lg:hidden flex items-center space-x-2">
-                @if($marca)
-                <span class="{{ $textColor }} text-sm">{{ $marca->nome }}</span>
-                @if($linha)
-                <span class="{{ $textColor }}">/</span>
-                <span class="{{ $textColor }} text-sm">{{ $linha->nome }}</span>
-                @endif
-                @if($produto)
-                <span class="{{ $textColor }}">/</span>
-                <span class="{{ $textColor }} text-sm">{{ $produto->nome }}</span>
-                @endif
-                @endif
-            </div>
-
             <!-- Versão Desktop -->
             <div class="hidden lg:flex items-center space-x-2">
                 <a href="/" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
                     <i class="fas fa-home"></i>
                 </a>
 
+                @if($marca)
                 <span class="{{ $textColor }}">/</span>
-
                 <a href="{{ route('marcas') }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
                     Nossas Marcas
                 </a>
@@ -44,21 +40,19 @@
                 </a>
                 @endif
 
-                @if($marca)
                 <span class="{{ $textColor }}">/</span>
                 <a href="{{ route('marcas.produtos', ['tipoSlug' => $tipo->slug, 'slugMarca' => $marca->slug]) }}"
                     class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
                     {{ $marca->nome }}
                 </a>
-                @endif
 
                 @if($linha && (!$marca || $linha->nome !== $marca->nome))
                 <span class="{{ $textColor }}">/</span>
                 <a href="{{ route('marcas.produtos.linhas', [
-                    'tipoSlug' => $tipo->slug,
-                    'slugMarca' => $marca->slug,
-                    'slugProduto' => $linha->slug
-                ]) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                            'tipoSlug' => $tipo->slug,
+                            'slugMarca' => $marca->slug,
+                            'slugProduto' => $linha->slug
+                        ]) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
                     {{ $linha->nome }}
                 </a>
                 @endif
@@ -67,15 +61,21 @@
                 <span class="{{ $textColor }}">/</span>
                 @if($produto->slug)
                 <a href="{{ route('marcas.produtos.linhas', [
-                        'tipoSlug' => $tipo->slug,
-                        'slugMarca' => $marca->slug,
-                        'slugProduto' => $produto->slug
-                    ]) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                                    'tipoSlug' => $tipo->slug,
+                                    'slugMarca' => $marca->slug,
+                                    'slugProduto' => $produto->slug
+                                ]) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
                     {{ $produto->nome }}
                 </a>
                 @else
                 <span class="{{ $textColor }} text-sm">{{ $produto->nome }}</span>
                 @endif
+                @endif
+                @elseif($parentRoute && $parentText)
+                <span class="{{ $textColor }}">/</span>
+                <a href="{{ route($parentRoute) }}" class="{{ $textColor }} text-sm hover:text-red-600 transition-colors duration-200">
+                    {{ $parentText }}
+                </a>
                 @endif
 
                 @if($currentPage && $currentPage !== '')

@@ -4,22 +4,19 @@
 
 @section('content')
 <div class="container mx-auto py-16 px-4">
-    <!-- Voltar e Breadcrumb -->
-    <div class="flex justify-between items-center mb-6">
-        <a href="{{ route('receitas.categoria', $categoria->slug) }}" class="text-red-600 font-semibold flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 19l-7-7 7-7"></path>
-            </svg>
-            Voltar para {{ $categoria->nome }}
-        </a>
-        <x-breadcrumb-share currentPage="{{ $receita->nome }}" />
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+        <x-breadcrumb-share
+            currentPage="{{ $receita->nome }}"
+            parentRoute="receitas.index"
+            parentText="Receitas" />
     </div>
 
     <!-- Título da Receita -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Imagem da Receita -->
         <div class="relative">
-            <img src="https://via.placeholder.com/800x600?text={{ urlencode($receita->nome) }}" alt="{{ $receita->nome }}" class="w-full rounded-lg shadow-lg object-cover">
+            <img src="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}" alt="{{ $receita->nome }}" class="w-full rounded-lg shadow-lg object-cover">
 
             <!-- Botões de Compartilhar e Curtir -->
             <div class="flex space-x-4 mt-4">
@@ -58,17 +55,13 @@
             <!-- Ingredientes -->
             <div class="mb-6">
                 <h3 class="text-xl font-semibold text-gray-900">Ingredientes</h3>
-                <ul class="list-disc list-inside text-gray-700 mt-2">
-                    {!! nl2br(e($receita->ingredientes)) !!}
-                </ul>
+                <div class="ql-editor">{!! $receita->ingredientes !!}</div>
             </div>
 
             <!-- Modo de Preparo -->
             <div>
                 <h3 class="text-xl font-semibold text-gray-900">Modo de Preparo</h3>
-                <ol class="list-decimal list-inside text-gray-700 mt-2 space-y-2">
-                    {!! nl2br(e($receita->preparo)) !!}
-                </ol>
+                <div class="ql-editor">{!! $receita->modo_preparo !!}</div>
             </div>
         </div>
     </div>

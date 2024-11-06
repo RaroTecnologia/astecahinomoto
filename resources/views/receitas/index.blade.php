@@ -47,7 +47,14 @@
 
         <!-- Listagem de Receitas -->
         <div id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            @include('partials._receitas-list', ['receitas' => $receitas])
+            @foreach($receitas as $receita)
+            <x-card-item
+                title="{{ $receita->nome }}"
+                description="{{ Str::limit($receita->chamada, 100) }}"
+                image="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}"
+                link="{{ route('receitas.show', ['categoria' => $receita->categoria->slug, 'slug' => $receita->slug]) }}"
+                linkText="Ler Mais" />
+            @endforeach
         </div>
 
         <!-- Paginação -->

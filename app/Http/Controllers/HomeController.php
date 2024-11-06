@@ -8,6 +8,7 @@ use App\Models\Tipo;
 use App\Models\Categoria;
 use App\Models\HomeBanner;
 use App\Models\HomeDestaque;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -27,14 +28,21 @@ class HomeController extends Controller
         // Buscar as 4 notícias mais recentes
         $noticias = Noticia::latest()->take(4)->get();
 
-        // Buscar as 4 receitas mais recentes com todos os campos necessários
-        $receitas = Receita::select('id', 'nome', 'chamada', 'imagem')
-            ->latest()
+        // Buscar 4 receitas aleatórias com suas categorias
+        $receitas = Receita::with('categoria')
+            ->inRandomOrder()
             ->take(4)
             ->get();
 
         // Buscar as categorias de nível "marca"
         $marcas = Categoria::where('nivel', 'marca')->get();
+
+        // Debug para verificar os dados
+        foreach ($receitas as $receita) {
+            Log::info('Receita: ' . $receita->nome);
+            Log::info('Categoria ID: ' . $receita->categoria_id);
+            Log::info('Categoria: ', $receita->categoria ? ['nome' => $receita->categoria->nome] : ['sem categoria']);
+        }
 
         // Passar os dados para a view
         return view('home', compact('banners', 'tiposHeader', 'noticias', 'receitas', 'marcas', 'destaques'));
