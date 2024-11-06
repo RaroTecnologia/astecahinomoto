@@ -6,6 +6,7 @@ use App\Models\Receita;
 use App\Models\Categoria;
 use App\Models\Tipo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class ReceitaController extends Controller
 {
@@ -77,10 +78,20 @@ class ReceitaController extends Controller
     public function curtir($id)
     {
         $receita = Receita::findOrFail($id);
+        $cookieName = 'receita_curtida_' . $id;
+
+        if (Cookie::has($cookieName)) {
+            return response()->json([
+                'error' => 'Você já curtiu esta receita',
+                'curtidas' => $receita->curtidas
+            ], 403);
+        }
+
         $receita->increment('curtidas');
 
         return response()->json([
-            'curtidas' => $receita->curtidas
-        ]);
+            'curtidas' => $receita->curtidas,
+            'message' => 'Receita curtida com sucesso'
+        ])->cookie($cookieName, true, 60 * 24 * 30); // Cookie válido por 30 dias
     }
 }

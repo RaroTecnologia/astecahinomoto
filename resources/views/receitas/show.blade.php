@@ -25,7 +25,7 @@
                     <span id="textoCompartilhar">Compartilhar esta receita</span>
                 </button>
                 <button onclick="curtirReceita({{ $receita->id }})" class="flex items-center text-gray-600 hover:text-red-600 transition">
-                    <i class="fa-regular fa-heart mr-1"></i>
+                    <i id="iconeCurtir" class="fa-regular fa-heart mr-1"></i>
                     <span id="textoCurtir">Curtir</span>
                     <span id="numeroCurtidas" class="ml-1">({{ $receita->curtidas }})</span>
                 </button>
@@ -96,13 +96,42 @@
             })
             .then(response => response.json())
             .then(data => {
+                // Atualiza o contador de curtidas
                 document.getElementById('numeroCurtidas').textContent = `(${data.curtidas})`;
-                document.getElementById('textoCurtir').textContent = 'Curtido!';
 
+                if (data.error) {
+                    // Caso já tenha curtido
+                    document.getElementById('textoCurtir').textContent = 'Já curtido';
+                    document.getElementById('iconeCurtir').classList.remove('fa-regular');
+                    document.getElementById('iconeCurtir').classList.add('fa-solid');
+                } else {
+                    // Curtida com sucesso
+                    document.getElementById('textoCurtir').textContent = 'Curtido!';
+                    document.getElementById('iconeCurtir').classList.remove('fa-regular');
+                    document.getElementById('iconeCurtir').classList.add('fa-solid');
+                }
+
+                // Volta ao estado original após 2 segundos (mantendo o ícone preenchido)
                 setTimeout(() => {
                     document.getElementById('textoCurtir').textContent = 'Curtir';
                 }, 2000);
+            })
+            .catch(error => {
+                console.error('Erro ao curtir:', error);
             });
     }
+
+    // Verifica se já curtiu ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+        const receitaId = {
+            {
+                $receita - > id
+            }
+        };
+        if (document.cookie.includes(`receita_curtida_${receitaId}`)) {
+            document.getElementById('iconeCurtir').classList.remove('fa-regular');
+            document.getElementById('iconeCurtir').classList.add('fa-solid');
+        }
+    });
 </script>
 @endsection
