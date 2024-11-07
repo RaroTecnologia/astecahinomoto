@@ -1,18 +1,31 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
     @foreach($skus as $sku)
-    @if($sku->produto && $sku->produto->categoria)
     @php
-    $slugMarca = $sku->produto->categoria->parent ? $sku->produto->categoria->parent->slug : 'sem-marca';
-    $slugProduto = $sku->produto->slug ?? 'produto-nao-encontrado';
+    // Encontra a categoria marca (parent até chegar no nível marca)
+    $categoriaMarca = $sku->produto->categoria;
+    while ($categoriaMarca && $categoriaMarca->nivel !== 'marca') {
+    $categoriaMarca = $categoriaMarca->parent;
+    }
     @endphp
 
-    <x-card-item
-        title="{{ $sku->produto->nome }}"
-        description="{{ $sku->nome }}"
-        image="{{ $sku->imagem ? asset('storage/produtos/thumbnails/' . $sku->imagem) : asset('assets/sem_imagem.png') }}"
-        link="{{ route('produtos.show', ['slugMarca' => $slugMarca, 'slugProduto' => $slugProduto]) }}"
-        linkText="Ver Produto"
-        :centerContent="true" />
+    @if($categoriaMarca) {{-- Só mostra se tiver uma marca válida --}}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <a href="{{ route('produtos.show', [
+            'slugMarca' => $categoriaMarca->slug,
+            'slugProduto' => $sku->produto->slug
+        ]) }}" class="block">
+            <x-card-item
+                title="{{ $sku->produto->nome }}"
+                description="{{ $sku->nome }}"
+                image="{{ $sku->imagem ? asset('storage/produtos/thumbnails/' . $sku->imagem) : asset('assets/sem_imagem.png') }}"
+                link="{{ route('produtos.show', [
+                    'slugMarca' => $categoriaMarca->slug,
+                    'slugProduto' => $sku->produto->slug
+                ]) }}"
+                linkText="Ver Produto"
+                :centerContent="true" />
+        </a>
+    </div>
     @endif
     @endforeach
 </div>

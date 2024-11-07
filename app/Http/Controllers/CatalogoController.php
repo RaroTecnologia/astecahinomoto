@@ -267,23 +267,18 @@ class CatalogoController extends Controller
         try {
             Log::info('Buscando produtos para marca:', ['marca_id' => $marca]);
 
-            // Voltando à versão que funcionava
             $produtos = Categoria::where('tipo', 'produto')
                 ->where('nivel', 'produto')
                 ->where('parent_id', $marca)
                 ->orderBy('nome')
                 ->get();
 
-            Log::info('Produtos encontrados:', [
-                'total' => $produtos->count(),
-                'produtos' => $produtos->pluck(['id', 'nome'])->toArray()
-            ]);
-
             return response()->json([
                 'success' => true,
                 'produtos' => $produtos->map(function ($produto) {
                     return [
                         'id' => $produto->id,
+                        'slug' => $produto->slug,
                         'nome' => $produto->nome
                     ];
                 })
@@ -306,7 +301,6 @@ class CatalogoController extends Controller
         try {
             Log::info('Buscando linhas para produto:', ['produto_id' => $produto]);
 
-            // Mantendo o filtro de SKUs ativos apenas para as linhas
             $linhas = Categoria::where('tipo', 'produto')
                 ->where('nivel', 'linha')
                 ->where('parent_id', $produto)
@@ -319,16 +313,12 @@ class CatalogoController extends Controller
                 ->orderBy('nome')
                 ->get();
 
-            Log::info('Linhas encontradas:', [
-                'total' => $linhas->count(),
-                'linhas' => $linhas->pluck('nome', 'id')->toArray()
-            ]);
-
             return response()->json([
                 'success' => true,
                 'linhas' => $linhas->map(function ($linha) {
                     return [
                         'id' => $linha->id,
+                        'slug' => $linha->slug,
                         'nome' => $linha->nome
                     ];
                 })

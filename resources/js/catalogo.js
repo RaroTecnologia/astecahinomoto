@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Atualizar seleção e carregar dados
-    function updateSelection(type, value, text) {
+    function updateSelection(type, value, text, slug) {
         const spanElement = document.getElementById(`selected${type}`);
         if (spanElement) {
             spanElement.textContent = text;
@@ -102,51 +102,57 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdownElement.classList.add('hidden');
         }
 
-        // Resetar página ao mudar filtros
-        currentPage = 1;
-
-        // Atualizar variáveis de estado e filtrar imediatamente
+        // Atualizar variáveis de estado
         switch(type) {
             case 'Marca':
                 selectedMarca = value;
-                selectedProduto = ''; // Resetar produto
-                selectedLinha = '';   // Resetar linha
-                
-                // Primeiro atualiza os cards
-                updateProdutos(1);
-                
-                // Depois carrega o dropdown de produtos
-                if (value) {
-                    toggleDropdownLoading('Produto', true);
-                    loadProdutos(value);
-                } else {
-                    resetDropdown('Produto');
-                    resetDropdown('Linha');
-                }
+                selectedProduto = '';
+                selectedLinha = '';
                 break;
-
             case 'Produto':
                 selectedProduto = value;
-                selectedLinha = '';   // Resetar linha
-                
-                // Primeiro atualiza os cards
-                updateProdutos(1);
-                
-                // Depois carrega o dropdown de linhas
-                if (value) {
-                    toggleDropdownLoading('Linha', true);
-                    loadLinhas(value);
-                } else {
-                    resetDropdown('Linha');
-                }
+                selectedLinha = '';
                 break;
-
             case 'Linha':
                 selectedLinha = value;
-                // Atualiza os cards imediatamente
-                updateProdutos(1);
                 break;
         }
+
+        // Atualizar URL com os slugs
+        const url = new URL(window.location);
+        
+        // Limpar todos os parâmetros
+        url.searchParams.delete('marca');
+        url.searchParams.delete('produto');
+        url.searchParams.delete('linha');
+        url.searchParams.delete('page');
+        
+        // Adicionar apenas parâmetros com valores válidos
+        if (selectedMarca) {
+            const marcaLink = document.querySelector(`a[data-marca="${selectedMarca}"]`);
+            if (marcaLink && marcaLink.dataset.marcaSlug) {
+                url.searchParams.set('marca', marcaLink.dataset.marcaSlug);
+            }
+        }
+        
+        if (selectedProduto) {
+            const produtoLink = document.querySelector(`a[data-produto="${selectedProduto}"]`);
+            if (produtoLink && produtoLink.dataset.produtoSlug) {
+                url.searchParams.set('produto', produtoLink.dataset.produtoSlug);
+            }
+        }
+        
+        if (selectedLinha) {
+            const linhaLink = document.querySelector(`a[data-linha="${selectedLinha}"]`);
+            if (linhaLink && linhaLink.dataset.linhaSlug) {
+                url.searchParams.set('linha', linhaLink.dataset.linhaSlug);
+            }
+        }
+        
+        window.history.pushState({}, '', url);
+
+        // Atualizar produtos
+        updateProdutos(1);
     }
 
     // Função para mostrar/esconder loading do dropdown
@@ -228,24 +234,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success && data.produtos.length > 0) {
                     const produtoDropdown = document.getElementById('produtoDropdown');
                     if (produtoDropdown) {
-                        produtoDropdown.innerHTML = '<a href="#" data-produto="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>';
+                        produtoDropdown.innerHTML = '<a href="#" data-produto="" data-produto-slug="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>';
                         
                         data.produtos.forEach(produto => {
                             produtoDropdown.innerHTML += `
-                                <a href="#" data-produto="${produto.id}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
+                                <a href="#" 
+                                   data-produto="${produto.id}" 
+                                   data-produto-slug="${produto.slug}" 
+                                   class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
                                     ${produto.nome}
                                 </a>
                             `;
                         });
 
-                        // Adiciona os event listeners para os novos links
+                        // Adiciona os event listeners
                         produtoDropdown.querySelectorAll('a').forEach(link => {
                             link.addEventListener('click', function(e) {
                                 e.preventDefault();
                                 const value = this.dataset.produto;
+                                const slug = this.dataset.produtoSlug;
                                 const text = this.textContent.trim();
                                 
-                                updateSelection('Produto', value, text);
+                                updateSelection('Produto', value, text, slug);
 
                                 if (value) {
                                     loadLinhas(value);
@@ -283,11 +293,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success && data.linhas.length > 0) {
                     const linhaDropdown = document.getElementById('linhaDropdown');
                     if (linhaDropdown) {
-                        linhaDropdown.innerHTML = '<a href="#" data-linha="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>';
+                        linhaDropdown.innerHTML = '<a href="#" data-linha="" data-linha-slug="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>';
                         
                         data.linhas.forEach(linha => {
                             linhaDropdown.innerHTML += `
-                                <a href="#" data-linha="${linha.id}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
+                                <a href="#" 
+                                   data-linha="${linha.id}" 
+                                   data-linha-slug="${linha.slug}" 
+                                   class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
                                     ${linha.nome}
                                 </a>
                             `;
@@ -298,9 +311,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             link.addEventListener('click', function(e) {
                                 e.preventDefault();
                                 const value = this.dataset.linha;
+                                const slug = this.dataset.linhaSlug;
                                 const text = this.textContent.trim();
                                 
-                                updateSelection('Linha', value, text);
+                                updateSelection('Linha', value, text, slug);
                                 
                                 // Atualiza produtos imediatamente
                                 updateProdutos(1);
@@ -341,35 +355,25 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Fazendo requisição para:', url);
 
         fetch(url)
-            .then(response => {
-                console.log('Status da resposta:', response.status);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Dados recebidos:', data);
                 if (data.success) {
-                    // Atualiza o grid de produtos
                     document.getElementById('produtos-container').innerHTML = data.html;
-                    
-                    // Atualiza a paginação
                     document.getElementById('paginacao-container').innerHTML = data.pagination;
                     
-                    // Atualiza a URL
+                    // Atualiza a URL com os slugs
                     const newUrl = new URL(window.location);
-                    newUrl.searchParams.set('page', page);
+                    if (page > 1) {
+                        newUrl.searchParams.set('page', page);
+                        // Scroll suave APENAS na paginação
+                        document.getElementById('produtos-container').scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
                     window.history.pushState({}, '', newUrl);
-
-                    // Scroll suave para o topo
-                    document.getElementById('produtos-container').scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                } else {
-                    console.error('Erro nos dados:', data);
                 }
             })
-            .catch(error => {
-                console.error('Erro ao atualizar produtos:', error);
-            })
+            .catch(error => console.error('Erro ao atualizar produtos:', error))
             .finally(() => {
                 if (loadingMore) {
                     loadingMore.classList.add('hidden');

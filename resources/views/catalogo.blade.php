@@ -2,81 +2,78 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <!-- Título e Descrição -->
-    <div class="mb-8">
+    <!-- Breadcrumb -->
+    <x-breadcrumb-share
+        currentPage="Catálogo de Produtos"
+        parentText="Produtos"
+        parentRoute="catalogo.index" />
+
+    <!-- Título e Descrição (Centralizado) -->
+    <div class="text-center mb-8">
         <h1 class="text-3xl font-bold mb-2">Catálogo de Produtos</h1>
         <p class="text-gray-600">Explore nossa linha completa de produtos</p>
     </div>
 
-    <!-- Barra de Busca -->
-    <div class="mb-8 relative">
-        <input type="text"
-            class="w-full p-4 border rounded-lg shadow-sm"
-            placeholder="Buscar produtos..."
-            data-search="produtos"
-            autocomplete="off">
-
-        <!-- Container de Resultados do Autocomplete -->
-        <div id="autocomplete-results-produtos"
-            class="absolute z-50 w-full bg-white border rounded-lg shadow-lg mt-1 hidden">
-            <!-- Loading State -->
-            <div id="autocomplete-loading-produtos" class="p-4 hidden">
-                <div class="animate-pulse flex space-x-4">
-                    <div class="flex-1 space-y-4 py-1">
-                        <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div class="space-y-2">
-                            <div class="h-4 bg-gray-200 rounded"></div>
-                            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Autocomplete Search -->
+    <x-autocomplete context="produtos" placeholder="produtos" />
 
     <!-- Filtros -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div class="flex justify-center mb-16">
         <!-- Filtros Dropdown -->
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap justify-center gap-4">
             <!-- Marca -->
-            <div class="relative">
-                <button id="marcaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
-                    <span id="selectedMarca">Todas as Marcas</span>
-                    <i class="fas fa-chevron-down ml-2"></i>
-                </button>
-                <div id="marcaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
-                    <a href="#" data-marca="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Marcas</a>
-                    @foreach($marcas as $marca)
-                    <a href="#" data-marca="{{ $marca->id }}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
-                        {{ $marca->nome }}
-                    </a>
-                    @endforeach
+            <div class="flex items-center gap-2">
+                <span class="px-4 py-1.5 border border-gray-700 rounded-full text-base font-medium">
+                    Marca
+                </span>
+                <div class="relative">
+                    <button id="marcaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                        <span id="selectedMarca">Todas as Marcas</span>
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                    <div id="marcaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
+                        <a href="#" data-marca="" data-marca-slug="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Marcas</a>
+                        @foreach($marcas as $marca)
+                        <a href="#"
+                            data-marca="{{ $marca->id }}"
+                            data-marca-slug="{{ $marca->slug }}"
+                            class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
+                            {{ $marca->nome }}
+                        </a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
 
             <!-- Produto -->
-            <div class="relative">
-                <button id="produtoFilter"
-                    class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed"
-                    disabled>
-                    <span id="selectedProduto">Todos os Produtos</span>
-                    <i class="fas fa-chevron-down ml-2"></i>
-                </button>
-                <div id="produtoDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
-                    <a href="#" data-produto="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>
+            <div class="flex items-center gap-2">
+                <span class="px-4 py-1.5 border border-gray-700 rounded-full text-base font-medium">
+                    Produto
+                </span>
+                <div class="relative">
+                    <button id="produtoFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed" disabled>
+                        <span id="selectedProduto">Todos os Produtos</span>
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                    <div id="produtoDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
+                        <a href="#" data-produto="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>
+                    </div>
                 </div>
             </div>
 
             <!-- Linha -->
-            <div class="relative">
-                <button id="linhaFilter"
-                    class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed"
-                    disabled>
-                    <span id="selectedLinha">Todas as Linhas</span>
-                    <i class="fas fa-chevron-down ml-2"></i>
-                </button>
-                <div id="linhaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
-                    <a href="#" data-linha="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>
+            <div class="flex items-center gap-2">
+                <span class="px-4 py-1.5 border border-gray-700 rounded-full text-base font-medium">
+                    Linha
+                </span>
+                <div class="relative">
+                    <button id="linhaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed" disabled>
+                        <span id="selectedLinha">Todas as Linhas</span>
+                        <i class="fas fa-chevron-down ml-2"></i>
+                    </button>
+                    <div id="linhaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
+                        <a href="#" data-linha="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,4 +98,4 @@
 </div>
 @endsection
 
-@vite(['resources/js/catalogo.js'])
+@vite(['resources/js/autocomplete.js', 'resources/js/catalogo.js'])

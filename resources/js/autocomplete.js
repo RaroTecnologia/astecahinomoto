@@ -73,17 +73,38 @@ document.addEventListener('DOMContentLoaded', function() {
                         data.forEach(item => {
                             const resultDiv = document.createElement('div');
                             resultDiv.className = 'p-2 hover:bg-gray-100 cursor-pointer';
-                            resultDiv.innerHTML = `
-                                <a href="/${context}/${item.categoria?.slug || 'sem-categoria'}/${item.slug}" 
-                                   class="flex items-center">
-                                    <div class="flex-1">
-                                        <div class="font-medium">${context === 'noticias' ? item.titulo : item.nome}</div>
-                                        <div class="text-sm text-gray-500">
-                                            ${item.categoria ? item.categoria.nome : ''}
+                            
+                            // Ajuste específico para produtos
+                            if (context === 'produtos') {
+                                if (item.categoria?.slug) {
+                                    resultDiv.innerHTML = `
+                                        <a href="/produto/${item.categoria.slug}/${item.slug}" 
+                                           class="flex items-center">
+                                            <div class="flex-1">
+                                                <div class="font-medium">${item.nome}</div>
+                                                <div class="text-sm text-gray-500">
+                                                    ${item.categoria.nome}
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
+                                    resultsContainer.appendChild(resultDiv);
+                                }
+                            } else {
+                                // Mantém o código original para outros contextos
+                                resultDiv.innerHTML = `
+                                    <a href="/${context}/${item.categoria?.slug || 'sem-categoria'}/${item.slug}" 
+                                       class="flex items-center">
+                                        <div class="flex-1">
+                                            <div class="font-medium">${context === 'noticias' ? item.titulo : item.nome}</div>
+                                            <div class="text-sm text-gray-500">
+                                                ${item.categoria ? item.categoria.nome : ''}
+                                            </div>
                                         </div>
-                                    </div>
-                                </a>
-                            `;
+                                    </a>
+                                `;
+                            }
+                            
                             resultsContainer.appendChild(resultDiv);
                         });
                     } else {
