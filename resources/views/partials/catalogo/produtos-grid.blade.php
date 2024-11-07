@@ -17,7 +17,7 @@
             <x-card-item
                 title="{{ $sku->produto->nome }}"
                 description="{{ $sku->nome }}"
-                image="{{ $sku->imagem ? asset('storage/produtos/thumbnails/' . $sku->imagem) : asset('assets/sem_imagem.png') }}"
+                image="{{ $sku->imagem ? asset('storage/thumbnails/' . $sku->imagem) : asset('assets/sem_imagem.png') }}"
                 link="{{ route('produtos.show', [
                     'slugMarca' => $categoriaMarca->slug,
                     'slugProduto' => $sku->produto->slug
