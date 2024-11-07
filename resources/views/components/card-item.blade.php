@@ -3,7 +3,7 @@
     <div class="h-[250px] w-full overflow-hidden">
         <img src="{{ $image }}"
             alt="{{ $title }}"
-            class="w-full h-full object-cover">
+            class="w-full h-full {{ $fullImage ? 'object-contain' : 'object-cover' }}">
     </div>
 
     <!-- Conteúdo -->

@@ -23,7 +23,8 @@
                     'slugProduto' => $sku->produto->slug
                 ]) }}"
                 linkText="Ver Produto"
-                :centerContent="true" />
+                :centerContent="true"
+                :fullImage="true" />
         </a>
     </div>
     @endif
