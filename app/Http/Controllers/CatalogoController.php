@@ -45,6 +45,8 @@ class CatalogoController extends Controller
     public function filtrar(Request $request)
     {
         try {
+            Log::info('Iniciando filtro com parâmetros:', $request->all());
+
             $skusQuery = Sku::with([
                 'produto',
                 'produto.categoria',
@@ -59,9 +61,11 @@ class CatalogoController extends Controller
             if ($marca = $request->input('marca')) {
                 $skusQuery->whereHas('produto.categoria', function ($query) use ($marca) {
                     $query->where(function ($q) use ($marca) {
-                        // Produtos diretamente da marca
-                        $q->where('categorias.parent_id', $marca)
-                            // Ou linhas dos produtos da marca
+                        // Produtos diretamente na marca
+                        $q->where('categorias.id', $marca)
+                            // Produtos em subcategorias da marca
+                            ->orWhere('categorias.parent_id', $marca)
+                            // Produtos em linhas das subcategorias
                             ->orWhereHas('parent', function ($p) use ($marca) {
                                 $p->where('parent_id', $marca);
                             });
@@ -69,32 +73,37 @@ class CatalogoController extends Controller
                 });
             }
 
-            // Filtro de Produto
+            // Filtro de Produto (só aplica se tiver produto selecionado)
             if ($produto = $request->input('produto')) {
                 $skusQuery->whereHas('produto.categoria', function ($query) use ($produto) {
                     $query->where(function ($q) use ($produto) {
-                        // SKUs do produto diretamente
-                        $q->where('categorias.parent_id', $produto)
-                            // Ou SKUs das linhas do produto
-                            ->orWhere('categorias.id', $produto);
+                        $q->where('categorias.id', $produto)
+                            ->orWhere('categorias.parent_id', $produto);
                     });
                 });
             }
 
-            // Filtro de Linha
+            // Filtro de Linha (só aplica se tiver linha selecionada)
             if ($linha = $request->input('linha')) {
                 $skusQuery->whereHas('produto.categoria', function ($query) use ($linha) {
                     $query->where('categorias.id', $linha);
                 });
             }
 
-            // Log para debug
-            Log::info('Query SKUs:', [
+            // Log da query final para debug
+            Log::info('Query final:', [
                 'sql' => $skusQuery->toSql(),
                 'bindings' => $skusQuery->getBindings()
             ]);
 
             $skus = $skusQuery->paginate(24);
+
+            // Log dos resultados
+            Log::info('Resultados encontrados:', [
+                'total' => $skus->total(),
+                'por_pagina' => $skus->perPage(),
+                'pagina_atual' => $skus->currentPage()
+            ]);
 
             return response()->json([
                 'success' => true,

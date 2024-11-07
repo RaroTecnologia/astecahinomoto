@@ -56,43 +56,27 @@
 
             <!-- Produto -->
             <div class="relative">
-                <button id="produtoFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                <button id="produtoFilter"
+                    class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed"
+                    disabled>
                     <span id="selectedProduto">Todos os Produtos</span>
                     <i class="fas fa-chevron-down ml-2"></i>
                 </button>
                 <div id="produtoDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
                     <a href="#" data-produto="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>
-                    <!-- Estado de loading -->
-                    <div id="produtoDropdownLoading" class="hidden">
-                        <div class="px-4 py-2">
-                            <div class="animate-pulse space-y-2">
-                                <div class="h-4 bg-gray-200 rounded"></div>
-                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-                                <div class="h-4 bg-gray-200 rounded w-4/6"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
             <!-- Linha -->
             <div class="relative">
-                <button id="linhaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                <button id="linhaFilter"
+                    class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed"
+                    disabled>
                     <span id="selectedLinha">Todas as Linhas</span>
                     <i class="fas fa-chevron-down ml-2"></i>
                 </button>
                 <div id="linhaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
                     <a href="#" data-linha="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>
-                    <!-- Estado de loading -->
-                    <div id="linhaDropdownLoading" class="hidden">
-                        <div class="px-4 py-2">
-                            <div class="animate-pulse space-y-2">
-                                <div class="h-4 bg-gray-200 rounded"></div>
-                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-                                <div class="h-4 bg-gray-200 rounded w-4/6"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

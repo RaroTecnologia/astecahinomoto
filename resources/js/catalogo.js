@@ -188,19 +188,44 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Adicione estas funções no início do arquivo, logo após o DOMContentLoaded
+    function disableDropdown(type) {
+        const button = document.getElementById(`${type.toLowerCase()}Filter`);
+        const dropdown = document.getElementById(`${type.toLowerCase()}Dropdown`);
+        
+        if (button) {
+            button.disabled = true;
+            button.classList.add('opacity-50', 'cursor-not-allowed');
+            button.classList.remove('hover:bg-gray-50');
+            
+            // Garante que o dropdown está fechado
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+            }
+        }
+    }
+
+    function enableDropdown(type) {
+        const button = document.getElementById(`${type.toLowerCase()}Filter`);
+        
+        if (button) {
+            button.disabled = false;
+            button.classList.remove('opacity-50', 'cursor-not-allowed');
+            button.classList.add('hover:bg-gray-50');
+        }
+    }
+
     // Carregar produtos baseado na marca
     function loadProdutos(marcaId) {
+        console.log('Carregando produtos para marca:', marcaId);
         toggleDropdownLoading('Produto', true);
+        disableDropdown('Produto');
+        disableDropdown('Linha');
 
         fetch(`/api/catalogo/produtos/${marcaId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.success && data.produtos.length > 0) {
                     const produtoDropdown = document.getElementById('produtoDropdown');
                     if (produtoDropdown) {
                         produtoDropdown.innerHTML = '<a href="#" data-produto="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>';
@@ -213,20 +238,33 @@ document.addEventListener('DOMContentLoaded', function() {
                             `;
                         });
 
-                        // Adicionar event listeners para os novos links
+                        // Adiciona os event listeners para os novos links
                         produtoDropdown.querySelectorAll('a').forEach(link => {
                             link.addEventListener('click', function(e) {
                                 e.preventDefault();
-                                updateSelection('Produto', this.dataset.produto, this.textContent.trim());
+                                const value = this.dataset.produto;
+                                const text = this.textContent.trim();
+                                
+                                updateSelection('Produto', value, text);
+
+                                if (value) {
+                                    loadLinhas(value);
+                                } else {
+                                    disableDropdown('Linha');
+                                    resetDropdown('Linha');
+                                }
                             });
                         });
+
+                        enableDropdown('Produto');
                     }
                 } else {
-                    console.error('Erro ao carregar produtos:', data.error);
+                    disableDropdown('Produto');
                 }
             })
             .catch(error => {
                 console.error('Erro ao carregar produtos:', error);
+                disableDropdown('Produto');
             })
             .finally(() => {
                 toggleDropdownLoading('Produto', false);
@@ -237,46 +275,47 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadLinhas(produtoId) {
         console.log('Carregando linhas para produto:', produtoId);
         toggleDropdownLoading('Linha', true);
+        disableDropdown('Linha');
 
         fetch(`/api/catalogo/linhas/${produtoId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.success && data.linhas.length > 0) {
                     const linhaDropdown = document.getElementById('linhaDropdown');
                     if (linhaDropdown) {
-                        // Começa com a opção "Todas as Linhas"
                         linhaDropdown.innerHTML = '<a href="#" data-linha="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>';
                         
-                        // Adiciona cada linha retornada pela API
                         data.linhas.forEach(linha => {
                             linhaDropdown.innerHTML += `
-                                <a href="#" 
-                                   data-linha="${linha.id}" 
-                                   class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
+                                <a href="#" data-linha="${linha.id}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
                                     ${linha.nome}
                                 </a>
                             `;
                         });
 
-                        // Adiciona event listeners para os novos links
+                        // Adiciona os event listeners para os novos links
                         linhaDropdown.querySelectorAll('a').forEach(link => {
                             link.addEventListener('click', function(e) {
                                 e.preventDefault();
-                                updateSelection('Linha', this.dataset.linha, this.textContent.trim());
+                                const value = this.dataset.linha;
+                                const text = this.textContent.trim();
+                                
+                                updateSelection('Linha', value, text);
+                                
+                                // Atualiza produtos imediatamente
+                                updateProdutos(1);
                             });
                         });
+
+                        enableDropdown('Linha');
                     }
                 } else {
-                    console.error('Erro ao carregar linhas:', data.error);
+                    disableDropdown('Linha');
                 }
             })
             .catch(error => {
                 console.error('Erro ao carregar linhas:', error);
+                disableDropdown('Linha');
             })
             .finally(() => {
                 toggleDropdownLoading('Linha', false);
@@ -342,48 +381,21 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#marcaDropdown a').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            // Pega o valor e texto da marca
             const value = this.dataset.marca;
             const text = this.textContent.trim();
             
-            // Atualiza o estado
-            selectedMarca = value;
-            selectedProduto = '';
-            selectedLinha = '';
-            
-            // Atualiza o texto do botão
-            const span = document.getElementById('selectedMarca');
-            if (span) span.textContent = text;
-            
-            // Fecha o dropdown
-            document.getElementById('marcaDropdown').classList.add('hidden');
-            
-            // Reseta os outros dropdowns
-            resetDropdown('Produto');
-            resetDropdown('Linha');
-            
-            // Faz a requisição para atualizar os produtos
-            fetch(`/api/catalogo/filtrar?marca=${value}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Atualiza o grid de produtos
-                        document.getElementById('produtos-container').innerHTML = data.html;
-                        
-                        // Atualiza a paginação
-                        document.getElementById('paginacao-container').innerHTML = data.pagination;
-                        
-                        // Se tiver uma marca selecionada, carrega os produtos no dropdown
-                        if (value) {
-                            toggleDropdownLoading('Produto', true);
-                            loadProdutos(value);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao filtrar por marca:', error);
-                });
+            updateSelection('Marca', value, text);
+
+            if (value) {
+                // Se selecionou uma marca, carrega os produtos
+                loadProdutos(value);
+            } else {
+                // Se desmarcou a marca, desabilita os outros dropdowns
+                disableDropdown('Produto');
+                disableDropdown('Linha');
+                resetDropdown('Produto');
+                resetDropdown('Linha');
+            }
         });
     });
 
@@ -393,26 +405,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const value = this.dataset.produto;
             const text = this.textContent.trim();
-            console.log('Produto selecionado:', value, text);
             
-            selectedProduto = value;
-            selectedLinha = '';
-            
-            // Atualizar texto do botão
-            const span = document.getElementById('selectedProduto');
-            if (span) span.textContent = text;
-            
-            // Fechar dropdown
-            document.getElementById('produtoDropdown').classList.add('hidden');
-            
-            // Atualizar produtos imediatamente
-            updateProdutos(1);
-            
-            // Carregar linhas no dropdown se necessário
+            updateSelection('Produto', value, text);
+
             if (value) {
-                toggleDropdownLoading('Linha', true);
+                // Se selecionou um produto, carrega as linhas
                 loadLinhas(value);
             } else {
+                // Se desmarcou o produto, desabilita o dropdown de linha
+                disableDropdown('Linha');
                 resetDropdown('Linha');
             }
         });
