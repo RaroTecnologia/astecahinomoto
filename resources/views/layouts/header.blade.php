@@ -166,25 +166,27 @@
             </div>
         </div>
 
-        <!-- Submenu Expansível de Produtos que ocupa 100% da largura -->
-        <div id="produtos-submenu" class="absolute left-0 w-screen bg-red-700 text-black py-6 hidden transition-all duration-300 ease-in-out top-full overflow-hidden">
-            <div class="flex justify-between w-full max-w-screen-xl mx-auto px-10">
-                <!-- Coluna de Categorias -->
-                <div class="grid grid-cols-2 gap-8 w-2/3">
-                    @foreach($tiposHeader as $tipo)
-                    <div class="flex items-center space-x-3" data-tipo-descricao="{{ $tipo->descricao }}" data-tipo-imagem="{{ asset('assets/' . $tipo->slug . '_icon.png') }}">
-                        <img src="{{ asset('assets/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-10 h-10">
-                        <a href="{{ route('marcas.tipo', $tipo->slug) }}" class="text-black font-medium">{{ $tipo->nome }}</a>
+        <!-- Submenu Expansível de Produtos -->
+        <div id="produtos-submenu" class="absolute left-0 right-0 bg-red-700 text-black py-6 hidden transition-all duration-300 ease-in-out top-full overflow-hidden">
+            <div class="container mx-auto px-4 lg:px-10">
+                <div class="flex flex-wrap justify-between">
+                    <!-- Coluna de Categorias -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full lg:w-2/3">
+                        @foreach($tiposHeader as $tipo)
+                        <div class="flex items-center space-x-3" data-tipo-descricao="{{ $tipo->descricao }}" data-tipo-imagem="{{ asset('assets/' . $tipo->slug . '_destaque.png') }}">
+                            <img src="{{ asset('assets/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-10 h-10">
+                            <a href="{{ route('marcas.tipo', $tipo->slug) }}" class="text-black font-medium">{{ $tipo->nome }}</a>
+                        </div>
+                        @endforeach
                     </div>
-                    @endforeach
-                </div>
 
-                <!-- Coluna de Destaque -->
-                <div class="w-1/3 flex items-center bg-yellow-400 rounded-lg px-6 py-4" id="descricao-tipo">
-                    <img src="{{ asset('images/default_highlight.png') }}" alt="Descrição" id="descricao-tipo-imagem" class="w-24 h-24 rounded-md mr-4">
-                    <div>
-                        <h3 class="text-lg font-semibold" id="descricao-tipo-nome">Selecione uma categoria</h3>
-                        <p class="text-sm" id="descricao-tipo-descricao">Passe o mouse sobre as categorias para mais detalhes</p>
+                    <!-- Coluna de Destaque -->
+                    <div class="w-full lg:w-1/3 flex items-center bg-yellow-400 rounded-lg px-4 py-4 mt-8 lg:mt-0" id="descricao-tipo">
+                        <img src="{{ asset('images/default_highlight.png') }}" alt="Descrição" id="descricao-tipo-imagem" class="w-24 h-24 rounded-md mr-6">
+                        <div>
+                            <h3 class="text-lg font-semibold" id="descricao-tipo-nome">Selecione uma categoria</h3>
+                            <p class="text-sm" id="descricao-tipo-descricao">Passe o mouse sobre as categorias para mais detalhes</p>
+                        </div>
                     </div>
                 </div>
             </div>

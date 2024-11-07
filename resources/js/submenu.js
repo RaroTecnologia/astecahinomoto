@@ -10,6 +10,11 @@ const mainMenu = document.querySelector('nav');
 // Função para detectar se a tela é mobile
 const isMobile = () => window.innerWidth < 768;
 
+// Função para controlar o overflow do body
+function toggleBodyScroll(disable) {
+    document.body.style.overflow = disable ? 'hidden' : '';
+}
+
 // Exibir o menu mobile ao clicar no botão de menu
 if (mobileMenuButton) {
     mobileMenuButton.addEventListener('click', () => {
@@ -21,10 +26,12 @@ if (mobileMenuButton) {
 produtosMenu.addEventListener('click', (event) => {
     if (isMobile()) {
         event.preventDefault(); // Prevenir navegação em mobile
-        produtosSubmenu.classList.toggle('hidden'); // Alterna visibilidade no mobile
+        produtosSubmenu.classList.toggle('hidden');
     } else {
         event.stopPropagation(); // Evitar fechamento imediato no desktop
+        const isHidden = produtosSubmenu.classList.contains('hidden');
         produtosSubmenu.classList.toggle('hidden');
+        toggleBodyScroll(!isHidden); // Controla o scroll quando abre/fecha o menu
     }
 
     // Exibe o conteúdo do primeiro item quando o submenu é aberto
@@ -35,7 +42,6 @@ produtosMenu.addEventListener('click', (event) => {
             const imagem = primeiroItem.getAttribute('data-tipo-imagem');
             const nome = primeiroItem.querySelector('a').textContent;
 
-            // Atualizar a descrição e imagem do box amarelo com o primeiro item
             descricaoNome.textContent = nome;
             descricaoTexto.textContent = descricao;
             descricaoImagem.src = imagem;
@@ -47,26 +53,33 @@ produtosMenu.addEventListener('click', (event) => {
 window.addEventListener('click', () => {
     if (!produtosSubmenu.classList.contains('hidden')) {
         produtosSubmenu.classList.add('hidden');
+        toggleBodyScroll(false); // Restaura o scroll quando fecha o menu
     }
 });
 
 // Prevenir o fechamento ao clicar dentro do submenu
 produtosSubmenu.addEventListener('click', (event) => {
-    event.stopPropagation(); // Evita o fechamento ao clicar dentro do submenu
+    event.stopPropagation();
 });
 
 // Alterar o conteúdo da descrição ao passar o mouse sobre as categorias (Desktop)
 document.querySelectorAll('[data-tipo-descricao]').forEach(function(element) {
     element.addEventListener('mouseenter', function() {
-        if (!isMobile()) { // Apenas para desktop
+        if (!isMobile()) {
             const descricao = element.getAttribute('data-tipo-descricao');
             const imagem = element.getAttribute('data-tipo-imagem');
             const nome = element.querySelector('a').textContent;
 
-            // Atualizar a descrição e imagem do box amarelo
             descricaoNome.textContent = nome;
             descricaoTexto.textContent = descricao;
             descricaoImagem.src = imagem;
         }
     });
+});
+
+// Restaurar scroll ao redimensionar a janela
+window.addEventListener('resize', () => {
+    if (isMobile()) {
+        toggleBodyScroll(false);
+    }
 });

@@ -23,7 +23,7 @@
         <div class="flex flex-wrap justify-center gap-4">
             <!-- Marca -->
             <div class="flex items-center gap-2">
-                <span class="px-4 py-1.5 border border-gray-700 rounded-full text-base font-medium">
+                <span class="px-4 py-1.5 border border-gray-500 rounded-full text-base font-semibold">
                     Marca
                 </span>
                 <div class="relative">
@@ -47,7 +47,7 @@
 
             <!-- Produto -->
             <div class="flex items-center gap-2">
-                <span class="px-4 py-1.5 border border-gray-700 rounded-full text-base font-medium">
+                <span class="px-4 py-1.5 border border-gray-500 rounded-full text-base font-semibold">
                     Produto
                 </span>
                 <div class="relative">
@@ -63,7 +63,7 @@
 
             <!-- Linha -->
             <div class="flex items-center gap-2">
-                <span class="px-4 py-1.5 border border-gray-700 rounded-full text-base font-medium">
+                <span class="px-4 py-1.5 border border-gray-500 rounded-full text-base font-semibold">
                     Linha
                 </span>
                 <div class="relative">
