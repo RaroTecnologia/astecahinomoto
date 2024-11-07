@@ -11,7 +11,7 @@
         <!-- Título e Subtítulo -->
         <div class="text-center mb-12">
             <h1 class="text-5xl font-bold text-black">Nossa História</h1>
-            <p class="text-lg text-white mt-4">Proporcionar saúde e bem-estar para todos os brasileiros.</p>
+            <p class="text-lg text-white mt-4">Asteca Hinomoto: Sabores que conectam Brasil e Japão.</p>
         </div>
     </div>
 </div>
@@ -19,8 +19,16 @@
 <!-- Imagem Grande com Posicionamento -->
 <div class="relative">
     <div class="absolute inset-x-0 top-[-120px] mx-auto max-w-5xl">
-        <img src="https://via.placeholder.com/1920x1080?text=Imagem+da+Empresa" alt="Imagem da Empresa" class="rounded-lg shadow-lg w-full">
-        <p class="text-center text-sm text-gray-600 mt-2">Nossa sede em São Paulo - Um símbolo do nosso compromisso com a inovação e qualidade</p>
+        <div class="relative w-full" style="padding-top: 56.25%"> <!-- Aspect ratio 16:9 -->
+            <iframe
+                src="https://www.youtube.com/embed/Pw1nWRLSnEs"
+                class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <p class="text-center text-sm text-gray-600 mt-2">Conheça a Asteca Hinomoto</p>
     </div>
 </div>
 
@@ -29,8 +37,7 @@
     <div class="text-center">
         <h2 class="text-3xl font-bold mb-6">Nossa História</h2>
         <p class="text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            A Asteca Hinomoto começou sua jornada em [ano], com o objetivo de trazer inovação e qualidade em produtos para os consumidores brasileiros. Com uma presença forte no mercado, nossa missão é proporcionar bem-estar e saúde, garantindo que nossos produtos sejam de alta qualidade e acessíveis para todos.
-        </p>
+            Fundada em Presidente Prudente, no dia 28 de junho de 1948, pelos imigrantes japoneses Sr. Keniti Fukuhara e Sr. Massami Honda, a empresa Asteca Hinomoto logo demonstrou sinais de prosperidade. Isso porque seus proprietários sempre cultivaram valores tradicionais da cultura japonesa, como: ética, trabalho árduo, conhecimento e inovação. Desde então, a marca Asteca Hinomoto se consolidou no mercado com a qualidade de suas matérias primas e moderna tecnologia na produção de seus produtos.A empresa é especializada nos setores alimentício e de bebidas, com fábricas distintas para os diferentes segmentos. Com o sucesso de seus produtos, a empresa alcançou forte presença nos pontos de vendas do Brasil e ultrapassou as fronteiras, exportando para os principais mercados internacionais, como: Estados Unidos, França, Holanda, Itália, Portugal, Japão, China, países do Mercosul, dentre outros. Fazendo valer os princípios dos seus fundadores, a Asteca Hinomoto permanece atuante na inovação de sua linha, para continuar participando do dia-a-dia dos brasileiros com deliciosos e variados produtos. </p>
     </div>
 </div>
 
@@ -38,13 +45,15 @@
 <div class="container mx-auto py-12">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <!-- Imagem -->
-        <div>
-            <img src="https://via.placeholder.com/600x400?text=Imagem+Complementar" alt="Imagem Complementar" class="rounded-lg w-full shadow-lg">
+        <div class="max-w-xl mx-auto">
+            <img src="assets/img1_sobre.png"
+                alt="Produtos Asteca Hinomoto"
+                class="rounded-lg w-full shadow-lg object-cover">
         </div>
         <!-- Texto -->
         <div class="flex items-center">
             <p class="text-gray-600 leading-relaxed">
-                Ao longo dos anos, a Asteca Hinomoto expandiu sua atuação e continua a se reinventar para atender às necessidades dos consumidores, sempre com foco em sustentabilidade, inovação, e bem-estar.
+                A empresa é especializada nos setores alimentício e de bebidas, com fábricas distintas para os diferentes segmentos. Com o sucesso de seus produtos, a empresa alcançou forte presença nos pontos de vendas do Brasil e ultrapassou as fronteiras, exportando para os principais mercados internacionais, como: Estados Unidos, França, Holanda, Itália, Portugal, Japão, China, países do Mercosul, dentre outros. Fazendo valer os princípios dos seus fundadores, a Asteca Hinomoto permanece atuante na inovação de sua linha, para continuar participando do dia-a-dia dos brasileiros com deliciosos e variados produtos.
             </p>
         </div>
     </div>
@@ -56,12 +65,15 @@
         <!-- Texto -->
         <div class="flex items-center">
             <p class="text-gray-600 leading-relaxed">
-                Nossa empresa se destaca pela busca constante de excelência em produtos e serviços. Investimos em pesquisa e desenvolvimento para oferecer soluções inovadoras que melhoram a qualidade de vida dos nossos clientes, sempre respeitando o meio ambiente e promovendo práticas sustentáveis.
-            </p>
+                Possuímos uma <span class="font-bold">rede de distribuição cobrindo praticamente todo o território brasileiro</span>, através de nossos representantes de venda e distribuidores estrategicamente localizados. Nossos produtos estão presentes nos <span class="font-bold">principais pontos de vendas, redes varejistas e atacadistas do Brasil</span>.
+
+                Atualmente exportamos nossos produtos para: Alemanha, Espanha, Estados Unidos da América, França, Holanda, Itália, Portugal, Angola, Japão, China, Curaçao, países do Mercosul, dentre outros. Contamos hoje com um quadro de colaboradores que se situa em torno de 500 funcionários diretos e 120 representantes de vendas, além de uma frota composta de 80 caminhões entre próprios e terceirizados para distribuição dos produtos. </p>
         </div>
         <!-- Imagem -->
-        <div>
-            <img src="https://via.placeholder.com/600x400?text=Outra+Imagem+Complementar" alt="Outra Imagem Complementar" class="rounded-lg w-full shadow-lg">
+        <div class="max-w-xl mx-auto">
+            <img src="assets/img2_sobre.png"
+                alt="Forte Rede de Distribuição"
+                class="rounded-lg w-full shadow-lg object-cover">
         </div>
     </div>
 </div>

@@ -156,10 +156,6 @@
 
             <!-- Botões e Ícones -->
             <div class="flex items-center space-x-4">
-                <a href="#" class="bg-black hover:bg-red-900 text-white font-semibold px-6 py-3 flex items-center">
-                    <i class="fas fa-phone mr-4"></i>
-                    Contato para Pedido
-                </a>
                 <button class="text-black">
                     <i class="fas fa-search text-2xl"></i>
                 </button>

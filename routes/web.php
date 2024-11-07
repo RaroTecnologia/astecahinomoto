@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 Route::controller(PaginaController::class)->group(function () {
     Route::get('/sobre', 'sobre')->name('sobre');
     Route::get('/fale-conosco', 'faleConosco')->name('fale-conosco');
+    Route::post('/fale-conosco/enviar', 'enviarContato')->name('fale-conosco.enviar');
     Route::get('/politica-de-privacidade', 'politicaPrivacidade')->name('politica-privacidade');
 });
 
