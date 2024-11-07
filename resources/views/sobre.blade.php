@@ -53,7 +53,8 @@
         <!-- Texto -->
         <div class="flex items-center">
             <p class="text-gray-600 leading-relaxed">
-                A empresa é especializada nos setores alimentício e de bebidas, com fábricas distintas para os diferentes segmentos. Com o sucesso de seus produtos, a empresa alcançou forte presença nos pontos de vendas do Brasil e ultrapassou as fronteiras, exportando para os principais mercados internacionais, como: Estados Unidos, França, Holanda, Itália, Portugal, Japão, China, países do Mercosul, dentre outros. Fazendo valer os princípios dos seus fundadores, a Asteca Hinomoto permanece atuante na inovação de sua linha, para continuar participando do dia-a-dia dos brasileiros com deliciosos e variados produtos.
+                <span class="font-light text-2xl">A empresa é especializada nos setores alimentício e de bebidas, com fábricas distintas para os diferentes segmentos.</span>
+                <br><br>O sucesso de seus produtos, a empresa alcançou forte presença nos pontos de vendas do Brasil e ultrapassou as fronteiras, exportando para os principais mercados internacionais, como: Estados Unidos, França, Holanda, Itália, Portugal, Japão, China, países do Mercosul, dentre outros. Fazendo valer os princípios dos seus fundadores, a Asteca Hinomoto permanece atuante na inovação de sua linha, para continuar participando do dia-a-dia dos brasileiros com deliciosos e variados produtos.
             </p>
         </div>
     </div>
@@ -65,7 +66,7 @@
         <!-- Texto -->
         <div class="flex items-center">
             <p class="text-gray-600 leading-relaxed">
-                Possuímos uma <span class="font-bold">rede de distribuição cobrindo praticamente todo o território brasileiro</span>, através de nossos representantes de venda e distribuidores estrategicamente localizados. Nossos produtos estão presentes nos <span class="font-bold">principais pontos de vendas, redes varejistas e atacadistas do Brasil</span>.
+            <span class="font-light text-2xl">Possuímos uma rede de distribuição cobrindo praticamente todo o território brasileiro, através de nossos representantes de venda e distribuidores estrategicamente localizados. </span> <br><br>Nossos produtos estão presentes nos <span class="font-bold">principais pontos de vendas, redes varejistas e atacadistas do Brasil</span>.
 
                 Atualmente exportamos nossos produtos para: Alemanha, Espanha, Estados Unidos da América, França, Holanda, Itália, Portugal, Angola, Japão, China, Curaçao, países do Mercosul, dentre outros. Contamos hoje com um quadro de colaboradores que se situa em torno de 500 funcionários diretos e 120 representantes de vendas, além de uma frota composta de 80 caminhões entre próprios e terceirizados para distribuição dos produtos. </p>
         </div>
