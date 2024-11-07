@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tipo;
+use App\Models\Marca;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 
@@ -13,8 +14,14 @@ class PaginaController extends Controller
         // Carregar todos os tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
-        // Retornar a view principal com a variável $tipos
-        return view('home', compact('tiposHeader'));
+        // Carregar as marcas com seus tipos e fazer debug
+        $marcas = Marca::with('tipo')->orderBy('ordem')->get();
+        
+        // Debug para ver a estrutura dos dados
+        \Log::info('Marcas:', $marcas->toArray());
+
+        // Retornar a view principal com as variáveis
+        return view('home', compact('tiposHeader', 'marcas'));
     }
 
     public function sobre()

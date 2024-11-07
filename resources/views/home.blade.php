@@ -46,9 +46,23 @@
                 <div class="swiper-wrapper">
                     @foreach ($marcas as $marca)
                     <div class="swiper-slide flex justify-center items-center">
-                        <img src="{{ asset('storage/categorias/' . $marca->imagem) }}"
-                            alt="{{ $marca->nome }}"
-                            class="rounded-full w-52 h-52">
+                        @php
+                            $tipoSlug = is_object($marca->tipo) ? $marca->tipo->slug : '';
+                            $marcaSlug = $marca->slug ?? '';
+                        @endphp
+                        
+                        @if($tipoSlug && $marcaSlug)
+                            <a href="{{ route('marcas.produtos', ['tipoSlug' => $tipoSlug, 'slugMarca' => $marcaSlug]) }}" 
+                               class="transition-transform duration-300 hover:scale-105">
+                                <img src="{{ asset('storage/categorias/' . $marca->imagem) }}"
+                                     alt="{{ $marca->nome }}"
+                                     class="rounded-full w-52 h-52">
+                            </a>
+                        @else
+                            <img src="{{ asset('storage/categorias/' . $marca->imagem) }}"
+                                 alt="{{ $marca->nome }}"
+                                 class="rounded-full w-52 h-52">
+                        @endif
                     </div>
                     @endforeach
                 </div>

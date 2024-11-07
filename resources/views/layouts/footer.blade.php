@@ -42,29 +42,30 @@
                     <i class="fab fa-tiktok fa-lg"></i>
                 </a>
                 <div class="relative group">
-                    <a href="javascript:void(0)" class="text-white hover:text-red-800">
+                    <!-- Botão do Instagram -->
+                    <button class="text-white hover:text-red-800 focus:outline-none">
                         <i class="fab fa-instagram fa-xl"></i>
-                    </a>
-
+                    </button>
+                    
                     <!-- Dropdown -->
-                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-white rounded-lg shadow-lg">
+                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 w-48 bg-white rounded-lg shadow-lg z-50">
                         <!-- Seta do dropdown -->
                         <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
                             <div class="border-8 border-solid border-transparent border-t-white"></div>
                         </div>
-
+                        
                         <!-- Links -->
                         <div class="py-2">
-                            <a href="https://www.instagram.com/bebidasasteca" target="_blank"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 hover:text-vermelho-asteca transition-colors duration-200">
+                            <a href="https://www.instagram.com/bebidasasteca" target="_blank" 
+                               class="block px-4 py-2 text-gray-800 hover:bg-gray-100 hover:text-vermelho-asteca transition-colors duration-200 whitespace-nowrap">
                                 @bebidasasteca
                             </a>
                             <a href="https://www.instagram.com/hinomoto_oficial" target="_blank"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 hover:text-vermelho-asteca transition-colors duration-200">
+                               class="block px-4 py-2 text-gray-800 hover:bg-gray-100 hover:text-vermelho-asteca transition-colors duration-200 whitespace-nowrap">
                                 @hinomoto_oficial
                             </a>
                             <a href="https://www.instagram.com/askov_oficial" target="_blank"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 hover:text-vermelho-asteca transition-colors duration-200">
+                               class="block px-4 py-2 text-gray-800 hover:bg-gray-100 hover:text-vermelho-asteca transition-colors duration-200 whitespace-nowrap">
                                 @askov_oficial
                             </a>
                         </div>
