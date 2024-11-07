@@ -21,16 +21,14 @@
                 <ul>
                     <li><a href="{{ route('marcas') }}" class="text-white hover:underline">Nossas Marcas</a></li>
                     <li><a href="{{ route('noticias.index') }}" class="text-white hover:underline">Notícias</a></li>
-                    <li><a href="#" class="text-white hover:underline">Contato</a></li>
+                    <li><a href="/fale-conosco" class="text-white hover:underline">Contato</a></li>
                     <li><a href="{{ route('politica-privacidade') }}" class="text-white hover:underline">Política de Privacidade</a></li>
-                    <li><a href="#" class="text-white hover:underline">Carreiras</a></li>
                 </ul>
             </div>
             <div>
                 <ul>
                     <li><a href="{{ route('catalogo.index') }}" class="text-white hover:underline">Catálogo</a></li>
                     <li><a href="#" class="text-white hover:underline">Receitas</a></li>
-                    <li><a href="#" class="text-white hover:underline">Dicas de Saúde</a></li>
                     <li><a href="#" class="text-white hover:underline">Seja um Revendedor</a></li>
                 </ul>
             </div>
