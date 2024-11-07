@@ -194,6 +194,30 @@
     </header>
 </div>
 
+<!-- Modal de Busca -->
+<div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-[10000] flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-8 relative -mt-96">
+        <button id="close-search-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times text-2xl"></i>
+        </button>
+        <h2 class="text-2xl font-bold mb-4">O que procura?</h2>
+        <input type="text" id="search-global" data-search="global" class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vermelho-asteca/50" placeholder="Digite aqui...">
+        <p class="mt-4 text-gray-600">Exemplos: "Vodka", "Notícias sobre eventos", "Receitas de verão"</p>
+        <div id="autocomplete-results-global" class="absolute bg-white shadow-lg mt-1 w-full max-h-48 overflow-y-auto hidden rounded-lg border border-gray-200 z-50">
+            <!-- Loading state -->
+            <div id="autocomplete-loading-global" class="hidden p-4 text-center text-gray-500">
+                <div class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-vermelho-asteca"></div>
+                <span class="ml-2">Buscando...</span>
+            </div>
+            <!-- No results state -->
+            <div id="autocomplete-no-results-global" class="hidden p-4 text-center text-gray-500">
+                Nenhum resultado encontrado
+            </div>
+            <!-- Results will be inserted here -->
+        </div>
+    </div>
+</div>
+
 <!-- Script para o menu mobile -->
 <script>
     document.getElementById('mobile-menu-button').addEventListener('click', function() {
@@ -227,4 +251,64 @@
     });
 </script>
 
-@vite('resources/js/submenu.js')
+@vite('resources/js/submenu.js','resources/js/autocomplete.js')
+
+<script>
+    const searchIcon = document.querySelector('.fa-search');
+    const searchModal = document.getElementById('search-modal');
+    const closeSearchModal = document.getElementById('close-search-modal');
+    const searchInput = document.getElementById('search-global');
+    const searchResults = document.getElementById('autocomplete-results-global');
+
+    searchIcon.addEventListener('click', () => {
+        searchModal.classList.remove('hidden');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    });
+
+    closeSearchModal.addEventListener('click', () => {
+        searchModal.classList.add('hidden');
+    });
+
+    searchModal.addEventListener('click', (e) => {
+        if (e.target === searchModal) {
+            searchModal.classList.add('hidden');
+        }
+    });
+
+    searchInput.addEventListener('input', async () => {
+        const query = searchInput.value.trim();
+        if (query.length < 2) {
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/global-search?query=${query}`);
+            const results = await response.json();
+            console.log('Results:', results);
+            displaySearchResults(results);
+        } catch (error) {
+            console.error('Erro ao buscar:', error);
+        }
+    });
+
+    function displaySearchResults(results) {
+        const resultsArray = Object.values(results);
+
+        if (resultsArray.length > 0) {
+            searchResults.classList.remove('hidden');
+            const html = resultsArray.map(result => `
+                <div class="p-4 border-b border-gray-200">
+                    <a href="${result.url}" class="text-lg font-semibold text-vermelho-asteca hover:underline">${result.title}</a>
+                    <p class="text-sm text-gray-600">${result.description}</p>
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">${result.type}</span>
+                </div>
+            `).join('');
+            searchResults.innerHTML = html;
+        } else {
+            searchResults.classList.add('hidden');
+        }
+    }
+</script>

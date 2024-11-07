@@ -106,6 +106,7 @@ Route::controller(ReceitaController::class)->group(function () {
 Route::get('/api/produtos/filtrar/{categoria}/{subcategoria?}', [ProdutoController::class, 'filtrarCategoria'])->name('produtos.filtrar.ajax');
 Route::get('/api/subcategorias/{slug}', [CategoriaController::class, 'getSubcategorias']);
 Route::get('/api/search', [SearchController::class, 'search'])->name('api.search');
+Route::get('/api/global-search', [SearchController::class, 'globalSearch'])->name('api.global-search');
 
 // Rotas de autenticação
 require __DIR__ . '/auth.php';

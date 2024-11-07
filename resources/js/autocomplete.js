@@ -90,6 +90,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                     `;
                                     resultsContainer.appendChild(resultDiv);
                                 }
+                            } else if (context === 'global') {
+                                // Implementação para busca global no header
+                                resultDiv.innerHTML = `
+                                    <a href="${item.url}" class="flex items-center">
+                                        <div class="flex-1">
+                                            <div class="font-medium">${item.title}</div>
+                                            <div class="text-sm text-gray-500">${item.description}</div>
+                                            <span class="text-xs text-gray-500">${item.type}</span>
+                                        </div>
+                                    </a>
+                                `;
+                                resultsContainer.appendChild(resultDiv);
                             } else {
                                 // Mantém o código original para outros contextos
                                 resultDiv.innerHTML = `
