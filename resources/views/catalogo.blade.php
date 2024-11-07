@@ -1,85 +1,120 @@
 @extends('layouts.app')
 
-@section('title', 'Catálogo de Produtos')
-
 @section('content')
-<div class="container mx-auto py-8 px-4">
-    <!-- Breadcrumb -->
-    <x-breadcrumb-share currentPage="Catálogo" />
+<div class="container mx-auto px-4 py-8">
+    <!-- Título e Descrição -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Catálogo de Produtos</h1>
+        <p class="text-gray-600">Explore nossa linha completa de produtos</p>
+    </div>
 
-    <!-- Título Principal -->
-    <h1 class="text-4xl font-bold mb-6">Catálogo de Produtos</h1>
+    <!-- Barra de Busca -->
+    <div class="mb-8 relative">
+        <input type="text"
+            class="w-full p-4 border rounded-lg shadow-sm"
+            placeholder="Buscar produtos..."
+            data-search="produtos"
+            autocomplete="off">
+
+        <!-- Container de Resultados do Autocomplete -->
+        <div id="autocomplete-results-produtos"
+            class="absolute z-50 w-full bg-white border rounded-lg shadow-lg mt-1 hidden">
+            <!-- Loading State -->
+            <div id="autocomplete-loading-produtos" class="p-4 hidden">
+                <div class="animate-pulse flex space-x-4">
+                    <div class="flex-1 space-y-4 py-1">
+                        <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                        <div class="space-y-2">
+                            <div class="h-4 bg-gray-200 rounded"></div>
+                            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Filtros -->
-    <div class="border-b border-gray-300 pb-4 mb-6">
-        <!-- Filtro de Marcas -->
-        <div class="flex space-x-4 overflow-auto mb-4">
-            @foreach ($marcas as $marca)
-            <button class="px-4 py-2 rounded-full {{ request('marca') == $marca->id ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-800' }}"
-                onclick="window.location.href='{{ route('catalogo.index', ['marca' => $marca->id]) }}'">
-                {{ strtoupper($marca->nome) }}
-            </button>
-            @endforeach
-        </div>
-
-        <!-- Filtros de Produtos e Linhas -->
-        <div class="flex justify-between items-center">
-            <!-- Filtro de Produtos -->
-            <div class="flex space-x-4">
-                <span class="text-lg font-semibold">Escolha o produto:</span>
-                @foreach ($produtos as $produto)
-                <button class="px-4 py-2 rounded-full {{ request('produto') == $produto->id ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-800' }}"
-                    onclick="window.location.href='{{ route('catalogo.index', ['marca' => request('marca'), 'produto' => $produto->id]) }}'">
-                    {{ strtoupper($produto->nome) }}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <!-- Filtros Dropdown -->
+        <div class="flex flex-wrap gap-4">
+            <!-- Marca -->
+            <div class="relative">
+                <button id="marcaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                    <span id="selectedMarca">Todas as Marcas</span>
+                    <i class="fas fa-chevron-down ml-2"></i>
                 </button>
-                @endforeach
+                <div id="marcaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <a href="#" data-marca="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Marcas</a>
+                    @foreach($marcas as $marca)
+                    <a href="#" data-marca="{{ $marca->id }}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">
+                        {{ $marca->nome }}
+                    </a>
+                    @endforeach
+                </div>
             </div>
 
-            <!-- Filtro de Linhas -->
-            <div class="flex space-x-4">
-                <span class="text-lg font-semibold">Escolha a linha:</span>
-                <button class="px-4 py-2 rounded-full {{ request('linha') ? 'bg-gray-200 text-gray-800' : 'bg-black text-white' }}"
-                    onclick="window.location.href='{{ route('catalogo.index', ['marca' => request('marca'), 'produto' => request('produto')]) }}'">
-                    TODOS
+            <!-- Produto -->
+            <div class="relative">
+                <button id="produtoFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                    <span id="selectedProduto">Todos os Produtos</span>
+                    <i class="fas fa-chevron-down ml-2"></i>
                 </button>
-                @foreach ($linhas as $linha)
-                <button class="px-4 py-2 rounded-full {{ request('linha') == $linha->id ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-800' }}"
-                    onclick="window.location.href='{{ route('catalogo.index', ['marca' => request('marca'), 'produto' => request('produto'), 'linha' => $linha->id]) }}'">
-                    {{ strtoupper($linha->nome) }}
+                <div id="produtoDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <a href="#" data-produto="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todos os Produtos</a>
+                    <!-- Estado de loading -->
+                    <div id="produtoDropdownLoading" class="hidden">
+                        <div class="px-4 py-2">
+                            <div class="animate-pulse space-y-2">
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                                <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linha -->
+            <div class="relative">
+                <button id="linhaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
+                    <span id="selectedLinha">Todas as Linhas</span>
+                    <i class="fas fa-chevron-down ml-2"></i>
                 </button>
-                @endforeach
+                <div id="linhaDropdown" class="hidden absolute left-0 z-10 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
+                    <a href="#" data-linha="" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Todas as Linhas</a>
+                    <!-- Estado de loading -->
+                    <div id="linhaDropdownLoading" class="hidden">
+                        <div class="px-4 py-2">
+                            <div class="animate-pulse space-y-2">
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                                <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Contagem de Produtos e Opções de Ordenação -->
-    <div class="flex justify-between items-center mb-4">
-        <span class="text-gray-600">{{ $skusPorMarca->flatten()->count() }} Produtos Encontrados</span>
-        <button class="text-gray-800">Ordenar</button>
+    <!-- Grid de Produtos -->
+    <div id="produtos-container">
+        @include('partials.catalogo.produtos-grid', ['skus' => $skus ?? collect()])
     </div>
 
-    <!-- Grid de Produtos por Marca -->
-    @if($skusPorMarca->isEmpty())
-    <p class="text-center text-gray-600">Nenhum produto encontrado.</p>
-    @else
-    <!-- Agrupamento de Produtos por Marca -->
-    @foreach ($skusPorMarca as $marcaNome => $skus)
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">{{ $marcaNome }}</h2>
+    <!-- Paginação -->
+    <div id="paginacao-container" class="mt-8">
+        {{ $skus->links('vendor.pagination.custom') }}
+    </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            @foreach ($skus as $sku)
-            <div class="border p-4 rounded-lg text-center">
-                <img src="{{ asset('storage/thumbnails/' . $sku->imagem) }}" alt="{{ $sku->produto->nome }}" class="w-full h-48 object-contain mb-4 rounded">
-                <h2 class="text-xl font-semibold">{{ $sku->produto->nome }}</h2>
-                <p class="text-gray-600">{{ $sku->quantidade }}</p>
-                <a href="{{ url("/produto/{$sku->produto->categoria->getMarca()->slug}/{$sku->produto->slug}#{$sku->slug}") }}"
-                    class="text-red-600 font-semibold hover:underline">Ver mais detalhes</a>
-            </div>
-            @endforeach
+    <!-- Loading State -->
+    <div id="loading-more" class="hidden">
+        <div class="flex justify-center items-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
         </div>
     </div>
-    @endforeach
-    @endif
 </div>
 @endsection
+
+@vite(['resources/js/catalogo.js'])

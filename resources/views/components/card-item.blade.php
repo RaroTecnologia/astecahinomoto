@@ -7,7 +7,7 @@
     </div>
 
     <!-- Conteúdo -->
-    <div class="p-6 flex flex-col flex-grow">
+    <div class="p-6 flex flex-col flex-grow {{ $centerContent ? 'text-center' : '' }}">
         <!-- Área de texto -->
         <div class="flex-grow space-y-4">
             <!-- Título -->
@@ -18,7 +18,7 @@
         </div>
 
         <!-- Botão visual (não mais um link) -->
-        <div class="mt-4">
+        <div class="mt-4 {{ $centerContent ? 'flex justify-center' : '' }}">
             <div class="w-full text-center font-semibold border border-vermelho-asteca text-vermelho-asteca group-hover:text-white group-hover:bg-vermelho-asteca py-2 px-4 rounded-full transition-all duration-300 h-[40px] leading-[20px]">
                 {{ $linkText }}
             </div>

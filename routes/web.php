@@ -90,7 +90,7 @@ Route::controller(MarcaController::class)->group(function () {
 
 // Rota para detalhe do produto
 Route::controller(ProdutoController::class)->group(function () {
-    Route::get('/produto/{slugMarca}/{slugProduto}', 'show')->name('produtos.show');
+    Route::get('/produto/{slugMarca}/{slugProduto}', [ProdutoController::class, 'show'])->name('produtos.show');
 });
 
 
@@ -109,3 +109,11 @@ Route::get('/api/search', [SearchController::class, 'search'])->name('api.search
 
 // Rotas de autenticação
 require __DIR__ . '/auth.php';
+
+// Rotas do Catálogo
+Route::controller(CatalogoController::class)->group(function () {
+    Route::get('/catalogo', 'index')->name('catalogo.index');
+    Route::get('/api/catalogo/filtrar', 'filtrar')->name('catalogo.filtrar');
+    Route::get('/api/catalogo/produtos/{marca}', 'getProdutos')->name('catalogo.produtos');
+    Route::get('/api/catalogo/linhas/{produto}', 'getLinhas')->name('catalogo.linhas');
+});

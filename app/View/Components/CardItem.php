@@ -11,14 +11,16 @@ class CardItem extends Component
     public $image;
     public $link;
     public $linkText;
+    public $centerContent;
 
-    public function __construct($title, $description, $image, $link, $linkText = 'Ver Mais')
+    public function __construct($title, $description, $image, $link, $linkText = 'Ver Mais', $centerContent = false)
     {
         $this->title = $title;
         $this->description = $description;
         $this->image = $image;
         $this->link = $link;
         $this->linkText = $linkText;
+        $this->centerContent = $centerContent;
     }
 
     public function render()

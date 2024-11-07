@@ -131,14 +131,7 @@
 
         function updateRecipes(params = {}) {
             const currentUrl = new URL(window.location.href);
-            const currentCategory = currentUrl.searchParams.get('categoria');
 
-            // Mantém a categoria atual se não estiver sendo alterada
-            if (!params.hasOwnProperty('categoria')) {
-                params.categoria = currentCategory;
-            }
-
-            // Atualiza os parâmetros da URL
             Object.keys(params).forEach(key => {
                 if (params[key]) {
                     currentUrl.searchParams.set(key, params[key]);
@@ -161,11 +154,10 @@
                     document.querySelector('.mt-8').innerHTML = data.pagination;
                     window.history.pushState({}, '', currentUrl.toString());
 
-                    // Atualiza classes ativas das categorias
+                    // Atualiza classes ativas das categorias com transição
                     document.querySelectorAll('.category-link').forEach(link => {
-                        const categorySlug = link.dataset.category;
-                        const isActive = categorySlug === (currentUrl.searchParams.get('categoria') || '');
-
+                        const isActive = link.dataset.category === (params.categoria || '');
+                        link.style.transition = 'all 0.3s ease';
                         link.classList.toggle('bg-vermelho-asteca', isActive);
                         link.classList.toggle('text-white', isActive);
                         link.classList.toggle('bg-gray-100', !isActive);
@@ -193,7 +185,7 @@
                 const order = this.dataset.order;
                 updateRecipes({
                     order: order
-                }); // Não limpa a categoria
+                });
                 document.getElementById('orderDropdown').classList.add('hidden');
             });
         });

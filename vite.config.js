@@ -15,6 +15,7 @@ export default defineConfig({
                 'resources/js/submenu.js',
                 'resources/js/toast.js',
                 'resources/js/autocomplete.js',
+                'resources/js/catalogo.js',
                 ],
             refresh: true,
         }),

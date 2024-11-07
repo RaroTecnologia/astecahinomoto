@@ -65,4 +65,25 @@ class Categoria extends Model
     {
         return $this->hasMany(Noticia::class, 'categoria_id');
     }
+
+    public function remissivas()
+    {
+        return $this->hasMany(CategoriaRemissiva::class, 'categoria_origem_id');
+    }
+
+    public function remissivasDestino()
+    {
+        return $this->hasMany(CategoriaRemissiva::class, 'categoria_destino_id');
+    }
+
+    // Método auxiliar para verificar se a categoria tem produtos ativos com SKUs ativos
+    public function hasActiveProdutos()
+    {
+        return $this->produtos()
+            ->where('is_active', 1)
+            ->whereHas('skus', function ($query) {
+                $query->where('is_active', 1);
+            })
+            ->exists();
+    }
 }
