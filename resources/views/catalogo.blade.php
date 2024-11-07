@@ -23,8 +23,8 @@
         <div class="flex flex-wrap justify-center gap-4">
             <!-- Marca -->
             <div class="flex items-center gap-2">
-                <span class="px-4 py-1.5 border border-gray-500 rounded-full text-base font-semibold">
-                    Marca
+                <span class="px-4 py-1.5 text-base font-semibold">
+                    Marca:
                 </span>
                 <div class="relative">
                     <button id="marcaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50">
@@ -47,8 +47,8 @@
 
             <!-- Produto -->
             <div class="flex items-center gap-2">
-                <span class="px-4 py-1.5 border border-gray-500 rounded-full text-base font-semibold">
-                    Produto
+                <span class="px-4 py-1.5 text-base font-semibold">
+                    Produto:
                 </span>
                 <div class="relative">
                     <button id="produtoFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed" disabled>
@@ -63,8 +63,8 @@
 
             <!-- Linha -->
             <div class="flex items-center gap-2">
-                <span class="px-4 py-1.5 border border-gray-500 rounded-full text-base font-semibold">
-                    Linha
+                <span class="px-4 py-1.5 text-base font-semibold">
+                    Linha:
                 </span>
                 <div class="relative">
                     <button id="linhaFilter" class="flex items-center justify-between w-64 px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-gray-700 hover:bg-gray-50 opacity-50 cursor-not-allowed" disabled>
