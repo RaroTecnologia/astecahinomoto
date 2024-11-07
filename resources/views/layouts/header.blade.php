@@ -251,7 +251,7 @@
     });
 </script>
 
-@vite('resources/js/submenu.js','resources/js/autocomplete.js')
+@vite('resources/js/submenu.js')
 
 <script>
     const searchIcon = document.querySelector('.fa-search');
@@ -301,9 +301,8 @@
             searchResults.classList.remove('hidden');
             const html = resultsArray.map(result => `
                 <div class="p-4 border-b border-gray-200">
-                    <a href="${result.url}" class="text-lg font-semibold text-vermelho-asteca hover:underline">${result.title}</a>
+                    <a href="${result.url}" class="text-lg font-semibold text-vermelho-asteca hover:underline">${result.title}</a><span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold ml-2 px-2.5 py-0.5 rounded">${result.type}</span>
                     <p class="text-sm text-gray-600">${result.description}</p>
-                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">${result.type}</span>
                 </div>
             `).join('');
             searchResults.innerHTML = html;

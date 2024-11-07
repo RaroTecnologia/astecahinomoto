@@ -126,7 +126,7 @@
 
 #autocomplete-results-global {
     width: 93%; /* Ajusta a largura para corresponder ao input */
-    max-height: 500px; /* Define uma altura máxima para o container */
+    max-height: 400px; /* Define uma altura máxima para o container */
     overflow-y: auto; /* Permite rolagem vertical */
     border: 1px solid #ccc; /* Adiciona uma borda */
     border-radius: 4px; /* Arredonda os cantos */
