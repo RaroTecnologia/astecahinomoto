@@ -27,7 +27,6 @@
                 data-category=""
                 class="category-link px-4 py-2 rounded-full text-sm {{ !request()->get('categoria') ? 'bg-vermelho-asteca text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                 Todas
-                <span class="ml-1 text-xs">({{ $noticias->total() }})</span>
             </a>
             @foreach($categorias as $categoria)
             <a href="#"
