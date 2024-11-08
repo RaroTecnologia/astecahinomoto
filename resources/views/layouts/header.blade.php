@@ -113,14 +113,14 @@
 
                 <!-- Notícias -->
                 <a href="{{ route('noticias.index') }}"
-                    class="text-white text-lg relative group inline-block {{ Request::is('noticias.index') ? 'text-black font-semibold' : '' }}">
+                    class="text-white text-lg relative group inline-block {{ Request::is('noticias') ? 'text-black font-semibold' : '' }}">
                     <span class="font-normal group-hover:opacity-0 transition-opacity duration-200">
                         Notícias
                     </span>
                     <span class="font-semibold absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                         Notícias
                     </span>
-                    @if (Request::is('noticias.index'))
+                    @if (Request::is('noticias'))
                     <span class="absolute left-1/2 transform -translate-x-1/2 -bottom-3 w-2 h-2 bg-black rounded-full"></span>
                     @endif
                 </a>

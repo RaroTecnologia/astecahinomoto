@@ -249,4 +249,18 @@
     });
 </script>
 
+<!-- Adicione esta seção onde achar mais apropriado na página de contato -->
+<div class="bg-gray-100 py-8 mt-16">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col items-center justify-center text-center space-y-3">
+            <i class="fas fa-map-marker-alt text-vermelho-asteca text-3xl"></i>
+            <div class="text-gray-700">
+                <p class="text-lg font-semibold">Endereço</p>
+                <p>Av. José Moises Ferreira - nº 500 - Distrito Industrial</p>
+                <p>Presidente Prudente - SP CEP 19043-120</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
