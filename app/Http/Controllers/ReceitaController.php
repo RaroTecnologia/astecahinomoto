@@ -44,7 +44,7 @@ class ReceitaController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'list' => view('receitas._list', compact('receitas'))->render(),
-                'pagination' => $receitas->links()->render()
+                'pagination' => view('vendor.pagination.default', ['paginator' => $receitas])->render()
             ]);
         }
 
