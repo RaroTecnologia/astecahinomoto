@@ -25,7 +25,7 @@
                 <div class="flex flex-col h-full">
                     <img src="{{ $subLinha->imagem ? asset('storage/categorias/' . $subLinha->imagem) : asset('assets/sem_imagem.png') }}" alt="{{ $subLinha->nome }}" class="w-full h-56 object-cover mb-4 rounded-lg">
                     <h2 class="text-xl font-semibold text-gray-800 mb-2 text-center">{{ $subLinha->nome }}</h2>
-                    <p class="text-gray-600 flex-grow text-center">{{ $subLinha->descricao ?? 'Descrição indisponível' }}</p>
+                    <p class="text-gray-600 flex-grow text-center">{{ $subLinha->descricao }}</p>
                     <span class="text-red-600 font-semibold hover:underline mt-4 text-center">Ver mais detalhes</span>
                 </div>
             </a>

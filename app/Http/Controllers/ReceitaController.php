@@ -39,7 +39,7 @@ class ReceitaController extends Controller
         }
 
         // Executar a query com paginação
-        $receitas = $query->paginate(12)->appends(request()->query());
+        $receitas = $query->whereHas('categoria')->paginate(12)->appends(request()->query());
 
         if ($request->ajax()) {
             return response()->json([

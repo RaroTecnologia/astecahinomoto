@@ -19,10 +19,10 @@
         @foreach($tipos as $tipo)
         <a href="{{ route('marcas.tipo', $tipo->slug) }}"
             class="block mb-6 transition-transform hover:scale-[1.02]">
-            <div class="relative rounded-3xl overflow-hidden flex items-center p-6"
+            <div class="relative rounded-3xl overflow-hidden flex items-center justify-center"
                 style="background-color: #{{ $tipo->cor_bg }}">
                 <!-- Conteúdo do Tipo -->
-                <div class="flex-1">
+                <div class="flex-1 p-6 text-center">
                     <h2 class="text-3xl font-bold text-{{ $tipo->cor_texto }}">
                         {{ strtoupper($tipo->nome) }}
                     </h2>
@@ -34,13 +34,6 @@
                     <div class="text-{{ $tipo->cor_texto }} opacity-80 mt-3">
                         {{ $tipo->categorias_count }} {{ Str::plural('marca', $tipo->categorias_count) }}
                     </div>
-                </div>
-
-                <!-- Imagem do Tipo -->
-                <div class="flex-shrink-0">
-                    <img src="{{ asset('images/categorias/' . $tipo->slug . '.png') }}"
-                        alt="{{ $tipo->nome }}"
-                        class="w-40 h-40 object-cover">
                 </div>
             </div>
         </a>
