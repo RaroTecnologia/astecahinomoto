@@ -35,6 +35,16 @@
                         </select>
                     </div>
 
+                    <!-- Status -->
+                    <div class="mb-4">
+                        <label for="status" class="block text-gray-700 font-bold mb-2">Status:</label>
+                        <select name="status" id="status" class="w-full px-4 py-2 border rounded-lg">
+                            <option value="publicada" {{ old('status', $receita->status) == 'publicada' ? 'selected' : '' }}>Publicada</option>
+                            <option value="rascunho" {{ old('status', $receita->status) == 'rascunho' ? 'selected' : '' }}>Rascunho</option>
+                            <option value="arquivada" {{ old('status', $receita->status) == 'arquivada' ? 'selected' : '' }}>Arquivada</option>
+                        </select>
+                    </div>
+
                     <!-- Dificuldade -->
                     <div class="mb-4">
                         <label for="dificuldade" class="block text-gray-700 font-bold mb-2">Dificuldade:</label>

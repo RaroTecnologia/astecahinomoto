@@ -12,47 +12,61 @@ class ReceitaController extends Controller
 {
     public function index(Request $request)
     {
-        // Carregar todos os tipos para o submenu
-        $tiposHeader = Tipo::orderBy('ordem')->get();
+        try {
+            // Carregar tipos para o submenu
+            $tiposHeader = Tipo::orderBy('ordem')->get();
 
-        // Iniciar a query
-        $query = Receita::with('categoria');
+            // Iniciar a query
+            $query = Receita::with('categoria')->where('status', 'publicada');
 
-        // Filtrar por categoria se especificado
-        if ($request->has('categoria')) {
-            $categoria = Categoria::where('slug', $request->categoria)->first();
-            if ($categoria) {
-                $query->where('categoria_id', $categoria->id);
+            // Filtrar por categoria se especificado
+            if ($request->has('categoria')) {
+                $categoria = Categoria::where('slug', $request->categoria)->first();
+                if ($categoria) {
+                    $query->where('categoria_id', $categoria->id);
+                }
             }
+
+            // Aplicar ordenação
+            switch ($request->get('order')) {
+                case 'recent':
+                    $query->latest();
+                    break;
+                case 'likes':
+                    $query->orderBy('curtidas', 'desc');
+                    break;
+                default:
+                    $query->latest();
+            }
+
+            $receitas = $query->whereHas('categoria')->paginate(12)->appends(request()->query());
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'list' => view('receitas._list', compact('receitas'))->render(),
+                    'pagination' => view('vendor.pagination.default', ['paginator' => $receitas])->render(),
+                    'success' => true
+                ]);
+            }
+
+            // Buscar apenas as categorias com tipo "receita"
+            $categorias = Categoria::where('tipo', 'receita')->get();
+
+            // Retornar a view com as receitas, categorias e tipos
+            return view('receitas.index', compact('receitas', 'categorias', 'tiposHeader'));
+
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Não foi possível carregar as receitas. Tente novamente.',
+                    'list' => view('receitas._list', ['receitas' => collect()])->render(),
+                    'pagination' => ''
+                ], 200); // Retornando 200 ao invés de 500 para tratar no frontend
+            }
+            
+            throw $e;
         }
-
-        // Aplicar ordenação
-        switch ($request->get('order')) {
-            case 'recent':
-                $query->latest();
-                break;
-            case 'likes':
-                $query->orderBy('curtidas', 'desc');
-                break;
-            default:
-                $query->latest(); // ordenação padrão por data
-        }
-
-        // Executar a query com paginação
-        $receitas = $query->whereHas('categoria')->paginate(12)->appends(request()->query());
-
-        if ($request->ajax()) {
-            return response()->json([
-                'list' => view('receitas._list', compact('receitas'))->render(),
-                'pagination' => view('vendor.pagination.default', ['paginator' => $receitas])->render()
-            ]);
-        }
-
-        // Buscar apenas as categorias com tipo "receita"
-        $categorias = Categoria::where('tipo', 'receita')->get();
-
-        // Retornar a view com as receitas e as categorias filtradas
-        return view('receitas.index', compact('receitas', 'categorias', 'tiposHeader'));
     }
 
 
@@ -65,11 +79,15 @@ class ReceitaController extends Controller
         $categoria = Categoria::where('slug', $categoriaSlug)->firstOrFail();
 
         // Buscar a receita pelo slug e categoria
-        $receita = Receita::where('slug', $slug)->where('categoria_id', $categoria->id)->firstOrFail();
+        $receita = Receita::where('slug', $slug)
+            ->where('categoria_id', $categoria->id)
+            ->where('status', 'publicada')
+            ->firstOrFail();
 
         // Buscar sugestões de receitas
         $sugestoes = Receita::where('categoria_id', $categoria->id)
-            ->where('id', '!=', $receita->id) // Exclui a receita atual
+            ->where('id', '!=', $receita->id)
+            ->where('status', 'publicada')
             ->inRandomOrder()
             ->take(4)
             ->get();
@@ -96,6 +114,7 @@ class ReceitaController extends Controller
         $categoria = Categoria::where('slug', $slug)->firstOrFail();
         $receitas = Receita::with('categoria')
             ->where('categoria_id', $categoria->id)
+            ->where('status', 'publicada')
             ->paginate(8);
 
         return response()->json([

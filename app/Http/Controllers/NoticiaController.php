@@ -18,7 +18,7 @@ class NoticiaController extends Controller
             ->get();
 
         // Query base
-        $query = Noticia::with('categoria');
+        $query = Noticia::with('categoria')->where('status', 'publicado');
 
         // Filtrar por categoria se especificado
         if ($request->has('categoria')) {
@@ -68,17 +68,19 @@ class NoticiaController extends Controller
             ->where('tipo', 'noticia')
             ->firstOrFail();
 
-        // Buscar a notícia e incrementar visualizações
+        // Buscar a notícia publicada
         $noticia = Noticia::where('slug', $slug)
             ->where('categoria_id', $categoria->id)
+            ->where('status', 'publicado')
             ->firstOrFail();
 
         // Incrementa visualizações
         $noticia->increment('views');
 
-        // Notícias relacionadas (mesma categoria, excluindo atual)
+        // Notícias relacionadas (mesma categoria, apenas publicadas)
         $relacionadas = Noticia::where('categoria_id', $categoria->id)
             ->where('id', '!=', $noticia->id)
+            ->where('status', 'publicado')
             ->latest()
             ->take(4)
             ->get();
