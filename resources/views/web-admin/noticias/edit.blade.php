@@ -49,6 +49,7 @@
         <div class="mb-4">
             <label for="status" class="block text-gray-700 font-bold mb-2">Status da Notícia:</label>
             <select name="status" id="status" class="w-full px-4 py-2 border rounded-lg">
+                <option value="">Selecione um status</option>
                 <option value="rascunho" {{ (old('status', $noticia->status ?? '') == 'rascunho') ? 'selected' : '' }}>Rascunho</option>
                 <option value="publicado" {{ (old('status', $noticia->status ?? '') == 'publicado') ? 'selected' : '' }}>Publicado</option>
                 <option value="arquivado" {{ (old('status', $noticia->status ?? '') == 'arquivado') ? 'selected' : '' }}>Arquivado</option>

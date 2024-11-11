@@ -17,7 +17,7 @@ class ReceitaController extends Controller
             $tiposHeader = Tipo::orderBy('ordem')->get();
 
             // Iniciar a query
-            $query = Receita::with('categoria')->where('status', 'publicada');
+            $query = Receita::with('categoria')->where('status', 'publicado');
 
             // Filtrar por categoria se especificado
             if ($request->has('categoria')) {
@@ -62,7 +62,7 @@ class ReceitaController extends Controller
                     'message' => 'Não foi possível carregar as receitas. Tente novamente.',
                     'list' => view('receitas._list', ['receitas' => collect()])->render(),
                     'pagination' => ''
-                ], 200); // Retornando 200 ao invés de 500 para tratar no frontend
+                ], 200);
             }
             
             throw $e;

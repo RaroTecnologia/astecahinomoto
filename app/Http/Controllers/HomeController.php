@@ -25,11 +25,15 @@ class HomeController extends Controller
         // Buscar os tipos de categorias principais para o sub menu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
-        // Buscar as 4 notícias mais recentes
-        $noticias = Noticia::latest()->take(4)->get();
+        // Buscar as 4 notícias mais recentes publicadas
+        $noticias = Noticia::where('status', 'publicado')
+            ->latest()
+            ->take(4)
+            ->get();
 
-        // Buscar 4 receitas aleatórias com suas categorias
+        // Buscar 4 receitas aleatórias publicadas com suas categorias
         $receitas = Receita::with('categoria')
+            ->where('status', 'publicado')
             ->inRandomOrder()
             ->take(4)
             ->get();
