@@ -5,6 +5,32 @@
 @section('content')
 <div class="bg-white">
     <div class="container mx-auto py-16 px-4">
+        <!-- Mensagens de Feedback -->
+        @if (session('success'))
+        <div class="mb-8 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Sucesso!</strong>
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+        @endif
+
+        @if (session('error'))
+        <div class="mb-8 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Erro!</strong>
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+        @endif
+
+        @if ($errors->any())
+        <div class="mb-8 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Atenção!</strong>
+            <ul class="mt-2">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <!-- Breadcrumb e Opção de Compartilhar -->
         <x-breadcrumb-share currentPage="Fale Conosco" />
 
@@ -145,7 +171,7 @@
         <div class="mt-3">
             <h2 class="text-2xl font-bold text-center mb-6" id="modalTitle">Contato - <span id="departmentName"></span></h2>
 
-            <form action="{{ route('fale-conosco.enviar') }}" method="POST" class="space-y-6">
+            <form id="contactForm" method="POST" action="{{ route('fale-conosco.enviar') }}" class="space-y-6">
                 @csrf
                 <input type="hidden" name="department" id="departmentInput">
 
@@ -184,14 +210,15 @@
                         class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-yellow-500 resize-y min-h-[200px]"></textarea>
                 </div>
 
-                <div class="flex justify-end space-x-4 mt-8">
-                    <button type="button" onclick="closeModal()"
-                        class="px-6 py-3 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition duration-200">
-                        Cancelar
-                    </button>
+                <div class="mt-6">
                     <button type="submit"
-                        class="px-6 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition duration-200">
-                        Enviar Mensagem
+                        id="submitButton"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <span id="buttonText">Enviar Mensagem</span>
+                        <svg id="loadingSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
                     </button>
                 </div>
             </form>
@@ -262,5 +289,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        const button = document.getElementById('submitButton');
+        const buttonText = document.getElementById('buttonText');
+        const spinner = document.getElementById('loadingSpinner');
+
+        // Desabilita o botão
+        button.disabled = true;
+        button.classList.add('opacity-75', 'cursor-not-allowed');
+
+        // Altera o texto e mostra o spinner
+        buttonText.textContent = 'Enviando...';
+        spinner.classList.remove('hidden');
+    });
+</script>
 
 @endsection
