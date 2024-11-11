@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Tipo;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use App\Mail\ContatoEmail;
+use Illuminate\Support\Facades\Mail;
 
 class PaginaController extends Controller
 {
@@ -62,12 +64,8 @@ class PaginaController extends Controller
         ]);
 
         try {
-            // Aqui você pode adicionar a lógica para:
-            // 1. Enviar e-mail
-            // Mail::to('seu-email@exemplo.com')->send(new ContatoEmail($validated));
-
-            // 2. E/ou salvar no banco de dados
-            // Contato::create($validated);
+            Mail::to('tiagolevorato@treslados.group')
+                ->send(new ContatoEmail($validated));
 
             return back()->with('success', 'Mensagem enviada com sucesso! Em breve entraremos em contato.');
         } catch (\Exception $e) {
