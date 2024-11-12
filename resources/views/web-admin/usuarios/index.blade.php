@@ -41,13 +41,15 @@
                     <input type="file" name="avatar" id="avatar" class="w-full px-4 py-2 border rounded-lg">
                 </div>
 
-                <!-- Papel do Usuário -->
+                <!-- Papéis -->
                 <div class="mb-4">
-                    <label for="role" class="block text-gray-700 font-bold mb-2">Papel:</label>
-                    <select name="role" id="role" class="w-full px-4 py-2 border rounded-lg" required>
-                        <option value="admin">Admin</option>
-                        <option value="user">Usuário</option>
-                    </select>
+                    <label class="block text-gray-700 font-bold mb-2">Papéis:</label>
+                    @foreach($roles as $role)
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" name="roles[]" value="{{ $role->name }}" class="mr-2">
+                        <label>{{ ucfirst($role->name) }}</label>
+                    </div>
+                    @endforeach
                 </div>
 
                 <!-- Botão de Submissão -->
@@ -71,7 +73,7 @@
                     <tr>
                         <th class="py-2 text-left">Nome</th>
                         <th class="py-2 text-left">Email</th>
-                        <th class="py-2 text-left">Papel</th>
+                        <th class="py-2 text-left">Papéis</th>
                         <th class="py-2 text-left">Avatar</th>
                         <th class="py-2 text-left">Ações</th>
                     </tr>
@@ -81,7 +83,9 @@
                     <tr>
                         <td class="border px-4 py-2">{{ $usuario->name }}</td>
                         <td class="border px-4 py-2">{{ $usuario->email }}</td>
-                        <td class="border px-4 py-2">{{ $usuario->role }}</td>
+                        <td class="border px-4 py-2">
+                            {{ $usuario->roles->pluck('name')->implode(', ') }}
+                        </td>
                         <td class="border px-4 py-2">
                             @if($usuario->avatar)
                             <img src="{{ asset('storage/' . $usuario->avatar) }}" alt="{{ $usuario->name }}" class="h-10 w-10 rounded-full">

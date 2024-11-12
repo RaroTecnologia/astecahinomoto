@@ -21,14 +21,42 @@
                 @enderror
             </div>
 
+            <!-- Papéis do Usuário -->
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">Papéis:</label>
+                @can('users.manage_roles')
+                @foreach($roles as $role)
+                <div class="flex items-center mb-2">
+                    <input type="checkbox" name="roles[]" value="{{ $role->name }}"
+                        {{ $usuario->hasRole($role->name) ? 'checked' : '' }} class="mr-2">
+                    <label>{{ ucfirst($role->name) }}</label>
+                </div>
+                @endforeach
+                @else
+                <div class="text-gray-600">
+                    Papéis atuais: {{ $usuario->roles->pluck('name')->implode(', ') }}
+                </div>
+                @endcan
+            </div>
+
+            <!-- Campos sensíveis apenas visíveis para quem tem permissão -->
+            @can('users.edit')
             <!-- Email do Usuário -->
             <div class="mb-4">
                 <label for="email" class="block text-gray-700 font-bold mb-2">Email:</label>
-                <input type="email" name="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 @error('email') border-red-500 @enderror" value="{{ old('email', $usuario->email) }}" required>
+                <input type="email" name="email" id="email" class="w-full px-4 py-2 border rounded-lg @error('email') border-red-500 @enderror" value="{{ old('email', $usuario->email) }}" required>
                 @error('email')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+
+            <!-- Senha e outros campos sensíveis -->
+            <div class="mb-4">
+                <label for="password" class="block text-gray-700 font-bold mb-2">Senha (opcional):</label>
+                <input type="password" name="password" id="password" class="w-full px-4 py-2 border rounded-lg">
+                <small class="text-gray-500">Deixe em branco para manter a senha atual</small>
+            </div>
+            @endcan
 
             <!-- Avatar do Usuário -->
             <div class="mb-4">
@@ -39,25 +67,6 @@
                 </div>
                 @endif
                 <input type="file" name="avatar" id="avatar" class="w-full px-4 py-2 border rounded-lg">
-            </div>
-
-            <!-- Papel do Usuário -->
-            <div class="mb-4">
-                <label for="role" class="block text-gray-700 font-bold mb-2">Papel:</label>
-                <select name="role" id="role" class="w-full px-4 py-2 border rounded-lg @error('role') border-red-500 @enderror" required>
-                    <option value="user" {{ old('role', $usuario->role) == 'user' ? 'selected' : '' }}>Usuário</option>
-                    <option value="admin" {{ old('role', $usuario->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                </select>
-                @error('role')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Senha do Usuário (opcional) -->
-            <div class="mb-4">
-                <label for="password" class="block text-gray-700 font-bold mb-2">Senha (opcional):</label>
-                <input type="password" name="password" id="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                <small class="text-gray-500">Deixe este campo em branco se não quiser alterar a senha.</small>
             </div>
 
             <!-- Confirmação da Senha -->

@@ -10,12 +10,14 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        // Verifica se o usuário está autenticado e se é admin
-        if (Auth::check() && Auth::user()->is_admin) {
-            return $next($request);
+        if (!Auth::check()) {
+            return redirect('login');
         }
 
-        // Redireciona o usuário se não for admin
-        return redirect('/dashboard')->withErrors('Acesso negado: você não tem permissão para acessar esta área.');
+        if (!Auth::user()->hasRole('admin')) {
+            return redirect('/dashboard')->with('error', 'Acesso negado: você não tem permissão para acessar esta área.');
+        }
+
+        return $next($request);
     }
 }

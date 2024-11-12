@@ -6,13 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $usuarios = User::all();
-        return view('web-admin.usuarios.index', compact('usuarios'));
+        $roles = Role::all();
+        return view('web-admin.usuarios.index', compact('usuarios', 'roles'));
     }
 
     public function create()
@@ -22,55 +27,65 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // Validação dos campos
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:admin,user',
+            'roles' => 'required|array',
             'avatar' => 'nullable|image',
         ]);
 
-        // Criar o usuário
         $usuario = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
-            'role' => $request->input('role'),
             'avatar' => $request->hasFile('avatar') ? $request->file('avatar')->store('avatars', 'public') : null,
         ]);
+
+        $usuario->syncRoles($request->input('roles'));
 
         return redirect()->route('web-admin.usuarios.index')->with('success', 'Usuário criado com sucesso.');
     }
 
     public function edit($id)
     {
+        $this->authorize('users.edit');
         $usuario = User::findOrFail($id);
-        return view('web-admin.usuarios.edit', compact('usuario'));
+        $roles = Role::all();
+        return view('web-admin.usuarios.edit', compact('usuario', 'roles'));
     }
 
     public function update(Request $request, $id)
     {
-        // Validações
+        $this->authorize('users.edit');
+        $usuario = User::findOrFail($id);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|string|in:admin,user',
             'avatar' => 'nullable|image',
         ]);
 
-        // Atualizar o usuário
-        $usuario = User::findOrFail($id);
-        $usuario->update([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => $request->filled('password') ? Hash::make($request->input('password')) : $usuario->password,
-            'role' => $request->input('role'),
-            'avatar' => $request->hasFile('avatar') ? $request->file('avatar')->store('avatars', 'public') : $usuario->avatar,
-        ]);
+        $data = $request->only(['name', 'email']);
 
-        return redirect()->route('web-admin.usuarios.index')->with('success', 'Usuário atualizado com sucesso.');
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $usuario->update($data);
+
+        // Apenas usuários com permissão podem gerenciar roles
+        if ($request->user()->can('users.manage_roles')) {
+            $usuario->syncRoles($request->input('roles', []));
+        }
+
+        return redirect()->route('web-admin.usuarios.index')
+            ->with('success', 'Usuário atualizado com sucesso.');
     }
 
     public function destroy($id)

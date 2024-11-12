@@ -34,33 +34,31 @@ Route::controller(PaginaController::class)->group(function () {
 });
 
 // Rotas de Autenticado com Middleware
-Route::middleware('auth')->group(function () {
-    Route::prefix('web-admin')->group(function () {
-        //Route::get('/dashboard', fn() => view('dashboard'))->middleware('verified')->name('admin.dashboard');
+Route::middleware(['auth'])->prefix('web-admin')->name('web-admin.')->group(function () {
+    // Dashboard - acessível para todos os usuários autenticados
+    Route::get('/', [WebAdminController::class, 'index'])->name('index');
 
-        // Rotas de Perfil
-        Route::controller(ProfileController::class)->group(function () {
-            Route::get('/profile', 'edit')->name('profile.edit');
-            Route::patch('/profile', 'update')->name('profile.update');
-            Route::delete('/profile', 'destroy')->name('profile.destroy');
-        });
+    // Rotas de Perfil
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::patch('/profile', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
+    });
 
-        // Rotas do Admin
-        Route::controller(WebAdminController::class)->group(function () {
-            Route::get('/', 'index')->name('web-admin.index');
-        });
+    // Rotas apenas para administradores
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('usuarios', AdminUserController::class);
+        Route::resource('categorias', AdminCategoryController::class);
+        Route::resource('nutrientes', AdminNutrientController::class);
+        Route::resource('tabelas-nutricionais', AdminNutritionTableController::class);
+    });
 
-        // Rotas de Admin usando Resource com alias
-        Route::resources([
-            'home' => AdminHomeController::class,
-            'noticias' => AdminNewsController::class,
-            'receitas' => AdminRecipeController::class,
-            'categorias' => AdminCategoryController::class,
-            'usuarios' => AdminUserController::class,
-            'nutrientes' => AdminNutrientController::class,
-            'tabelas-nutricionais' => AdminNutritionTableController::class,
-            'produtos' => AdminProductController::class,
-        ], ['as' => 'web-admin']);
+    // Rotas para admins e editores
+    Route::middleware(['role:admin|editor'])->group(function () {
+        Route::resource('noticias', AdminNewsController::class);
+        Route::resource('receitas', AdminRecipeController::class);
+        Route::resource('produtos', AdminProductController::class);
+        Route::resource('home', AdminHomeController::class);
 
         // Rotas SKU
         Route::post('/skus', [AdminSkuController::class, 'store'])->name('skus.store');

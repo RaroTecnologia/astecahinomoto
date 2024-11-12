@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Providers\RouteServiceProvider;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -24,11 +25,24 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
 
-        $request->session()->regenerate();
+            $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            // Tentando diferentes abordagens em ordem
+            try {
+                return redirect()->route('web-admin.index');
+            } catch (\Exception $e) {
+                try {
+                    return redirect()->route('dashboard');
+                } catch (\Exception $e) {
+                    return redirect('/web-admin');
+                }
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['email' => 'Erro ao autenticar']);
+        }
     }
 
     /**
