@@ -34,7 +34,7 @@
     </div>
 
     <!-- Corpo da Notícia -->
-    <div class="text-gray-700 leading-relaxed text-left mb-8">
+    <div class="text-gray-700 leading-relaxed text-left mb-8 mt-8">
         {!! $noticia->conteudo !!}
     </div>
 
