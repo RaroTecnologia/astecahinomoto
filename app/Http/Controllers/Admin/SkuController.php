@@ -55,11 +55,23 @@ class SkuController extends Controller
 
             // Processa a imagem se houver upload
             if ($request->hasFile('imagem')) {
+                // Deleta imagens antigas
                 if ($sku->imagem && Storage::exists('public/skus/' . $sku->imagem)) {
                     Storage::delete('public/skus/' . $sku->imagem);
+                    Storage::delete('public/skus/thumbnails/' . $sku->imagem);
                 }
-                $imagePath = $request->file('imagem')->store('skus', 'public');
-                $sku->imagem = basename($imagePath);
+
+                $file = $request->file('imagem');
+                $fileName = $file->hashName();
+
+                // Salva imagem original
+                $file->storeAs('skus', $fileName, 'public');
+
+                // Cria e salva thumbnail
+                $thumbnailPath = storage_path('app/public/skus/thumbnails/' . $fileName);
+                $this->resizeImage($file->getPathname(), $thumbnailPath, 300, 300);
+
+                $sku->imagem = $fileName;
             }
 
             // Converte explicitamente o is_active para 0 ou 1

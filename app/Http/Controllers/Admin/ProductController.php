@@ -114,11 +114,23 @@ class ProductController extends Controller
 
             // Processa a imagem se houver upload
             if ($request->hasFile('imagem')) {
+                // Deleta imagens antigas
                 if ($produto->imagem && Storage::exists('public/produtos/' . $produto->imagem)) {
                     Storage::delete('public/produtos/' . $produto->imagem);
+                    Storage::delete('public/produtos/thumbnails/' . $produto->imagem);
                 }
-                $imagePath = $request->file('imagem')->store('produtos', 'public');
-                $produto->imagem = basename($imagePath);
+
+                $file = $request->file('imagem');
+                $fileName = $file->hashName();
+
+                // Salva imagem original
+                $file->storeAs('produtos', $fileName, 'public');
+
+                // Cria e salva thumbnail
+                $thumbnailPath = storage_path('app/public/produtos/thumbnails/' . $fileName);
+                $this->resizeImage($file->getPathname(), $thumbnailPath, 300, 300);
+
+                $produto->imagem = $fileName;
             }
 
             // Converte o status para 0 ou 1
@@ -165,5 +177,57 @@ class ProductController extends Controller
         }
 
         return $ids;
+    }
+
+    private function resizeImage($sourcePath, $destinationPath, $width, $height)
+    {
+        $imageType = exif_imagetype($sourcePath);
+
+        switch ($imageType) {
+            case IMAGETYPE_JPEG:
+                $sourceImage = imagecreatefromjpeg($sourcePath);
+                break;
+            case IMAGETYPE_PNG:
+                $sourceImage = imagecreatefrompng($sourcePath);
+                break;
+            case IMAGETYPE_GIF:
+                $sourceImage = imagecreatefromgif($sourcePath);
+                break;
+            default:
+                throw new \Exception("Tipo de imagem não suportado");
+        }
+
+        list($originalWidth, $originalHeight) = getimagesize($sourcePath);
+        $aspectRatio = $originalWidth / $originalHeight;
+
+        if ($width / $height > $aspectRatio) {
+            $width = $height * $aspectRatio;
+        } else {
+            $height = $width / $aspectRatio;
+        }
+
+        $newImage = imagecreatetruecolor($width, $height);
+
+        if ($imageType == IMAGETYPE_PNG) {
+            imagealphablending($newImage, false);
+            imagesavealpha($newImage, true);
+        }
+
+        imagecopyresampled($newImage, $sourceImage, 0, 0, 0, 0, $width, $height, $originalWidth, $originalHeight);
+
+        switch ($imageType) {
+            case IMAGETYPE_JPEG:
+                imagejpeg($newImage, $destinationPath, 90);
+                break;
+            case IMAGETYPE_PNG:
+                imagepng($newImage, $destinationPath);
+                break;
+            case IMAGETYPE_GIF:
+                imagegif($newImage, $destinationPath);
+                break;
+        }
+
+        imagedestroy($newImage);
+        imagedestroy($sourceImage);
     }
 }
