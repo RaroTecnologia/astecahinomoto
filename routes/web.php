@@ -45,26 +45,22 @@ Route::middleware(['auth'])->prefix('web-admin')->name('web-admin.')->group(func
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 
-    // Rotas apenas para administradores
-    Route::middleware(['role:admin'])->group(function () {
-        Route::resource('usuarios', AdminUserController::class);
-        Route::resource('categorias', AdminCategoryController::class);
-        Route::resource('nutrientes', AdminNutrientController::class);
-        Route::resource('tabelas-nutricionais', AdminNutritionTableController::class);
-    });
+    // Rotas que eram apenas para administradores (agora para todos autenticados)
+    Route::resource('usuarios', AdminUserController::class);
+    Route::resource('categorias', AdminCategoryController::class);
+    Route::resource('nutrientes', AdminNutrientController::class);
+    Route::resource('tabelas-nutricionais', AdminNutritionTableController::class);
 
-    // Rotas para admins e editores
-    Route::middleware(['role:admin|editor'])->group(function () {
-        Route::resource('noticias', AdminNewsController::class);
-        Route::resource('receitas', AdminRecipeController::class);
-        Route::resource('produtos', AdminProductController::class);
-        Route::resource('home', AdminHomeController::class);
+    // Rotas que eram para admins e editores (agora para todos autenticados)
+    Route::resource('noticias', AdminNewsController::class);
+    Route::resource('receitas', AdminRecipeController::class);
+    Route::resource('produtos', AdminProductController::class);
+    Route::resource('home', AdminHomeController::class);
 
-        // Rotas SKU
-        Route::post('/skus', [AdminSkuController::class, 'store'])->name('skus.store');
-        Route::put('/skus/{id}', [AdminSkuController::class, 'update'])->name('skus.update');
-        Route::delete('/skus/{id}', [AdminSkuController::class, 'destroy'])->name('skus.destroy');
-    });
+    // Rotas SKU
+    Route::post('/skus', [AdminSkuController::class, 'store'])->name('skus.store');
+    Route::put('/skus/{id}', [AdminSkuController::class, 'update'])->name('skus.update');
+    Route::delete('/skus/{id}', [AdminSkuController::class, 'destroy'])->name('skus.destroy');
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
