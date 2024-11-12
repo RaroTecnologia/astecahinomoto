@@ -23,8 +23,14 @@
     </div>
 
     <!-- Imagem da Notícia -->
-    <div class="mb-8">
-        <img src="{{ asset('storage/noticias/' . $noticia->imagem) ?? asset('assets/sem_imagem.png') }}" alt="{{ $noticia->titulo }}" class="w-full rounded-lg shadow-lg object-cover">
+    <div class="relative w-full">
+        <div class="animate-pulse bg-gray-200 w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-lg"></div>
+        <img
+            src="{{ $noticia->imagem ? asset('storage/noticias/' . $noticia->imagem) : asset('assets/sem_imagem.png') }}"
+            alt="{{ $noticia->titulo }}"
+            class="w-full h-[400px] md:h-[500px] lg:h-[600px] rounded-lg shadow-lg object-cover"
+            onerror="this.src='{{ asset('assets/sem_imagem.png') }}'"
+            onload="this.previousElementSibling.remove()">
     </div>
 
     <!-- Corpo da Notícia -->
