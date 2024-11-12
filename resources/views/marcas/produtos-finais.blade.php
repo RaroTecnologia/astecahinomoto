@@ -28,9 +28,9 @@
             $imagemPrincipal = asset('assets/sem_imagem.png'); // Imagem padrão
 
             if ($produtoFinal && $produtoFinal->imagem) {
-            $imagemPrincipal = asset('storage/produtos/' . $produtoFinal->imagem);
+            $imagemPrincipal = asset('storage/produtos/thumbnails/' . $produtoFinal->imagem);
             } elseif ($produtoFinal && $produtoFinal->skus && $produtoFinal->skus->first() && $produtoFinal->skus->first()->imagem) {
-            $imagemPrincipal = asset('storage/skus/' . $produtoFinal->skus->first()->imagem);
+            $imagemPrincipal = asset('storage/skus/thumbnails/' . $produtoFinal->skus->first()->imagem);
             }
             @endphp
 
