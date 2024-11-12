@@ -80,7 +80,7 @@
                     <label for="imagem_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Imagem do SKU</label>
                     <input type="file" name="imagem" id="imagem_{{ $sku->id ?? 'new' }}" class="w-full px-4 py-2 border rounded-lg">
                     @if(isset($sku->imagem))
-                    <img src="{{ asset('storage/thumbnails/' . $sku->imagem) }}" alt="Imagem do SKU" class="mt-2 h-32">
+                    <img src="{{ asset('storage/' . $sku->imagem) }}" alt="Imagem do SKU" class="mt-2 h-32">
                     @endif
                 </div>
             </div>
