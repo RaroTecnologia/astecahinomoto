@@ -26,7 +26,23 @@ class Contato extends Model
     ];
 
     protected $dates = [
-        'ultima_interacao'
+        'ultima_interacao',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
+    protected $with = ['anotacoes.user']; // Carrega anotações e usuários automaticamente
+
+    const STATUS_VALIDOS = ['novo', 'em_andamento', 'respondido', 'finalizado'];
+
+    const DEPARTAMENTOS = [
+        'Atendimento ao Cliente',
+        'Representantes Comerciais',
+        'Imprensa',
+        'Recursos Humanos',
+        'Financeiro',
+        'Outros Assuntos'
     ];
 
     public function usuarioAtribuido()
@@ -34,8 +50,8 @@ class Contato extends Model
         return $this->belongsTo(User::class, 'atribuido_para');
     }
 
-    public function tarefas()
+    public function anotacoes()
     {
-        return $this->hasMany(TarefaContato::class, 'contato_id');
+        return $this->hasMany(AnotacaoContato::class)->orderBy('created_at', 'desc');
     }
 }

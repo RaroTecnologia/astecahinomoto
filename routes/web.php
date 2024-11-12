@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\NutritionTableController as AdminNutritionTableCo
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\SkuController as AdminSkuController;
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
+use App\Http\Controllers\Admin\CrmController;
 
 // Rotas Públicas
 Route::controller(PaginaController::class)->group(function () {
@@ -61,6 +62,18 @@ Route::middleware(['auth'])->prefix('web-admin')->name('web-admin.')->group(func
     Route::post('/skus', [AdminSkuController::class, 'store'])->name('skus.store');
     Route::put('/skus/{id}', [AdminSkuController::class, 'update'])->name('skus.update');
     Route::delete('/skus/{id}', [AdminSkuController::class, 'destroy'])->name('skus.destroy');
+
+    // Rotas do CRM agrupadas
+    Route::prefix('crm')->name('crm.')->controller(CrmController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{contato}/details', 'getDetails')->name('details');
+        Route::patch('/{contato}/status', 'updateStatus')->name('update-status');
+        Route::post('/{contato}/anotacoes', 'storeAnotacao')->name('anotacoes.store');
+        Route::get('/{contato}', 'show')->name('show');
+        Route::put('/{contato}', 'update')->name('update');
+        Route::post('/{contato}/tarefas', 'storeTarefa')->name('tarefas.store');
+        Route::put('/tarefas/{tarefa}', 'updateTarefa')->name('tarefas.update');
+    });
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');

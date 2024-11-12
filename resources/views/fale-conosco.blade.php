@@ -99,13 +99,13 @@
         </div>
     </a>
 
-    <!-- Setor 3 -->
-    <a href="javascript:void(0)" onclick="openModal('Imprensa')"
+    <!-- Marketing -->
+    <a href="javascript:void(0)" onclick="openModal('Marketing')"
         class="border border-gray-300 p-6 rounded-lg shadow hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
         <div class="text-center flex-grow">
-            <i class="fas fa-newspaper text-4xl text-yellow-500 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">Imprensa</h3>
-            <p class="text-gray-600 mb-6">Para jornalistas e veículos de comunicação.</p>
+            <i class="fas fa-bullhorn text-4xl text-yellow-500 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Marketing</h3>
+            <p class="text-gray-600 mb-6">Para parcerias e ações de marketing.</p>
         </div>
         <div class="text-center mt-auto">
             <span class="text-yellow-500 font-semibold inline-block border-t border-gray-200 pt-4 w-full">
