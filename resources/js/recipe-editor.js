@@ -2,7 +2,8 @@ import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Adiciona CSS personalizado para os editores
+    console.log('Recipe editor carregado');
+
     const style = document.createElement('style');
     style.textContent = `
         .ql-editor {
@@ -10,16 +11,12 @@ document.addEventListener('DOMContentLoaded', function () {
             line-height: 1.6;
             min-height: 200px;
         }
-        .ql-editor h1 {
-            font-size: 24px;
-        }
-        .ql-editor h2 {
-            font-size: 20px;
-        }
+        .ql-editor h1 { font-size: 24px; }
+        .ql-editor h2 { font-size: 20px; }
     `;
     document.head.appendChild(style);
 
-    // Configuração comum para ambos os editores
+    // Configuração dos editores
     const editorConfig = {
         theme: 'snow',
         modules: {
@@ -37,38 +34,76 @@ document.addEventListener('DOMContentLoaded', function () {
     const quillModoPreparo = new Quill('#editor-modo-preparo', editorConfig);
 
     // Carrega conteúdo existente
-    const ingredientesAtual = document.querySelector('#input-ingredientes').value;
-    const modoPreparoAtual = document.querySelector('#input-modo-preparo').value;
+    const ingredientesInput = document.querySelector('#input-ingredientes');
+    const modoPreparoInput = document.querySelector('#input-modo-preparo');
 
-    if (ingredientesAtual) {
-        quillIngredientes.root.innerHTML = ingredientesAtual;
+    if (ingredientesInput?.value) {
+        quillIngredientes.root.innerHTML = ingredientesInput.value;
     }
 
-    if (modoPreparoAtual) {
-        quillModoPreparo.root.innerHTML = modoPreparoAtual;
+    if (modoPreparoInput?.value) {
+        quillModoPreparo.root.innerHTML = modoPreparoInput.value;
     }
 
     // Captura o formulário
     const form = document.getElementById('form-receita');
     
     if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Atualiza os inputs hidden
+        console.log('Formulário encontrado');
+        
+        // Função para atualizar os campos hidden
+        const updateHiddenFields = () => {
             const ingredientes = quillIngredientes.root.innerHTML;
             const modoPreparo = quillModoPreparo.root.innerHTML;
             
             document.getElementById('input-ingredientes').value = ingredientes;
             document.getElementById('input-modo-preparo').value = modoPreparo;
+        };
+
+        // Atualiza os campos quando o conteúdo do editor muda
+        quillIngredientes.on('text-change', updateHiddenFields);
+        quillModoPreparo.on('text-change', updateHiddenFields);
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Agora precisamos prevenir o submit padrão
             
-            console.log('Conteúdo sendo enviado:', {
-                ingredientes: ingredientes,
-                modoPreparo: modoPreparo
-            });
-            
-            // Envia o formulário
-            this.submit();
+            try {
+                console.log('Submit interceptado');
+                
+                // Atualiza os campos hidden uma última vez antes do envio
+                updateHiddenFields();
+                
+                // Mostra notificação de processamento
+                notyf.success('Salvando receita...');
+                
+                // Envia o formulário via AJAX
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        notyf.success(data.message);
+                    } else {
+                        notyf.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    notyf.error('Erro ao salvar receita. Por favor, tente novamente.');
+                });
+                
+            } catch (error) {
+                console.error('Erro ao processar o formulário:', error);
+                notyf.error('Erro ao salvar receita. Por favor, tente novamente.');
+            }
         });
     }
 }); 

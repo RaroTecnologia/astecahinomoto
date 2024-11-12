@@ -7,7 +7,7 @@
     <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <h2 class="text-2xl font-bold mb-8">Editar Receita</h2>
 
-        <form action="{{ route('web-admin.receitas.update', $receita->id) }}" method="POST" enctype="multipart/form-data" id="form-receita">
+        <form action="{{ route('web-admin.receitas.update', $receita->id) }}" method="POST" enctype="multipart/form-data" id="form-receita" class="space-y-6">
             @csrf
             @method('PUT')
 
