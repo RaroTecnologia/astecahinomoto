@@ -110,7 +110,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 @foreach($noticias as $noticia)
                 <div class="bg-white p-3 md:p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <img src="{{ $noticia->imagem ? asset('storage/noticias/thumbnail/' . $noticia->imagem) : asset('assets/sem_imagem.png') }}"
+                    <img src="{{ $noticia->imagem ? asset('storage/noticias/thumbnails/' . $noticia->imagem) : asset('assets/sem_imagem.png') }}"
                         alt="{{ $noticia->titulo }}"
                         class="rounded-lg mb-3 md:mb-4 w-full h-36 md:h-48 object-cover">
                     <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-2">{{ $noticia->titulo }}</h3>
@@ -149,7 +149,7 @@
                         @endif
                     </div>
 
-                    <img src="{{ $receita->imagem ? asset('storage/receitas/thumbnail/' . $receita->imagem) : asset('assets/sem_imagem.png') }}"
+                    <img src="{{ $receita->imagem ? asset('storage/receitas/thumbnails/' . $receita->imagem) : asset('assets/sem_imagem.png') }}"
                         alt="{{ $receita->nome }}"
                         class="w-full h-32 md:h-48 object-cover">
 
