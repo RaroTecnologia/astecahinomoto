@@ -7,27 +7,35 @@ use App\Models\Categoria;
 use App\Models\Tipo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
 
 class ReceitaController extends Controller
 {
     public function index(Request $request)
     {
         try {
-            // Carregar tipos para o submenu
-            $tiposHeader = Tipo::orderBy('ordem')->get();
+            // Pegar todas as categorias do tipo receita
+            $categorias = Categoria::where('tipo', 'receita')
+                ->orderBy('nome')
+                ->get();
 
-            // Iniciar a query
+            // Query base
             $query = Receita::with('categoria')->where('status', 'publicado');
 
             // Filtrar por categoria se especificado
             if ($request->has('categoria')) {
-                $categoria = Categoria::where('slug', $request->categoria)->first();
+                $categoria = Categoria::where('slug', $request->categoria)
+                    ->where('tipo', 'receita')
+                    ->first();
+
                 if ($categoria) {
                     $query->where('categoria_id', $categoria->id);
                 }
             }
 
-            // Aplicar ordenação
+            // Ordenação
             switch ($request->get('order')) {
                 case 'recent':
                     $query->latest();
@@ -36,35 +44,40 @@ class ReceitaController extends Controller
                     $query->orderBy('curtidas', 'desc');
                     break;
                 default:
-                    $query->latest();
+                    $query->latest(); // Ordenação padrão
             }
 
-            $receitas = $query->whereHas('categoria')->paginate(12)->appends(request()->query());
+            // Executar a query com paginação
+            $receitas = $query->paginate(12);
 
+            // Carregar tipos para o submenu
+            $tiposHeader = Tipo::orderBy('ordem')->get();
+
+            // Se for uma requisição AJAX, retornar JSON
             if ($request->ajax()) {
+                $view = View::make('receitas._list', compact('receitas'))->render();
                 return response()->json([
-                    'list' => view('receitas._list', compact('receitas'))->render(),
-                    'pagination' => view('vendor.pagination.default', ['paginator' => $receitas])->render(),
-                    'success' => true
+                    'list' => $view,
+                    'pagination' => $receitas->render()
                 ]);
             }
 
-            // Buscar apenas as categorias com tipo "receita"
-            $categorias = Categoria::where('tipo', 'receita')->get();
-
-            // Retornar a view com as receitas, categorias e tipos
             return view('receitas.index', compact('receitas', 'categorias', 'tiposHeader'));
-
         } catch (\Exception $e) {
+            Log::error('Erro ao carregar receitas:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Não foi possível carregar as receitas. Tente novamente.',
+                    'message' => 'Erro ao carregar receitas',
                     'list' => view('receitas._list', ['receitas' => collect()])->render(),
                     'pagination' => ''
-                ], 200);
+                ]);
             }
-            
+
             throw $e;
         }
     }
@@ -72,27 +85,28 @@ class ReceitaController extends Controller
 
     public function show($categoriaSlug, $slug)
     {
-        // Carregar todos os tipos para o submenu
+        // Carregar tipos para o submenu
         $tiposHeader = Tipo::orderBy('ordem')->get();
 
         // Buscar a categoria
-        $categoria = Categoria::where('slug', $categoriaSlug)->firstOrFail();
+        $categoria = Categoria::where('slug', $categoriaSlug)
+            ->where('tipo', 'receita')
+            ->firstOrFail();
 
         // Buscar a receita pelo slug e categoria
         $receita = Receita::where('slug', $slug)
             ->where('categoria_id', $categoria->id)
-            ->where('status', 'publicada')
+            ->where('status', 'publicado')
             ->firstOrFail();
 
         // Buscar sugestões de receitas
         $sugestoes = Receita::where('categoria_id', $categoria->id)
             ->where('id', '!=', $receita->id)
-            ->where('status', 'publicada')
+            ->where('status', 'publicado')
             ->inRandomOrder()
             ->take(4)
             ->get();
 
-        // Retornar a view com a receita, categoria e sugestões
         return view('receitas.show', compact('receita', 'categoria', 'sugestoes', 'tiposHeader'));
     }
 
@@ -126,21 +140,55 @@ class ReceitaController extends Controller
 
     public function curtir($id)
     {
-        $receita = Receita::findOrFail($id);
-        $cookieName = 'receita_curtida_' . $id;
+        try {
+            Log::info('Iniciando curtida', ['receita_id' => $id]);
 
-        if (Cookie::has($cookieName)) {
+            $receita = Receita::findOrFail($id);
+            $cookieName = 'receita_curtida_' . $id;
+
+            // Log para verificar cookies
+            Log::info('Verificando cookies', [
+                'todos_cookies' => request()->cookies->all(),
+                'cookie_especifico' => request()->cookie($cookieName)
+            ]);
+
+            if (request()->cookie($cookieName)) {
+                Log::info('Tentativa de curtir novamente', ['receita_id' => $id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Você já curtiu esta receita',
+                    'curtidas' => $receita->curtidas
+                ], 403);
+            }
+
+            // Incrementa curtidas
+            $receita->increment('curtidas');
+
+            Log::info('Curtida realizada', [
+                'receita_id' => $id,
+                'curtidas_anterior' => $receita->curtidas - 1,
+                'curtidas_atual' => $receita->curtidas
+            ]);
+
+            // Cria o cookie
+            $cookie = cookie($cookieName, true, 60 * 24 * 30); // 30 dias
+
             return response()->json([
-                'error' => 'Você já curtiu esta receita',
+                'success' => true,
+                'message' => 'Receita curtida com sucesso',
                 'curtidas' => $receita->curtidas
-            ], 403);
+            ])->withCookie($cookie);
+        } catch (\Exception $e) {
+            Log::error('Erro ao curtir receita', [
+                'receita_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao curtir receita'
+            ], 500);
         }
-
-        $receita->increment('curtidas');
-
-        return response()->json([
-            'curtidas' => $receita->curtidas,
-            'message' => 'Receita curtida com sucesso'
-        ])->cookie($cookieName, true, 60 * 24 * 30); // Cookie válido por 30 dias
     }
 }

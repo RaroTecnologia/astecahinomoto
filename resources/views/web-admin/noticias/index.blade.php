@@ -61,6 +61,17 @@
 <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
     <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h2 class="text-xl font-bold mb-4">Criar Nova Notícia</h2>
+
+        @if ($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <form id="newsForm" action="{{ route('web-admin.noticias.store') }}" method="POST">
             @csrf
             <!-- Campo de Título -->
@@ -82,26 +93,73 @@
 
 @section('scripts')
 <script>
-    // Abrir o modal
-    document.getElementById('openModalBtn').addEventListener('click', function() {
-        const modal = document.getElementById('modal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM carregado, iniciando setup do modal...');
 
-    // Fechar o modal
-    document.getElementById('closeModalBtn').addEventListener('click', function() {
         const modal = document.getElementById('modal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    });
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const createAndEditBtn = document.getElementById('createAndEditBtn');
+        const newsForm = document.getElementById('newsForm');
 
-    // Enviar o formulário e redirecionar para a edição
-    document.getElementById('createAndEditBtn').addEventListener('click', function(event) {
-        event.preventDefault();
-        const form = document.getElementById('newsForm');
-        form.action = "{{ route('web-admin.noticias.store') }}?redirect=edit";
-        form.submit();
+        // Verificar se todos os elementos foram encontrados
+        console.log('Elementos encontrados:', {
+            modal: !!modal,
+            openModalBtn: !!openModalBtn,
+            closeModalBtn: !!closeModalBtn,
+            createAndEditBtn: !!createAndEditBtn,
+            newsForm: !!newsForm
+        });
+
+        // Abrir o modal
+        openModalBtn.addEventListener('click', function() {
+            console.log('Abrindo modal...');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        });
+
+        // Fechar o modal
+        closeModalBtn.addEventListener('click', function() {
+            console.log('Fechando modal...');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            newsForm.reset(); // Limpa o formulário ao fechar
+        });
+
+        // Enviar o formulário
+        createAndEditBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            console.log('Tentando enviar formulário...');
+
+            const titulo = document.getElementById('titulo').value;
+            console.log('Título:', titulo);
+
+            if (!titulo) {
+                console.error('Título é obrigatório');
+                alert('O título é obrigatório');
+                return;
+            }
+
+            try {
+                console.log('URL do formulário:', newsForm.action);
+                newsForm.action = "{{ route('web-admin.noticias.store') }}?redirect=edit";
+                console.log('Nova URL do formulário:', newsForm.action);
+
+                newsForm.submit();
+            } catch (error) {
+                console.error('Erro ao submeter formulário:', error);
+            }
+        });
+
+        // Fechar modal clicando fora
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                console.log('Fechando modal por clique externo...');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                newsForm.reset();
+            }
+        });
     });
 </script>
 @endsection

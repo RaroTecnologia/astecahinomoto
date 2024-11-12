@@ -15,8 +15,10 @@
     <!-- Título da Receita -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Imagem da Receita -->
-        <div class="relative">
-            <img src="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}" alt="{{ $receita->nome }}" class="w-full rounded-lg shadow-lg object-cover">
+        <div>
+            <img src="{{ $receita->imagem ? asset('storage/receitas/' . $receita->imagem) : 'assets/sem_imagem.png' }}"
+                alt="{{ $receita->nome }}"
+                class="w-full h-[600px] rounded-lg shadow-lg object-cover">
 
             <!-- Botões de Compartilhar e Curtir -->
             <div class="flex space-x-4 mt-4">
@@ -101,13 +103,6 @@
             const iconeCurtir = document.getElementById('iconeCurtir');
             const textoCurtir = document.getElementById('textoCurtir');
 
-            // Verifica se já curtiu ao carregar
-            if (document.cookie.includes('receita_curtida_' + receitaId)) {
-                setEstadoCurtido();
-                return; // Não adiciona o evento de clique se já estiver curtido
-            }
-
-            // Função para atualizar o estado visual
             function setEstadoCurtido() {
                 iconeCurtir.classList.remove('fa-regular');
                 iconeCurtir.classList.add('fa-solid');
@@ -116,35 +111,59 @@
                 botaoCurtir.classList.remove('hover:text-red-600');
             }
 
-            // Adiciona evento de clique apenas se não estiver curtido
+            // Verifica cookies
+            const cookieName = 'receita_curtida_' + receitaId;
+            const hasCookie = document.cookie.split(';').some(item => item.trim().startsWith(cookieName + '='));
+            console.log('Cookie check:', {
+                cookieName,
+                hasCookie,
+                allCookies: document.cookie
+            });
+
+            if (hasCookie) {
+                console.log('Receita já curtida anteriormente');
+                setEstadoCurtido();
+                return;
+            }
+
             botaoCurtir.addEventListener('click', function() {
-                fetch('/receitas/' + receitaId + '/curtir', {
+                console.log('Tentando curtir receita:', receitaId);
+
+                fetch(`/receitas/${receitaId}/curtir`, {
                         method: 'POST',
                         headers: {
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
                             'Accept': 'application/json'
-                        }
+                        },
+                        credentials: 'same-origin'
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
                     .then(data => {
-                        const numeroCurtidas = document.getElementById('numeroCurtidas');
+                        console.log('Response data:', data);
 
-                        if (numeroCurtidas) {
-                            numeroCurtidas.textContent = `(${data.curtidas})`;
+                        if (data.success) {
+                            // Atualiza o número de curtidas
+                            const numeroCurtidas = document.getElementById('numeroCurtidas');
+                            if (numeroCurtidas) {
+                                numeroCurtidas.textContent = `(${data.curtidas})`;
+                            }
+
+                            // Atualiza o visual do botão
+                            iconeCurtir.classList.remove('fa-regular');
+                            iconeCurtir.classList.add('fa-solid');
+                            textoCurtir.textContent = 'Curtido!';
+
+                            setTimeout(setEstadoCurtido, 2000);
+                        } else {
+                            console.error('Erro ao curtir:', data.message);
                         }
-
-                        // Animação de curtida bem-sucedida
-                        iconeCurtir.classList.remove('fa-regular');
-                        iconeCurtir.classList.add('fa-solid');
-                        textoCurtir.textContent = 'Curtido!';
-
-                        // Após um tempo, finaliza o estado
-                        setTimeout(() => {
-                            setEstadoCurtido();
-                        }, 2000);
                     })
                     .catch(error => {
-                        console.error('Erro:', error);
+                        console.error('Erro na requisição:', error);
                     });
             });
         }

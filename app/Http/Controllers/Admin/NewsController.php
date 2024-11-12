@@ -14,25 +14,136 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
+        Log::info('Iniciando listagem de notícias', [
+            'filtros' => $request->all()
+        ]);
+
         $query = Noticia::with('categoria');
 
         if ($request->filled('busca')) {
+            Log::info('Aplicando filtro de busca', ['termo' => $request->busca]);
             $query->where('titulo', 'like', '%' . $request->busca . '%');
         }
 
         $noticias = $query->paginate(10);
+
+        Log::info('Notícias carregadas', [
+            'total' => $noticias->total(),
+            'por_pagina' => $noticias->perPage(),
+            'pagina_atual' => $noticias->currentPage()
+        ]);
 
         return view('web-admin.noticias.index', compact('noticias'));
     }
 
     public function create()
     {
+        Log::info('Acessando formulário de criação de notícia');
         $categorias = Categoria::where('tipo', 'noticia')->get();
+
+        Log::info('Categorias carregadas', [
+            'total_categorias' => $categorias->count(),
+            'categorias' => $categorias->pluck('nome', 'id')
+        ]);
+
         return view('web-admin.noticias.create', compact('categorias'));
     }
 
     public function store(Request $request)
     {
+        try {
+            Log::info('Iniciando criação de notícia', [
+                'dados' => $request->all(),
+                'headers' => $request->headers->all(),
+                'method' => $request->method(),
+                'url' => $request->url(),
+                'query_params' => $request->query()
+            ]);
+
+            // Validação
+            $validator = validator($request->all(), [
+                'titulo' => 'required|string|max:255',
+                'conteudo' => 'nullable|string',
+                'status' => 'nullable|string|max:20',
+                'categoria_id' => 'nullable|exists:categorias,id',
+                'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+                'publicado_em' => 'nullable|date',
+            ]);
+
+            if ($validator->fails()) {
+                Log::error('Erro de validação', [
+                    'erros' => $validator->errors()->toArray()
+                ]);
+                return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            $data = $validator->validated();
+            $data['slug'] = Str::slug($data['titulo']);
+
+            // Define status padrão se não foi enviado
+            $data['status'] = $data['status'] ?? 'rascunho';
+
+            Log::info('Dados validados', ['data' => $data]);
+
+            // Criar a notícia
+            $noticia = Noticia::create($data);
+
+            Log::info('Notícia criada com sucesso', [
+                'id' => $noticia->id,
+                'titulo' => $noticia->titulo,
+                'slug' => $noticia->slug
+            ]);
+
+            if ($request->query('redirect') === 'edit') {
+                $redirectUrl = route('web-admin.noticias.edit', $noticia->id);
+                Log::info('Redirecionando para edição', ['url' => $redirectUrl]);
+
+                return redirect($redirectUrl)
+                    ->with('success', 'Notícia criada com sucesso e pronta para edição.');
+            }
+
+            Log::info('Redirecionando para listagem');
+            return redirect()->route('web-admin.noticias.index')
+                ->with('success', 'Notícia criada com sucesso.');
+        } catch (\Exception $e) {
+            Log::error('Erro ao criar notícia', [
+                'erro' => $e->getMessage(),
+                'linha' => $e->getLine(),
+                'arquivo' => $e->getFile(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+
+            return redirect()->back()
+                ->withErrors('Ocorreu um erro ao criar a notícia: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function edit(Noticia $noticia)
+    {
+        Log::info('Acessando edição de notícia', ['id' => $noticia->id]);
+        $categorias = Categoria::where('tipo', 'noticia')->get();
+
+        Log::info('Dados carregados para edição', [
+            'noticia' => $noticia->toArray(),
+            'total_categorias' => $categorias->count()
+        ]);
+
+        return view('web-admin.noticias.edit', compact('noticia', 'categorias'));
+    }
+
+    public function update(Request $request, Noticia $noticia)
+    {
+        Log::info('Iniciando atualização da notícia', [
+            'id' => $noticia->id,
+            'dados_atuais' => $noticia->toArray(),
+            'dados_novos' => $request->except('imagem'),
+            'tem_imagem_nova' => $request->hasFile('imagem')
+        ]);
+
         try {
             $data = $request->validate([
                 'titulo' => 'required|string|max:255',
@@ -46,81 +157,75 @@ class NewsController extends Controller
             $data['slug'] = Str::slug($data['titulo']);
 
             if ($request->hasFile('imagem')) {
+                Log::info('Processando nova imagem', [
+                    'imagem_antiga' => $noticia->imagem
+                ]);
+
+                $this->deleteImage($noticia);
+                Log::info('Imagem antiga deletada');
+
                 $file = $request->file('imagem');
                 $fileName = $file->hashName();
+
+                Log::info('Salvando nova imagem', [
+                    'nome_original' => $file->getClientOriginalName(),
+                    'nome_hash' => $fileName
+                ]);
 
                 $file->storeAs('noticias', $fileName, 'public');
                 $data['imagem'] = $fileName;
 
                 $thumbnailPath = storage_path('app/public/noticias/thumbnails/' . $fileName);
                 $this->resizeImage($file->getPathname(), $thumbnailPath, 300, 300);
+                Log::info('Nova thumbnail criada');
             }
 
-            $noticia = Noticia::create($data);
+            $noticia->update($data);
+            Log::info('Notícia atualizada com sucesso', [
+                'id' => $noticia->id,
+                'dados_atualizados' => $data
+            ]);
 
-            if ($request->query('redirect') === 'edit') {
-                return redirect()->route('web-admin.noticias.edit', $noticia->id)->with('success', 'Notícia criada com sucesso e pronta para edição.');
-            }
-
-            return redirect()->route('web-admin.noticias.index')->with('success', 'Notícia criada com sucesso.');
+            return redirect()->route('web-admin.noticias.index')
+                ->with('success', 'Notícia atualizada com sucesso!');
         } catch (\Exception $e) {
-            Log::error('Erro ao criar notícia: ' . $e->getMessage());
-            return redirect()->back()->withErrors('Ocorreu um erro ao criar a notícia.');
+            Log::error('Erro ao atualizar notícia', [
+                'id' => $noticia->id,
+                'erro' => $e->getMessage(),
+                'linha' => $e->getLine(),
+                'arquivo' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->withErrors('Ocorreu um erro ao atualizar a notícia.');
         }
-    }
-
-    public function edit(Noticia $noticia)
-    {
-        $categorias = Categoria::where('tipo', 'noticia')->get();
-        return view('web-admin.noticias.edit', compact('noticia', 'categorias'));
-    }
-
-    public function update(Request $request, Noticia $noticia)
-    {
-        Log::info('Iniciando atualização da notícia');
-        Log::info('Todos os dados recebidos:', $request->all());
-
-        $data = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'conteudo' => 'nullable|string',
-            'status' => 'nullable|string|max:20',
-            'categoria_id' => 'nullable|exists:categorias,id',
-            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'publicado_em' => 'nullable|date',
-        ]);
-
-        $data['slug'] = Str::slug($data['titulo']);
-
-        if ($request->hasFile('imagem')) {
-            $this->deleteImage($noticia);
-
-            $file = $request->file('imagem');
-            $fileName = $file->hashName();
-
-            $file->storeAs('noticias', $fileName, 'public');
-            $data['imagem'] = $fileName;
-
-            $thumbnailPath = storage_path('app/public/noticias/thumbnails/' . $fileName);
-            $this->resizeImage($file->getPathname(), $thumbnailPath, 300, 300);
-        }
-
-        Log::info('Atualizando notícia com os dados:', $data);
-        $noticia->update($data);
-        Log::info('Notícia atualizada. Novo conteúdo:', ['conteudo' => $noticia->conteudo]);
-
-        return redirect()->route('web-admin.noticias.index')->with('success', 'Notícia atualizada com sucesso!');
     }
 
     public function destroy(Noticia $noticia)
     {
         try {
-            $this->deleteImage($noticia);
-            $noticia->delete();
+            Log::info('Iniciando exclusão de notícia', [
+                'id' => $noticia->id,
+                'dados' => $noticia->toArray()
+            ]);
 
-            return redirect()->route('web-admin.noticias.index')->with('success', 'Notícia excluída com sucesso.');
+            $this->deleteImage($noticia);
+            Log::info('Imagens da notícia deletadas');
+
+            $noticia->delete();
+            Log::info('Notícia excluída com sucesso');
+
+            return redirect()->route('web-admin.noticias.index')
+                ->with('success', 'Notícia excluída com sucesso.');
         } catch (\Exception $e) {
-            Log::error('Erro ao excluir notícia: ' . $e->getMessage());
-            return redirect()->route('web-admin.noticias.index')->withErrors('Ocorreu um erro ao excluir a notícia.');
+            Log::error('Erro ao excluir notícia', [
+                'id' => $noticia->id,
+                'erro' => $e->getMessage(),
+                'linha' => $e->getLine(),
+                'arquivo' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('web-admin.noticias.index')
+                ->withErrors('Ocorreu um erro ao excluir a notícia.');
         }
     }
 

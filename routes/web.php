@@ -107,8 +107,12 @@ Route::controller(ReceitaController::class)->group(function () {
     Route::get('/receitas', 'index')->name('receitas.index');
     Route::get('/receitas/categoria/{slug}', 'categoriasReceitas')->name('receitas.categoria');
     Route::get('/receitas/{categoria}/{slug}', 'show')->name('receitas.show');
-    Route::post('/receitas/{id}/curtir', [ReceitaController::class, 'curtir'])->name('receitas.curtir');
 });
+
+// Rota de curtir separada
+Route::post('/receitas/{id}/curtir', [ReceitaController::class, 'curtir'])
+    ->name('receitas.curtir')
+    ->middleware('web'); // Garante que o CSRF e cookies funcionem
 
 // API Routes
 Route::get('/api/produtos/filtrar/{categoria}/{subcategoria?}', [ProdutoController::class, 'filtrarCategoria'])->name('produtos.filtrar.ajax');
