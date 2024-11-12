@@ -24,7 +24,7 @@
 
     <!-- Imagem da Notícia -->
     <div class="mb-8">
-        <img src="{{ $noticia->imagem_url }}" alt="{{ $noticia->titulo }}" class="w-full rounded-lg shadow-lg object-cover">
+        <img src="{{ asset('storage/noticias/' . $noticia->imagem) ?? asset('assets/sem_imagem.png') }}" alt="{{ $noticia->titulo }}" class="w-full rounded-lg shadow-lg object-cover">
     </div>
 
     <!-- Corpo da Notícia -->
