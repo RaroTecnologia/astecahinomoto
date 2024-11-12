@@ -77,10 +77,12 @@
             <!-- Imagem do SKU (ocupando duas colunas) -->
             <div class="col-span-2">
                 <div class="mb-4">
-                    <label for="imagem_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Imagem do SKU</label>
-                    <input type="file" name="imagem" id="imagem_{{ $sku->id ?? 'new' }}" class="w-full px-4 py-2 border rounded-lg">
+                    <label for="imagem_upload_{{ $sku->id ?? 'new' }}" class="block text-sm font-medium text-gray-700">Imagem do SKU</label>
+                    <input type="file" name="imagem" id="imagem_upload_{{ $sku->id ?? 'new' }}" class="w-full px-4 py-2 border rounded-lg">
                     @if(isset($sku->imagem))
-                    <img src="{{ asset('storage/skus/' . $sku->imagem) }}" alt="Imagem do SKU" class="mt-2 h-32">
+                    <img id="imagem_preview_{{ $sku->id ?? 'new' }}" src="{{ asset('storage/skus/thumbnails/' . $sku->imagem) }}" alt="Imagem do SKU" class="mt-2 h-32">
+                    @else
+                    <img id="imagem_preview_{{ $sku->id ?? 'new' }}" src="#" alt="Pré-visualização da Imagem" class="mt-2 h-32 hidden">
                     @endif
                 </div>
             </div>
@@ -126,6 +128,22 @@
                     label.classList.add('text-gray-500');
                 }
             });
+        });
+
+        // Pré-visualização da imagem após o upload
+        document.getElementById('imagem_upload_{{ $sku->id ?? '
+            new ' }}').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagem_preview_{{ $sku->id ?? '
+                        new ' }}');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
         });
     });
 </script>

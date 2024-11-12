@@ -63,11 +63,13 @@
     <!-- Imagem do Produto -->
     <div class="mb-4">
         <label for="imagem" class="block text-sm font-medium text-gray-700">Imagem do Produto</label>
-        <input type="file" name="imagem" id="imagem" class="w-full px-4 py-2 border rounded-lg">
+        <input type="file" name="imagem" id="imagem_upload" class="w-full px-4 py-2 border rounded-lg">
         @if ($produto->imagem)
         <div class="mt-2">
-            <img src="{{ asset('storage/produtos/' . $produto->imagem) }}" alt="{{ $produto->nome }}" class="w-32 h-32 object-cover rounded">
+            <img id="imagem_preview" src="{{ asset('storage/produtos/thumbnails/' . $produto->imagem) }}" alt="{{ $produto->nome }}" class="w-32 h-32 object-cover rounded">
         </div>
+        @else
+        <img id="imagem_preview" src="#" alt="Pré-visualização da Imagem" class="mt-2 h-32 hidden">
         @endif
     </div>
 
@@ -109,6 +111,20 @@
                     console.error('Erro:', error);
                     notyf.error('Erro ao atualizar produto');
                 });
+        });
+
+        // Pré-visualização da imagem após o upload
+        document.getElementById('imagem_upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagem_preview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
         });
     });
 </script>
