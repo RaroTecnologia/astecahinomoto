@@ -38,7 +38,7 @@
                         <span class="font-semibold">Catálogo Digital</span>
                     </span>
                 </a>
-                <p class="text-gray-300 mt-2 text-sm max-w-[200px] text-center md:text-right">
+                <p class="text-white mt-2 text-sm max-w-[200px] text-center md:text-right">
                     Conheça todos os nossos produtos em nosso catálogo completo
                 </p>
             </div>

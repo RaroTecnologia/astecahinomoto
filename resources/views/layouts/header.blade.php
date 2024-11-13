@@ -35,7 +35,7 @@
                     <div class="px-2">
                         @foreach($tiposHeader as $tipo)
                         <a href="{{ route('marcas.tipo', $tipo->slug) }}" class="flex items-center space-x-3 px-4 py-3 text-white hover:bg-red-900">
-                            <img src="{{ asset('images/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-6 h-6">
+                            <img src="{{ asset('assets/' . $tipo->slug . '_icon.png') }}" alt="{{ $tipo->nome }}" class="w-6 h-6">
                             <span>{{ $tipo->nome }}</span>
                         </a>
                         @endforeach

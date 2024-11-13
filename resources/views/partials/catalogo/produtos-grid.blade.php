@@ -1,4 +1,4 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     @foreach($skus as $sku)
     @php
     // Encontra a categoria marca (parent até chegar no nível marca)
