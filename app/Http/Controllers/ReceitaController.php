@@ -18,6 +18,7 @@ class ReceitaController extends Controller
         try {
             // Pegar todas as categorias do tipo receita
             $categorias = Categoria::where('tipo', 'receita')
+                ->where('nome', '!=', 'Receitas')
                 ->orderBy('nome')
                 ->get();
 

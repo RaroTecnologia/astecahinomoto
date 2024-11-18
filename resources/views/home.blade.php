@@ -142,8 +142,9 @@
             <!-- Grid de receitas -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 @foreach($receitas as $receita)
-                <div class="relative bg-white rounded-lg shadow-lg overflow-hidden">
-                    <div class="absolute top-2 md:top-4 left-2 md:left-4 bg-yellow-500 text-white text-xs font-semibold py-1 px-2 md:px-3 rounded-full">
+                <a href="{{ route('receitas.show', ['categoria' => $receita->categoria->slug ?? 'sem-categoria', 'slug' => $receita->slug]) }}"
+                    class="group relative bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <div class="absolute top-2 md:top-4 left-2 md:left-4 bg-yellow-500 text-white text-xs font-semibold py-1 px-2 md:px-3 rounded-full z-10">
                         @if($receita->categoria)
                         {{ $receita->categoria->nome }}
                         @endif
@@ -151,13 +152,13 @@
 
                     <img src="{{ $receita->imagem ? asset('storage/receitas/thumbnails/' . $receita->imagem) : asset('assets/sem_imagem.png') }}"
                         alt="{{ $receita->nome }}"
-                        class="w-full h-32 md:h-48 object-cover">
+                        class="w-full h-32 md:h-48 object-cover group-hover:scale-105 transition-transform duration-300">
 
                     <div class="p-2 md:p-4">
                         <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-1 md:mb-2">{{ $receita->nome }}</h3>
                         <p class="text-sm md:text-base text-gray-600">{{ Str::limit($receita->chamada, 60) }}</p>
                     </div>
-                </div>
+                </a>
                 @endforeach
             </div>
         </div>
