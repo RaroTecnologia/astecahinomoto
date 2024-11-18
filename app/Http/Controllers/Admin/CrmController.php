@@ -15,12 +15,30 @@ class CrmController extends Controller
 {
     public function index()
     {
-        $contatos = Contato::with(['anotacoes.user', 'usuarioAtribuido'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-        $usuarios = User::all();
+        try {
+            Log::info('Iniciando carregamento da página CRM');
 
-        return view('admin.crm.index', compact('contatos', 'usuarios'));
+            $contatos = Contato::with(['anotacoes.user', 'usuarioAtribuido'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $usuarios = User::all();
+
+            Log::info('Dados carregados com sucesso', [
+                'total_contatos' => $contatos->count(),
+                'total_usuarios' => $usuarios->count()
+            ]);
+
+            return view('web-admin.crm.index', compact('contatos', 'usuarios'));
+        } catch (\Exception $e) {
+            Log::error('Erro ao carregar página CRM', [
+                'erro' => $e->getMessage(),
+                'linha' => $e->getLine(),
+                'arquivo' => $e->getFile()
+            ]);
+
+            throw $e;
+        }
     }
 
     public function getDetails(Contato $contato)
