@@ -46,7 +46,7 @@
             <x-card-item
                 title="{{ $noticia->titulo }}"
                 description="{{ Str::limit($noticia->resumo, 100) }}"
-                image="{{ asset('storage/noticias/thumbnails/' . $noticia->imagem) }}"
+                image="{{ $noticia->imagem ? asset('storage/noticias/thumbnails/' . $noticia->imagem) : asset('assets/sem_imagem.png') }}"
                 link="{{ route('noticias.show', ['categoria' => $noticia->categoria->slug, 'slug' => $noticia->slug]) }}"
                 linkText="Ler Mais" />
             @endforeach
