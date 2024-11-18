@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CatalogoController extends Controller
 {
@@ -332,6 +333,111 @@ class CatalogoController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Erro ao carregar linhas: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function generatePdf(Request $request)
+    {
+        try {
+            Log::info('Iniciando geração de PDF do catálogo', [
+                'filtros' => $request->all()
+            ]);
+
+            $skusQuery = Sku::with([
+                'produto',
+                'produto.categoria',
+                'produto.categoria.parent'
+            ])
+                ->where('skus.is_active', 1)
+                ->whereHas('produto', function ($query) {
+                    $query->where('produtos.is_active', 1);
+                });
+
+            // Aplicar filtros usando a hierarquia de categorias
+            if ($marca = $request->input('marca')) {
+                $skusQuery->whereHas('produto.categoria', function ($query) use ($marca) {
+                    $query->where(function ($q) use ($marca) {
+                        $q->where('nivel', 'marca')
+                            ->where('slug', $marca)
+                            ->orWhereHas('children', function ($child) use ($marca) {
+                                $child->where('parent_id', function ($subquery) use ($marca) {
+                                    $subquery->select('id')
+                                        ->from('categorias')
+                                        ->where('slug', $marca)
+                                        ->where('nivel', 'marca');
+                                });
+                            });
+                    });
+                });
+            }
+
+            if ($produto = $request->input('produto')) {
+                $skusQuery->whereHas('produto.categoria', function ($query) use ($produto) {
+                    $query->where(function ($q) use ($produto) {
+                        $q->where('nivel', 'produto')
+                            ->where('slug', $produto)
+                            ->orWhereHas('children', function ($child) use ($produto) {
+                                $child->where('parent_id', function ($subquery) use ($produto) {
+                                    $subquery->select('id')
+                                        ->from('categorias')
+                                        ->where('slug', $produto)
+                                        ->where('nivel', 'produto');
+                                });
+                            });
+                    });
+                });
+            }
+
+            if ($linha = $request->input('linha')) {
+                $skusQuery->whereHas('produto.categoria', function ($query) use ($linha) {
+                    $query->where('nivel', 'linha')
+                        ->where('slug', $linha);
+                });
+            }
+
+            // Log da query para debug
+            Log::info('Query do PDF:', [
+                'sql' => $skusQuery->toSql(),
+                'bindings' => $skusQuery->getBindings()
+            ]);
+
+            $skus = $skusQuery->get();
+
+            Log::info('Produtos carregados para PDF', [
+                'total_produtos' => $skus->count()
+            ]);
+
+            $pdf = PDF::loadView('pdfs.catalogo', [
+                'skus' => $skus,
+                'filtros' => [
+                    'marca' => $request->marca,
+                    'produto' => $request->produto,
+                    'linha' => $request->linha
+                ]
+            ]);
+
+            $pdf->setPaper('a4', 'portrait');
+            $pdf->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'sans-serif',
+                'dpi' => 150,
+                'debugCss' => true
+            ]);
+
+            return $pdf->download('catalogo-asteca.pdf');
+        } catch (\Exception $e) {
+            Log::error('Erro ao gerar PDF do catálogo', [
+                'erro' => $e->getMessage(),
+                'linha' => $e->getLine(),
+                'arquivo' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => true,
+                'message' => 'Erro ao gerar PDF: ' . $e->getMessage()
             ], 500);
         }
     }

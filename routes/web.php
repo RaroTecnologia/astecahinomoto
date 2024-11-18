@@ -129,4 +129,5 @@ Route::controller(CatalogoController::class)->group(function () {
     Route::get('/api/catalogo/filtrar', 'filtrar')->name('catalogo.filtrar');
     Route::get('/api/catalogo/produtos/{marca}', 'getProdutos')->name('catalogo.produtos');
     Route::get('/api/catalogo/linhas/{produto}', 'getLinhas')->name('catalogo.linhas');
+    Route::get('/catalogo/pdf', 'generatePdf')->name('catalogo.pdf');
 });

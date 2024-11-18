@@ -454,4 +454,52 @@ document.addEventListener('DOMContentLoaded', function() {
         const page = link.dataset.page;
         updateProdutos(page);
     });
+
+    // Função para gerar PDF do catálogo
+    window.generatePDF = function() {
+        const loadingBtn = document.getElementById('generatePdfBtn');
+        const originalContent = loadingBtn.innerHTML;
+        
+        // Mostrar loading
+        loadingBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando PDF...';
+        loadingBtn.disabled = true;
+
+        // Pegar os slugs dos filtros atuais da URL
+        const url = new URL(window.location);
+        const marca = url.searchParams.get('marca') || '';
+        const produto = url.searchParams.get('produto') || '';
+        const linha = url.searchParams.get('linha') || '';
+
+        // Fazer a requisição
+        fetch(`/catalogo/pdf?marca=${marca}&produto=${produto}&linha=${linha}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erro ao gerar PDF');
+            return response.blob();
+        })
+        .then(blob => {
+            // Criar link para download
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'catalogo-asteca.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            // Restaurar botão
+            loadingBtn.innerHTML = originalContent;
+            loadingBtn.disabled = false;
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao gerar PDF. Tente novamente.');
+            loadingBtn.innerHTML = originalContent;
+            loadingBtn.disabled = false;
+        });
+    };
 }); 
