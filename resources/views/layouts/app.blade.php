@@ -17,6 +17,8 @@
     <!-- Importar os estilos do Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <script src="{{ asset('js/age-verification.js') }}"></script>
+
 </head>
 
 <body class="antialiased bg-white">

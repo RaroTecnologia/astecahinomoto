@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AgeVerificationMiddleware;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CatalogoController;
@@ -26,15 +27,21 @@ use App\Http\Controllers\Admin\SkuController as AdminSkuController;
 use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 use App\Http\Controllers\Admin\CrmController;
 
-// Rotas Públicas
-Route::controller(PaginaController::class)->group(function () {
-    Route::get('/sobre', 'sobre')->name('sobre');
-    Route::get('/fale-conosco', 'faleConosco')->name('fale-conosco');
-    Route::post('/fale-conosco/enviar', 'enviarContato')->name('fale-conosco.enviar');
-    Route::get('/politica-de-privacidade', 'politicaPrivacidade')->name('politica-privacidade');
-});
+// Rotas de verificação de idade (sem middleware)
+Route::get('/verificar-idade', function () {
+    return view('age-verification');
+})->name('verificar-idade');
 
-// Rotas de Autenticado com Middleware
+Route::get('/acesso-negado', function () {
+    return view('age-restriction');
+})->name('acesso-negado');
+
+Route::post('/api/verify-age', function () {
+    return response()->json(['success' => true])
+        ->cookie('age_verified', 'true', 60 * 24 * 180, null, null, false, false);
+})->name('api.verify-age');
+
+// Rotas administrativas (sem verificação de idade)
 Route::middleware(['auth'])->prefix('web-admin')->name('web-admin.')->group(function () {
     // Dashboard - acessível para todos os usuários autenticados
     Route::get('/', [WebAdminController::class, 'index'])->name('index');
@@ -76,58 +83,69 @@ Route::middleware(['auth'])->prefix('web-admin')->name('web-admin.')->group(func
     });
 });
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// Todas as outras rotas públicas com verificação de idade
+Route::middleware([AgeVerificationMiddleware::class])->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    
+    Route::controller(PaginaController::class)->group(function () {
+        Route::get('/sobre', 'sobre')->name('sobre');
+        Route::get('/fale-conosco', 'faleConosco')->name('fale-conosco');
+        Route::get('/politica-de-privacidade', 'politicaPrivacidade')->name('politica-privacidade');
+    });
 
-Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
+    // Rotas do catálogo
+    Route::controller(CatalogoController::class)->group(function () {
+        Route::get('/catalogo', 'index')->name('catalogo.index');
+        Route::get('/api/catalogo/filtrar', 'filtrar')->name('catalogo.filtrar');
+        Route::get('/api/catalogo/produtos/{marca}', 'getProdutos')->name('catalogo.produtos');
+        Route::get('/api/catalogo/linhas/{produto}', 'getLinhas')->name('catalogo.linhas');
+        Route::get('/catalogo/pdf', 'generatePdf')->name('catalogo.pdf');
+    });
 
-// Rotas para notícias (público)
-Route::controller(NoticiaController::class)->group(function () {
-    Route::get('/noticias', 'index')->name('noticias.index');
-    Route::get('/noticias/categoria/{slug}', 'categoriasNoticias')->name('noticias.categoria');
-    Route::get('/noticias/{categoria}/{slug}', 'show')->name('noticias.show');
+    // Rotas para notícias (público)
+    Route::controller(NoticiaController::class)->group(function () {
+        Route::get('/noticias', 'index')->name('noticias.index');
+        Route::get('/noticias/categoria/{slug}', 'categoriasNoticias')->name('noticias.categoria');
+        Route::get('/noticias/{categoria}/{slug}', 'show')->name('noticias.show');
+    });
+
+    // Rotas para marcas
+    Route::controller(MarcaController::class)->group(function () {
+        Route::get('/nossas-marcas', 'listarTipos')->name('marcas');
+        Route::get('/marcas', 'listarTipos')->name('marcas.tipos');
+        Route::get('/marcas/{tipoSlug}', 'listarMarcasPorTipo')->name('marcas.tipo');
+        Route::get('/marcas/{tipoSlug}/{slugMarca}', 'listarProdutosOuLinhasDaMarca')->name('marcas.produtos');
+        Route::get('/marcas/{tipoSlug}/{slugMarca}/{slugProduto}/{slugLinha?}', 'listarLinhasOuProdutos')->name('marcas.produtos.linhas');
+    });
+
+    // Rota para detalhe do produto
+    Route::controller(ProdutoController::class)->group(function () {
+        Route::get('/produto/{slugMarca}/{slugProduto}', [ProdutoController::class, 'show'])->name('produtos.show');
+    });
+
+    // Rotas para receitas
+    Route::controller(ReceitaController::class)->group(function () {
+        Route::get('/receitas', 'index')->name('receitas.index');
+        Route::get('/receitas/categoria/{slug}', 'categoriasReceitas')->name('receitas.categoria');
+        Route::get('/receitas/{categoria}/{slug}', 'show')->name('receitas.show');
+    });
+
+    // Rota de curtir separada
+    Route::post('/receitas/{id}/curtir', [ReceitaController::class, 'curtir'])
+        ->name('receitas.curtir')
+        ->middleware('web'); // Garante que o CSRF e cookies funcionem
+
+    // API Routes
+    Route::get('/api/produtos/filtrar/{categoria}/{subcategoria?}', [ProdutoController::class, 'filtrarCategoria'])->name('produtos.filtrar.ajax');
+    Route::get('/api/subcategorias/{slug}', [CategoriaController::class, 'getSubcategorias']);
+    Route::get('/api/search', [SearchController::class, 'search'])->name('api.search');
+    Route::get('/api/global-search', [SearchController::class, 'globalSearch'])->name('api.global-search');
 });
 
-// Rotas para marcas
-Route::controller(MarcaController::class)->group(function () {
-    Route::get('/nossas-marcas', 'listarTipos')->name('marcas');
-    Route::get('/marcas', 'listarTipos')->name('marcas.tipos');
-    Route::get('/marcas/{tipoSlug}', 'listarMarcasPorTipo')->name('marcas.tipo');
-    Route::get('/marcas/{tipoSlug}/{slugMarca}', 'listarProdutosOuLinhasDaMarca')->name('marcas.produtos');
-    Route::get('/marcas/{tipoSlug}/{slugMarca}/{slugProduto}/{slugLinha?}', 'listarLinhasOuProdutos')->name('marcas.produtos.linhas');
-});
-
-// Rota para detalhe do produto
-Route::controller(ProdutoController::class)->group(function () {
-    Route::get('/produto/{slugMarca}/{slugProduto}', [ProdutoController::class, 'show'])->name('produtos.show');
-});
-
-
-// Rotas para receitas
-Route::controller(ReceitaController::class)->group(function () {
-    Route::get('/receitas', 'index')->name('receitas.index');
-    Route::get('/receitas/categoria/{slug}', 'categoriasReceitas')->name('receitas.categoria');
-    Route::get('/receitas/{categoria}/{slug}', 'show')->name('receitas.show');
-});
-
-// Rota de curtir separada
-Route::post('/receitas/{id}/curtir', [ReceitaController::class, 'curtir'])
-    ->name('receitas.curtir')
-    ->middleware('web'); // Garante que o CSRF e cookies funcionem
-
-// API Routes
-Route::get('/api/produtos/filtrar/{categoria}/{subcategoria?}', [ProdutoController::class, 'filtrarCategoria'])->name('produtos.filtrar.ajax');
-Route::get('/api/subcategorias/{slug}', [CategoriaController::class, 'getSubcategorias']);
+// Rotas de API e outras que não precisam de verificação de idade
+Route::post('/fale-conosco/enviar', [PaginaController::class, 'enviarContato'])->name('fale-conosco.enviar');
 Route::get('/api/search', [SearchController::class, 'search'])->name('api.search');
 Route::get('/api/global-search', [SearchController::class, 'globalSearch'])->name('api.global-search');
 
 // Rotas de autenticação
 require __DIR__ . '/auth.php';
-
-// Rotas do Catálogo
-Route::controller(CatalogoController::class)->group(function () {
-    Route::get('/catalogo', 'index')->name('catalogo.index');
-    Route::get('/api/catalogo/filtrar', 'filtrar')->name('catalogo.filtrar');
-    Route::get('/api/catalogo/produtos/{marca}', 'getProdutos')->name('catalogo.produtos');
-    Route::get('/api/catalogo/linhas/{produto}', 'getLinhas')->name('catalogo.linhas');
-    Route::get('/catalogo/pdf', 'generatePdf')->name('catalogo.pdf');
-});

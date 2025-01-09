@@ -31,6 +31,9 @@ class CatalogoController extends Controller
 
         // Carregar SKUs iniciais
         $skus = Sku::with(['produto.categoria'])
+            ->whereHas('produto', function($query) {
+                $query->whereHas('categoria');
+            })
             ->paginate(24);
 
         if ($request->ajax()) {

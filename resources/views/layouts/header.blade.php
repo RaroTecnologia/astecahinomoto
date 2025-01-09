@@ -8,10 +8,18 @@
                 <img src="{{ asset('assets/astecahinomoto_logo.png') }}" alt="Logo Asteca Hinomoto" class="w-20">
             </a>
 
-            <!-- Botão Hamburger -->
-            <button id="mobile-menu-button" class="text-white text-2xl">
-                <i class="fas fa-bars"></i>
-            </button>
+            <!-- Botões Mobile -->
+            <div class="flex items-center gap-4">
+                <!-- Botão de Busca -->
+                <button id="mobile-search-button" class="text-white text-2xl">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <!-- Botão Hamburger -->
+                <button id="mobile-menu-button" class="text-white text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -307,3 +315,27 @@
         }
     }
 </script>
+
+<script>
+    document.getElementById('mobile-search-button').addEventListener('click', function() {
+        // Aqui você pode implementar a lógica de busca
+        // Por exemplo, abrir um modal ou redirecionar para a página de busca
+        // Exemplo básico:
+        const searchForm = document.querySelector('.search-form'); // ajuste o seletor conforme sua estrutura
+        if (searchForm) {
+            searchForm.classList.toggle('hidden');
+        }
+    });
+</script>
+
+<div class="search-form hidden absolute top-full left-0 w-full bg-white p-4 shadow-lg">
+    <form action="/busca" method="GET" class="flex items-center">
+        <input type="text" 
+               name="q" 
+               placeholder="O que você procura?" 
+               class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:border-blue-500">
+        <button type="submit" class="bg-blue-500 text-white p-2 rounded-r">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+</div>

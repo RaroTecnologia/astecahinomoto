@@ -14,21 +14,12 @@
         <p class="text-gray-600">Explore nossa linha completa de produtos</p>
     </div>
 
-    <!-- Autocomplete Search e Botão PDF -->
+    <!-- Autocomplete Search -->
     <div class="flex items-start gap-4 mb-16">
         <!-- Autocomplete Search -->
         <div class="flex-grow">
             <x-autocomplete context="produtos" placeholder="produtos" />
         </div>
-
-        <!-- Botão PDF -->
-        <button
-            id="generatePdfBtn"
-            class="h-10 flex items-center gap-2 px-4 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 shadow-sm"
-            onclick="generatePDF()">
-            <i class="fas fa-file-pdf"></i>
-            Gerar PDF
-        </button>
     </div>
 
     <!-- Filtros -->

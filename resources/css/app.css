@@ -147,3 +147,9 @@
     background-color: #aaa; /* Cor do "polegar" ao passar o mouse */
 }
 
+@layer components {
+    .age-verification-bg {
+        @apply bg-gradient-to-b from-vermelho-asteca/90 to-vermelho-asteca/80;
+    }
+}
+
