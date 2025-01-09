@@ -23,21 +23,17 @@ class ReceitaController extends Controller
                 ->get();
 
             // Query base
-            $query = Receita::with('categoria')->where('status', 'publicado');
+            $query = Receita::with(['categoria']) // Eager loading para evitar N+1
+                ->where('status', 'publicado');
 
             // Filtrar por categoria se especificado
-            if ($request->has('categoria')) {
-                $categoria = Categoria::where('slug', $request->categoria)
-                    ->where('tipo', 'receita')
-                    ->first();
-
-                if ($categoria) {
-                    $query->where('categoria_id', $categoria->id);
-                }
+            if ($request->filled('categoria')) {
+                $query->where('categoria_id', $request->categoria);
             }
 
             // Ordenação
-            switch ($request->get('order')) {
+            $order = $request->get('order', 'recent');
+            switch ($order) {
                 case 'recent':
                     $query->latest();
                     break;
@@ -45,21 +41,21 @@ class ReceitaController extends Controller
                     $query->orderBy('curtidas', 'desc');
                     break;
                 default:
-                    $query->latest(); // Ordenação padrão
+                    $query->latest();
             }
 
             // Executar a query com paginação
-            $receitas = $query->paginate(12);
+            $receitas = $query->paginate(12)->withQueryString(); // Adiciona withQueryString() para manter os filtros
 
             // Carregar tipos para o submenu
             $tiposHeader = Tipo::orderBy('ordem')->get();
 
             // Se for uma requisição AJAX, retornar JSON
             if ($request->ajax()) {
-                $view = View::make('receitas._list', compact('receitas'))->render();
                 return response()->json([
-                    'list' => $view,
-                    'pagination' => $receitas->render()
+                    'success' => true,
+                    'html' => view('receitas._list', compact('receitas'))->render(),
+                    'pagination' => view('vendor.pagination.custom', ['paginator' => $receitas])->render()
                 ]);
             }
 
@@ -69,15 +65,6 @@ class ReceitaController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Erro ao carregar receitas',
-                    'list' => view('receitas._list', ['receitas' => collect()])->render(),
-                    'pagination' => ''
-                ]);
-            }
 
             throw $e;
         }

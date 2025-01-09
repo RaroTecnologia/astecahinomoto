@@ -71,26 +71,21 @@
     </div>
 
     <!-- Lista de Receitas -->
-    <div id="recipes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         @forelse($receitas as $receita)
-        <x-card-item
-            title="{{ $receita->nome }}"
-            description="{{ Str::limit($receita->chamada, 100) }}"
-            image="{{ $receita->imagem ? asset('storage/receitas/thumbnails/' . $receita->imagem) : asset('assets/sem_imagem.png') }}"
-            link="{{ route('receitas.show', ['categoria' => $receita->categoria->slug, 'slug' => $receita->slug]) }}"
-            linkText="Ver Receita" />
+            @include('receitas._card', ['receita' => $receita])
         @empty
-        <div class="col-span-full flex flex-col items-center justify-center py-12">
-            <i class="fas fa-utensils text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-600">Nenhuma receita disponível</h3>
-            <p class="text-gray-500 mt-2">No momento não há receitas publicadas nesta categoria.</p>
-        </div>
+            <div class="col-span-full flex flex-col items-center justify-center py-12">
+                <i class="fas fa-utensils text-6xl text-gray-300 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600">Nenhuma receita disponível</h3>
+                <p class="text-gray-500 mt-2">No momento não há receitas publicadas nesta categoria.</p>
+            </div>
         @endforelse
     </div>
 
     <!-- Paginação -->
-    <div class="mt-8">
-        {{ $receitas->links() }}
+    <div id="paginacao-container" class="mt-8">
+        {{ $receitas->links('vendor.pagination.custom') }}
     </div>
 </div>
 @endsection
@@ -149,28 +144,33 @@
             showSkeletons();
 
             fetch(currentUrl.toString(), {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    renderResults(data);
-                    document.querySelector('.mt-8').innerHTML = data.pagination;
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const recipesContainer = document.querySelector('.grid');
+                    const paginationContainer = document.querySelector('#paginacao-container');
+                    
+                    recipesContainer.innerHTML = data.html;
+                    paginationContainer.innerHTML = data.pagination;
+                    
                     window.history.pushState({}, '', currentUrl.toString());
 
-                    // Atualiza classes ativas das categorias com transição
+                    // Atualiza classes ativas das categorias
                     document.querySelectorAll('.category-link').forEach(link => {
                         const isActive = link.dataset.category === (params.categoria || '');
-                        link.style.transition = 'all 0.3s ease';
                         link.classList.toggle('bg-vermelho-asteca', isActive);
                         link.classList.toggle('text-white', isActive);
                         link.classList.toggle('bg-gray-100', !isActive);
                         link.classList.toggle('text-gray-700', !isActive);
                     });
-                })
-                .catch(error => console.error('Erro:', error));
+                }
+            })
+            .catch(error => console.error('Erro:', error));
         }
 
         // Setup dos links de categoria

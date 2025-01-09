@@ -64,25 +64,12 @@
 
     <!-- Lista de Notícias -->
     <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        @forelse($noticias as $noticia)
-        <x-card-item
-            title="{{ $noticia->titulo }}"
-            description="{{ Str::limit($noticia->resumo, 100) }}"
-            image="{{ $noticia->imagem ? asset('storage/noticias/thumbnails/' . $noticia->imagem) : asset('assets/sem_imagem.png') }}"
-            link="{{ route('noticias.show', ['categoria' => $noticia->categoria->slug, 'slug' => $noticia->slug]) }}"
-            linkText="Ler Mais" />
-        @empty
-        <div class="col-span-full flex flex-col items-center justify-center py-12">
-            <i class="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-600">Nenhuma notícia disponível</h3>
-            <p class="text-gray-500 mt-2">No momento não há notícias publicadas nesta categoria.</p>
-        </div>
-        @endforelse
+        @include('noticias._list', ['noticias' => $noticias])
     </div>
 
     <!-- Paginação -->
-    <div class="mt-8">
-        {{ $noticias->links() }}
+    <div id="paginacao-container" class="mt-8">
+        {{ $noticias->links('vendor.pagination.custom') }}
     </div>
 </div>
 
@@ -121,47 +108,35 @@
             showSkeletons();
 
             fetch(currentUrl.toString(), {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
                     const newsContainer = document.getElementById('news-list');
-                    newsContainer.style.opacity = '0';
+                    const paginationContainer = document.querySelector('#paginacao-container');
+                    
+                    newsContainer.innerHTML = data.html;
+                    paginationContainer.innerHTML = data.pagination;
+                    
+                    window.history.pushState({}, '', currentUrl.toString());
 
-                    setTimeout(() => {
-                        newsContainer.innerHTML = data.list;
+                    // Atualiza classes ativas das categorias
+                    document.querySelectorAll('.category-link').forEach(link => {
+                        const categorySlug = link.dataset.category;
+                        const isActive = categorySlug === (currentUrl.searchParams.get('categoria') || '');
 
-                        const cards = newsContainer.querySelectorAll('.recipe-card');
-                        cards.forEach((card, index) => {
-                            card.style.opacity = '0';
-                            card.style.transform = 'translateY(20px)';
-                            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0)';
-                            }, index * 100);
-                        });
-
-                        newsContainer.style.opacity = '1';
-                        document.querySelector('.mt-8').innerHTML = data.pagination;
-                        window.history.pushState({}, '', currentUrl.toString());
-
-                        document.querySelectorAll('.category-link').forEach(link => {
-                            const categorySlug = link.dataset.category;
-                            const isActive = categorySlug === (currentUrl.searchParams.get('categoria') || '');
-
-                            link.classList.toggle('bg-vermelho-asteca', isActive);
-                            link.classList.toggle('text-white', isActive);
-                            link.classList.toggle('bg-gray-100', !isActive);
-                            link.classList.toggle('text-gray-700', !isActive);
-                        });
-                    }, 300);
-                })
-                .catch(error => console.error('Erro:', error));
+                        link.classList.toggle('bg-vermelho-asteca', isActive);
+                        link.classList.toggle('text-white', isActive);
+                        link.classList.toggle('bg-gray-100', !isActive);
+                        link.classList.toggle('text-gray-700', !isActive);
+                    });
+                }
+            })
+            .catch(error => console.error('Erro:', error));
         }
 
         // Setup dos links de categoria

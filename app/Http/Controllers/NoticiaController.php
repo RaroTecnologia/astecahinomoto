@@ -51,10 +51,10 @@ class NoticiaController extends Controller
 
         // Se for uma requisição AJAX, retornar JSON
         if ($request->ajax()) {
-            $view = View::make('noticias._lista', compact('noticias'))->render();
             return response()->json([
-                'list' => $view,
-                'pagination' => $noticias->render()
+                'success' => true,
+                'html' => view('noticias._list', compact('noticias'))->render(),
+                'pagination' => view('vendor.pagination.custom', ['paginator' => $noticias])->render()
             ]);
         }
 
